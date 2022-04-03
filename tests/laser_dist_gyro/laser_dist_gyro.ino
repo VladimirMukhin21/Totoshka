@@ -6,10 +6,17 @@
 VL53L0X sensor;
 MPU6050 mpu;
 
-int16_t ax, ay, az;
-int16_t gx, gy, gz;
+int16_t angle_x, angle_y, angle_z;
+int16_t gravity_x, gravity_y, gravity_z;
 
 Average dist;
+Average angleX;
+Average angleY;
+Average angleZ;
+Average gravityX;
+Average gravityY;
+Average gravityZ;
+
 
 void setup() {
   Wire.begin();
@@ -31,7 +38,6 @@ void setup() {
 void loop() {
   dist.add(sensor.readRangeSingleMillimeters() - 30);
 
-  //delay(1000);
   Serial.print(dist.getAverage());
   Serial.print('\t');
   if (sensor.timeoutOccurred()) {
@@ -43,13 +49,20 @@ void loop() {
     }
   }
 
+  mpu.getMotion6(&angle_x, &angle_y, &angle_z, &gravity_x, &gravity_y, &gravity_z);
+  angleX.add(angle_x);
+  angleY.add(angle_y);
+  angleZ.add(angle_z);
+  gravityX.add(gravity_x);
+  gravityY.add(gravity_y);
+  gravityZ.add(gravity_z);
 
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  Serial.print(ax); Serial.print('\t');
-  Serial.print(ay); Serial.print('\t');
-  Serial.print(az); Serial.print('\t');
-  Serial.print(gx); Serial.print('\t');
-  Serial.print(gy); Serial.print('\t');
-  Serial.println(gz);
+  Serial.print(angleX.getAverage()); Serial.print('\t');
+  Serial.print(angleY.getAverage()); Serial.print('\t');
+  Serial.print(angleZ.getAverage()); Serial.print('\t');
+  Serial.print(gravityX.getAverage()); Serial.print('\t');
+  Serial.print(gravityY.getAverage()); Serial.print('\t');
+  Serial.print(gravityZ.getAverage());
+  Serial.println();
   delay(5);
 }
