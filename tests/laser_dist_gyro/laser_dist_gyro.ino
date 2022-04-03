@@ -1,14 +1,16 @@
 #include <Wire.h>
 #include <VL53L0X.h>
-VL53L0X sensor;
-
 #include <MPU6050.h>
+#include "Average.h"
+
+VL53L0X sensor;
 MPU6050 mpu;
 
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
 
 int dist = 0;
+Average average;
 
 void setup() {
   Wire.begin();
@@ -27,14 +29,10 @@ void setup() {
   delay(1000);
 }
 void loop() {
-for (int i = 0; i <= 10; i++)
-  {
-    dist += sensor.readRangeSingleMillimeters() - 30;
-  }
-  dist = dist / 10;
+  average.add(sensor.readRangeSingleMillimeters() - 30);
 
   //delay(1000);
-  Serial.print(dist);
+  Serial.print(average.getAverage());
   Serial.print('\t');
   if (sensor.timeoutOccurred()) {
     Serial.print(" ТАЙМАУТ");
