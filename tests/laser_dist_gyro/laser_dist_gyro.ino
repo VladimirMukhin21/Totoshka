@@ -9,8 +9,7 @@ MPU6050 mpu;
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
 
-int dist = 0;
-Average average;
+Average dist;
 
 void setup() {
   Wire.begin();
@@ -28,11 +27,12 @@ void setup() {
   Serial.println(mpu.testConnection() ? "MPU6050 OK" : "MPU6050 FAIL");
   delay(1000);
 }
+
 void loop() {
-  average.add(sensor.readRangeSingleMillimeters() - 30);
+  dist.add(sensor.readRangeSingleMillimeters() - 30);
 
   //delay(1000);
-  Serial.print(average.getAverage());
+  Serial.print(dist.getAverage());
   Serial.print('\t');
   if (sensor.timeoutOccurred()) {
     Serial.print(" ТАЙМАУТ");
