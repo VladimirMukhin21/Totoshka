@@ -8,20 +8,30 @@ class Average {
   private:
     #define AVERAGE_ACC_COUNT 10
     int _acc[AVERAGE_ACC_COUNT];
+    int _sum = 0;
+    byte _accumulatedCount = 0;
 };
 
 void Average::add(int value) {
+  _sum -= _acc[0];
+  _sum += value;
+  
+  if (_accumulatedCount < AVERAGE_ACC_COUNT) {
+    _accumulatedCount++;
+  }
+  
   for (byte i = 0; i < AVERAGE_ACC_COUNT - 1; i++) {
     _acc[i] = _acc[i + 1];
   }
+  
   _acc[AVERAGE_ACC_COUNT - 1] = value;
 }
 
 int Average::getAverage() {
-  int sum = 0;
-  for (int i = 0; i < AVERAGE_ACC_COUNT; i++) {
-    sum += _acc[i];
+  if (_accumulatedCount == 0) {
+    return 0;
   }
-  int average = sum / AVERAGE_ACC_COUNT;
+  
+  int average = _sum / _accumulatedCount;
   return average;
 }
