@@ -5,6 +5,9 @@
 #include "Camera.h"
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
+#include "ProgGoStraight.h"
+#include "Average.h"
+#include "Gyro.h"
 
 #define L_EN_PIN  39
 #define L_INA_PIN 41
@@ -33,8 +36,10 @@ Truck truck;
 Hand hand;
 Tail tail;
 Camera camera;
+Gyro gyro;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
+ProgGoStraight progGoStraight;
 unsigned long lastRadioTime = millis();
 
 void setup() {
@@ -44,9 +49,11 @@ void setup() {
   hand.init(HAND_SHOULDER_PIN, HAND_ELBOW_PIN, HAND_ROTATE_PIN, HAND_CLAW_PIN);
   tail.init(TAIL_COCCYX_PIN);
   camera.init(CAMERA_FRONT_PIN);
+  gyro.init();
 
   progStairsUp.init(truck, tail);
   progStairsDown.init(truck, tail);
+  progGoStraight.init(truck, gyro);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -58,6 +65,7 @@ void loop() {
   camera.tick();
   progStairsUp.tick();
   progStairsDown.tick();
+  progGoStraight.tick();
 
   if (!radio.available()) {
     if (millis() - lastRadioTime > 250) {
@@ -129,4 +137,5 @@ void stopAll() {
   tail.stop();
   progStairsUp.stop();
   progStairsDown.stop();
+  progGoStraight.stop();
 }
