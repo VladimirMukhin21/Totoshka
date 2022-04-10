@@ -59,15 +59,6 @@ void setup() {
 }
 
 void loop() {
-  truck.tick();
-  hand.tick();
-  tail.tick();
-  camera.tick();
-  gyro.tick();
-  progStairsUp.tick();
-  progStairsDown.tick();
-  progGoStraight.tick();
-
   if (!radio.available()) {
     if (millis() - lastRadioTime > 250) {
       stopAll();
@@ -86,6 +77,8 @@ void loop() {
     stopAll();
     return;
   }
+
+  tickAll();
 
   if (progStairsUp.isRunning()
       || progStairsDown.isRunning()
@@ -138,11 +131,22 @@ void loop() {
 }
 
 void stopAll() {
-  camera.stop();
   truck.stop();
   hand.stop();
   tail.stop();
+  camera.stop();
   progStairsUp.stop();
   progStairsDown.stop();
   progGoStraight.stop();
+}
+
+void tickAll() {
+  truck.tick();
+  hand.tick();
+  tail.tick();
+  camera.tick();
+  gyro.tick();
+  progStairsUp.tick();
+  progStairsDown.tick();
+  progGoStraight.tick();
 }
