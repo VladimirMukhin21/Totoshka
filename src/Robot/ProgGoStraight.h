@@ -54,7 +54,7 @@ void ProgGoStraight::tick() {
   Serial.println(-200);
   return;*/
 
-  int turn = -_deviation / 1000;
+  int turn = -_deviation / 10000;
   _truck->goAndTurn(_driveSpeed, turn);
 
   /*if (_deviation > 0)
