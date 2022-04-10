@@ -25,14 +25,12 @@ class ProgGoStraight {
     int _course;
 
     bool _isRunning = false;
-
-    int getCourse();
 };
 
 void ProgGoStraight::init(Truck &truck, Gyro &gyro) {
   _truck = &truck;
   _gyro = &gyro;
-  _course = getCourse();
+  _course = _gyro->getCourse();
 }
 
 void ProgGoStraight::start() {
@@ -55,15 +53,15 @@ void ProgGoStraight::tick() {
   switch (_phase) {
     case STARTING:
       // программа стартует => запоминаем курс
-      _course = getCourse();
+      _course = _gyro->getCourse();
       _phase = INIT_DRIVING;
       break;
 
     case INIT_DRIVING:
       // запомнили курс => начинаем движение
-      if (getCourse() > _course)
+      if (_gyro->getCourse() > _course)
         _truck->speedGo(_driveSpeed, _driveSpeed + 30);
-      else if (getCourse() < _course)
+      else if (_gyro->getCourse() < _course)
         _truck->speedGo(_driveSpeed + 30, _driveSpeed);
       else
         _truck->speedGo(_driveSpeed, _driveSpeed);
@@ -78,8 +76,4 @@ void ProgGoStraight::tick() {
 
 bool ProgGoStraight::isRunning() {
   return _isRunning;
-}
-
-int ProgGoStraight::getCourse() {
-  return mpu.getRotationX(); // ------------------------------------
 }
