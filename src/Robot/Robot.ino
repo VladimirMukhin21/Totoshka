@@ -42,6 +42,9 @@ ProgStairsDown progStairsDown;
 ProgGoStraight progGoStraight;
 unsigned long lastRadioTime = millis();
 
+unsigned long changeLedTime = millis();
+bool ledStatus = true;
+
 void setup() {
   Serial.begin(9600);
   radio.initReceiver();
@@ -68,7 +71,7 @@ void loop() {
     return;
   }
 
-  digitalWrite(LED_PIN, LOW);
+  //digitalWrite(LED_PIN, LOW);
   lastRadioTime = millis();
 
   Payload payload = radio.read();
@@ -79,6 +82,12 @@ void loop() {
   }
 
   tickAll();
+
+  if (millis() - changeLedTime >= 500) {
+    changeLedTime = millis();
+    ledStatus = !ledStatus;
+    digitalWrite(LED_PIN, ledStatus);
+  }
 
   if (progStairsUp.isRunning()
       || progStairsDown.isRunning()
