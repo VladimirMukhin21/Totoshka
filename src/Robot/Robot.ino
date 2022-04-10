@@ -105,7 +105,9 @@ void loop() {
     progGoStraight.start();
   }
   else {
-    truck.go(payload.rightStick.vert, payload.rightStick.horiz);
+    if (!progGoStraight.isRunning()) { // добавить лестницу???
+      truck.go(payload.rightStick.vert, payload.rightStick.horiz);
+    }
 
     if (payload.frontSwitch == 1) {
       if (payload.upGreenButton) {
