@@ -17,7 +17,7 @@ class Truck {
     const byte _minStick = 0;
     const byte _maxStick = 255;
     const byte _maxSpeed = 255;
-    const byte _maxTurn = 127;
+    const byte _maxTurn = 255;
 
     Motor _left;
     Motor _right;
