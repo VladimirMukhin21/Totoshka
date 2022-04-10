@@ -87,15 +87,13 @@ void loop() {
     return;
   }
 
-  if (progStairsUp.isRunning() || progStairsDown.isRunning()) {
+  if (progStairsUp.isRunning()
+      || progStairsDown.isRunning()
+      || progGoStraight.isRunning()) {
     return;
   }
 
-  if (payload.upBlueButton) {
-    camera.operate(payload.leftStick.vert);
-  }
-
-  else if (payload.frontYellowButton) {
+  if (payload.frontYellowButton) {
     progStairsUp.start();
   }
   else if (payload.frontWhiteButton) {
@@ -105,11 +103,22 @@ void loop() {
     progGoStraight.start();
   }
   else {
-    if (!progGoStraight.isRunning()) { // добавить лестницу???
-      truck.go(payload.rightStick.vert, payload.rightStick.horiz);
+    truck.go(payload.rightStick.vert, payload.rightStick.horiz);
+
+    if (payload.upBlueButton) {
+      camera.operate(payload.leftStick.vert);
+      return;
     }
 
-    if (payload.frontSwitch == 1) {
+    if (payload.frontSwitch == 0) {
+      if (payload.upGreenButton) {
+        hand.upHand();
+      }
+      else {
+        hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1); // altMode
+      }
+    }
+    else if (payload.frontSwitch == 1) {
       if (payload.upGreenButton) {
         hand.upHand();
       }
@@ -123,14 +132,6 @@ void loop() {
       }
       else {
         tail.operate(payload.leftStick.vert);
-      }
-    }
-    else {
-      if (payload.upGreenButton) {
-        hand.upHand();
-      }
-      else {
-        hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1);
       }
     }
   }
