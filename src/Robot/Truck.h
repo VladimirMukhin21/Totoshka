@@ -6,6 +6,7 @@ class Truck {
   public:
     void init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin);
     void go(byte stickVert, byte stickHoriz);
+    void goAndTurn(int speed, int turn);
     void speedGo(int speedLeft, int speedRight);
     void autoGo(int speedLeft, int speedRight, int msec);
     void stop();
@@ -66,6 +67,10 @@ void Truck::go(byte stickVert, byte stickHoriz) {
   // speed = 0 & turn < 0 => разворот налево на месте
   // speed < 0 & turn < 0 => едем назад и подворачиваем влево
 
+  goAndTurn(speed, turn);
+}
+
+void Truck::goAndTurn(int speed, int turn) {
   speed = constrain(speed, -_maxSpeed, _maxSpeed);
   turn = constrain(turn, -_maxTurn, _maxTurn);
 
