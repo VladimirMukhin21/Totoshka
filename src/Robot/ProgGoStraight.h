@@ -15,7 +15,7 @@ class ProgGoStraight {
 
     Truck* _truck;
     Gyro* _gyro;
-    int _course;
+    long _deviation = 0;
 
     bool _isRunning = false;
 };
@@ -23,12 +23,11 @@ class ProgGoStraight {
 void ProgGoStraight::init(Truck &truck, Gyro &gyro) {
   _truck = &truck;
   _gyro = &gyro;
-  _course = _gyro->getCourse();
 }
 
 void ProgGoStraight::start() {
   if (!_isRunning) {
-    _course = _gyro->getCourse();
+    _deviation = 0;
     _isRunning = true;
   }
 }
@@ -43,10 +42,12 @@ void ProgGoStraight::tick() {
     return;
   }
 
+  _deviation += _gyro->getCourse();
+
   // запомнили курс => начинаем движение
-  if (_gyro->getCourse() > _course)
+  if (_deviation > 0)
     _truck->speedGo(_driveSpeed, _driveSpeed + 30);
-  else if (_gyro->getCourse() < _course)
+  else if (_deviation < 0)
     _truck->speedGo(_driveSpeed + 30, _driveSpeed);
   else
     _truck->speedGo(_driveSpeed, _driveSpeed);
