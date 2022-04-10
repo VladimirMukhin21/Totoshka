@@ -32,6 +32,8 @@ class Gyro {
 void Gyro::init() {
   Wire.begin();
   _mpu.initialize();
+  //_mpu.CalibrateAccel(6);
+  //_mpu.CalibrateGyro(6);
 }
 
 int Gyro::getCourse() {
