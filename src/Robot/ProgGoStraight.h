@@ -11,17 +11,10 @@ class ProgGoStraight {
     bool isRunning();
 
   private:
-    enum Phase {
-      STARTING,
-      INIT_DRIVING,
-      STOPPING
-    };
-
     const int _driveSpeed = 150;
 
     Truck* _truck;
     Gyro* _gyro;
-    Phase _phase;
     int _course;
 
     bool _isRunning = false;
@@ -35,7 +28,7 @@ void ProgGoStraight::init(Truck &truck, Gyro &gyro) {
 
 void ProgGoStraight::start() {
   if (!_isRunning) {
-    _phase = STARTING;
+    _course = _gyro->getCourse();
     _isRunning = true;
   }
 }
@@ -50,28 +43,13 @@ void ProgGoStraight::tick() {
     return;
   }
 
-  switch (_phase) {
-    case STARTING:
-      // программа стартует => запоминаем курс
-      _course = _gyro->getCourse();
-      _phase = INIT_DRIVING;
-      break;
-
-    case INIT_DRIVING:
-      // запомнили курс => начинаем движение
-      if (_gyro->getCourse() > _course)
-        _truck->speedGo(_driveSpeed, _driveSpeed + 30);
-      else if (_gyro->getCourse() < _course)
-        _truck->speedGo(_driveSpeed + 30, _driveSpeed);
-      else
-        _truck->speedGo(_driveSpeed, _driveSpeed);
-
-      _phase = INIT_DRIVING;
-
-    case STOPPING:
-      stop();
-      break;
-  }
+  // запомнили курс => начинаем движение
+  if (_gyro->getCourse() > _course)
+    _truck->speedGo(_driveSpeed, _driveSpeed + 30);
+  else if (_gyro->getCourse() < _course)
+    _truck->speedGo(_driveSpeed + 30, _driveSpeed);
+  else
+    _truck->speedGo(_driveSpeed, _driveSpeed);
 }
 
 bool ProgGoStraight::isRunning() {

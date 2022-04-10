@@ -11,6 +11,7 @@ class Gyro {
     int getCourse();
     int getRoll();
     int getPitch();
+    void tick();
 
   private:
     MPU6050 _mpu;
@@ -34,7 +35,7 @@ void Gyro::init() {
 }
 
 int Gyro::getCourse() {
-  return _mpu.getRotationX();
+  return _mpu.getRotationZ();
 }
 
 int Gyro::getRoll() {
@@ -42,7 +43,21 @@ int Gyro::getRoll() {
 }
 
 int Gyro::getPitch() {
-  return _mpu.getRotationZ();
+  return _mpu.getRotationX();
+}
+
+void Gyro::tick() {
+  /*int ax, ay, az, gx, gy, gz, mx, my, mz;
+  _mpu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
+  Serial.print(gy);
+  Serial.print("\t");
+  Serial.print(_mpu.getRotationY());
+  Serial.print("\t");
+  //Serial.print(az);
+  //Serial.print("\t");
+  Serial.print(20000);
+  Serial.print("\t");
+  Serial.println(-20000);*/
 }
 
 /*byte Gyro::filterDeadZone(byte value) {
@@ -50,4 +65,4 @@ int Gyro::getPitch() {
     return 0;
   else
     return value;
-}*/
+  }*/

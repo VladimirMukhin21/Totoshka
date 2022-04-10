@@ -63,6 +63,7 @@ void loop() {
   hand.tick();
   tail.tick();
   camera.tick();
+  gyro.tick();
   progStairsUp.tick();
   progStairsDown.tick();
   progGoStraight.tick();
@@ -99,6 +100,9 @@ void loop() {
   }
   else if (payload.frontWhiteButton) {
     progStairsDown.start();
+  }
+  else if (payload.frontBlackButton) {
+    progGoStraight.start();
   }
   else {
     truck.go(payload.rightStick.vert, payload.rightStick.horiz);
