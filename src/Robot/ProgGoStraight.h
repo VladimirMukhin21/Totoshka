@@ -42,27 +42,10 @@ void ProgGoStraight::tick() {
     return;
   }
 
-  int c = _gyro->getCourse();
-  _deviation += c;
-
-  /*Serial.print(_deviation);
-  Serial.print("\t");
-  Serial.print(c);
-  Serial.print("\t");
-  Serial.print(200);
-  Serial.print("\t");
-  Serial.println(-200);
-  return;*/
+  _deviation += _gyro->getCourse();
 
   int turn = -_deviation / 10000;
   _truck->goAndTurn(_driveSpeed, turn);
-
-  /*if (_deviation > 0)
-    _truck->goAndTurn(_driveSpeed, turn);
-  else if (_deviation < 0)
-    _truck->goAndTurn(_driveSpeed, -turn);
-  else
-    _truck->goAndTurn(_driveSpeed, 0);*/
 }
 
 bool ProgGoStraight::isRunning() {
