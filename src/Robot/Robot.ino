@@ -2,7 +2,7 @@
 #include "Truck.h"
 #include "Hand.h"
 #include "Tail.h"
-#include "Camera.h"
+#include "Video.h"
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
 #include "ProgGoStraight.h"
@@ -27,7 +27,9 @@
 
 #define TAIL_COCCYX_PIN 10
 
+#define CAMERA_SWITCHER_PIN 3
 #define CAMERA_FRONT_PIN 12
+#define CAMERA_TOP_PIN 6
 
 #define LED_PIN 13
 
@@ -35,7 +37,7 @@ Radio radio;
 Truck truck;
 Hand hand;
 Tail tail;
-Camera camera;
+Video video;
 Gyro gyro;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
@@ -51,7 +53,7 @@ void setup() {
   truck.init(L_EN_PIN, L_INA_PIN, L_INB_PIN, L_PWM_PIN, R_EN_PIN, R_INA_PIN, R_INB_PIN, R_PWM_PIN);
   hand.init(HAND_SHOULDER_PIN, HAND_ELBOW_PIN, HAND_ROTATE_PIN, HAND_CLAW_PIN);
   tail.init(TAIL_COCCYX_PIN);
-  camera.init(CAMERA_FRONT_PIN);
+  video.init(CAMERA_SWITCHER_PIN, CAMERA_FRONT_PIN, CAMERA_TOP_PIN);
   gyro.init();
 
   progStairsUp.init(truck, tail);
@@ -89,6 +91,8 @@ void loop() {
     digitalWrite(LED_PIN, ledStatus);
   }
 
+  video.setActiveCamera(payload.frontBlackButtonSwitch);
+
   if (progStairsUp.isRunning()
       || progStairsDown.isRunning()
       /*|| progGoStraight.isRunning()*/) {
@@ -108,7 +112,7 @@ void loop() {
     truck.go(payload.rightStick.vert, payload.rightStick.horiz);
 
     if (payload.upBlueButton) {
-      camera.operate(payload.leftStick.vert);
+      video.moveCamera(payload.leftStick.vert);
       return;
     }
 
@@ -143,7 +147,7 @@ void stopAll() {
   truck.stop();
   hand.stop();
   tail.stop();
-  camera.stop();
+  video.stop();
   progStairsUp.stop();
   progStairsDown.stop();
   //progGoStraight.stop();
@@ -153,7 +157,7 @@ void tickAll() {
   truck.tick();
   hand.tick();
   tail.tick();
-  camera.tick();
+  video.tick();
   gyro.tick();
   progStairsUp.tick();
   progStairsDown.tick();

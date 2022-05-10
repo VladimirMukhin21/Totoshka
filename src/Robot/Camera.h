@@ -5,7 +5,7 @@
 
 class Camera {
   public:
-    void init(byte cameraPin);
+    void init(byte servoPin, int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
     void operate(byte stickVert);
     void moveTo(int deg);
     void toInitialPos();
@@ -18,9 +18,8 @@ class Camera {
     const byte _maxStick = 0;
     const byte _maxSpeed = 5;
 
-    Servo _camera;
-
-    Angle _cameraAngle = Angle(0, 0, 180, 25);
+    Servo _servo;
+    Angle _direction;
 
     //#define DEBUG
 #ifdef DEBUG
@@ -34,9 +33,10 @@ class Camera {
     byte filterStickDeadZone(byte value);
 };
 
-void Camera::init(byte cameraPin) {
-  _camera.attach(cameraPin);
-  _camera.write(_cameraAngle.toDeg());
+void Camera::init(byte servoPin, int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100) {
+  _direction.init(startDeg, minDeg, maxDeg, countPointsInDeg);
+  _servo.attach(servoPin);
+  _servo.write(_direction.toDeg());
 }
 
 void Camera::operate(byte stickVert) {
@@ -44,8 +44,8 @@ void Camera::operate(byte stickVert) {
   if (speedVert != 0) {
     _isRunning = false;
 
-    _cameraAngle.addPoints(speedVert);
-    _camera.write(_cameraAngle.toDeg());
+    _direction.addPoints(speedVert);
+    _servo.write(_direction.toDeg());
   }
 
 #ifdef DEBUG
@@ -54,7 +54,7 @@ void Camera::operate(byte stickVert) {
     Serial.print("stick = ");
     Serial.print(stickVert);
     Serial.print("\tangle = ");
-    Serial.print(_cameraAngle.toDeg());
+    Serial.print(_direction.toDeg());
     Serial.print("\tspeed = ");
     Serial.print(speedVert);
     Serial.println();
@@ -83,14 +83,14 @@ void Camera::tick() {
   if (millis() - _tickTime >= 1) {
     _tickTime = millis();
 
-    int delta = _cameraAngle.toDeg() - _targetDeg;
+    int delta = _direction.toDeg() - _targetDeg;
     if (delta > 1) {
-      _cameraAngle.addPoints(-5);
-      _camera.write(_cameraAngle.toDeg());
+      _direction.addPoints(-5);
+      _servo.write(_direction.toDeg());
     }
     else if (delta < -1) {
-      _cameraAngle.addPoints(5);
-      _camera.write(_cameraAngle.toDeg());
+      _direction.addPoints(5);
+      _servo.write(_direction.toDeg());
     }
     else {
       _isRunning = false;
