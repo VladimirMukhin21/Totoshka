@@ -39,7 +39,7 @@ Camera camera;
 Gyro gyro;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
-ProgGoStraight progGoStraight;
+//ProgGoStraight progGoStraight;
 unsigned long lastRadioTime = millis();
 
 unsigned long changeLedTime = millis();
@@ -56,7 +56,7 @@ void setup() {
 
   progStairsUp.init(truck, tail);
   progStairsDown.init(truck, tail);
-  progGoStraight.init(truck, gyro);
+  //progGoStraight.init(truck, gyro);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -91,7 +91,7 @@ void loop() {
 
   if (progStairsUp.isRunning()
       || progStairsDown.isRunning()
-      || progGoStraight.isRunning()) {
+      /*|| progGoStraight.isRunning()*/) {
     return;
   }
 
@@ -101,9 +101,9 @@ void loop() {
   else if (payload.frontWhiteButton) {
     progStairsDown.start();
   }
-  else if (payload.frontBlackButton) {
+  /*else if (payload.frontBlackButton) {
     progGoStraight.start();
-  }
+  }*/
   else {
     truck.go(payload.rightStick.vert, payload.rightStick.horiz);
 
@@ -146,7 +146,7 @@ void stopAll() {
   camera.stop();
   progStairsUp.stop();
   progStairsDown.stop();
-  progGoStraight.stop();
+  //progGoStraight.stop();
 }
 
 void tickAll() {
@@ -157,5 +157,5 @@ void tickAll() {
   gyro.tick();
   progStairsUp.tick();
   progStairsDown.tick();
-  progGoStraight.tick();
+  //progGoStraight.tick();
 }
