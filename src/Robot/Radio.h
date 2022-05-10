@@ -19,7 +19,7 @@ struct Payload {
   bool frontRedButton: 1;
   bool frontYellowButton: 1;
   bool frontWhiteButton: 1;
-  bool frontBlackButton: 1;
+  byte frontBlackButtonSwitch: 2;
 
   bool upGreenButton: 1;
   bool upBlueButton: 1;
@@ -127,6 +127,9 @@ void Radio::debugPrint(Payload payload) {
       Serial.print("\trsP = ");
       Serial.print(payload.rightStick.pressed);*/
 
+    Serial.print("\tfrontSwitch = ");
+    Serial.print(payload.frontSwitch);
+
     Serial.print("\tredB = ");
     Serial.print(payload.frontRedButton);
     Serial.print("\tyellowB = ");
@@ -134,10 +137,7 @@ void Radio::debugPrint(Payload payload) {
     Serial.print("\twhiteB = ");
     Serial.print(payload.frontWhiteButton);
     Serial.print("\tblackB = ");
-    Serial.print(payload.frontBlackButton);
-
-    Serial.print("\tfrontSwitch = ");
-    Serial.print(payload.frontSwitch);
+    Serial.print(payload.frontBlackButtonSwitch);
 
     Serial.println();
   }
