@@ -32,10 +32,10 @@ void Video::setActiveCamera(byte activeCam) {
   _activeCam = activeCam;
   switch (_activeCam) {
     case 0:
-      analogWrite(_switcherPin, 0);
+      analogWrite(_switcherPin, 127);
       break;
     case 1:
-      analogWrite(_switcherPin, 127);
+      analogWrite(_switcherPin, 0);
       break;
   }
 }
