@@ -26,10 +26,10 @@ class ProgStairsUp {
     const byte _stairsCount = 5;
     const byte _tailUpDeg = 125;
     const byte _tailDownDeg = 15;
-    const int _driveSpeed = 150;
-    const int _driveToStairsTime = 1000;
-    const int _bowUpTime = 1000;
-    const int _sternUpTime = 500;
+    const int _driveSpeed = 180;
+    const int _driveToStairsTime = 1400; //1000
+    const int _bowUpTime = 1400; // 1000
+    const int _sternUpTime = 900; // 500
     const int _finishDriveTime = 150;
 
     Truck* _truck;
