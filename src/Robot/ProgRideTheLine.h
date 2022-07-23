@@ -52,7 +52,7 @@ void ProgRideTheLine::tick() {
   }
   int l = _color->getLeft();
   int r = _color->getRight();
-  int turn = (r - l) * _coef;
+  int turn = (l - r) * _coef;
   _truck->goAndTurn(_driveSpeed, turn);
   /*Serial.print(l);
   Serial.print("\t");
