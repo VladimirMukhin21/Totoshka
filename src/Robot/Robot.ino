@@ -6,7 +6,9 @@
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
 #include "ProgGoStraight.h"
+#include "ProgRideTheLine.h"
 #include "Average.h"
+#include "Color.h"
 //#include "Gyro.h"
 
 #define L_EN_PIN  39
@@ -38,10 +40,13 @@ Truck truck;
 Hand hand;
 Tail tail;
 Video video;
+Color color;
 //Gyro gyro;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
 //ProgGoStraight progGoStraight;
+ProgRideTheLine progRideTheLine;
+
 unsigned long lastRadioTime = millis();
 
 unsigned long changeLedTime = millis();
@@ -54,11 +59,13 @@ void setup() {
   hand.init(HAND_SHOULDER_PIN, HAND_ELBOW_PIN, HAND_ROTATE_PIN, HAND_CLAW_PIN);
   tail.init(TAIL_COCCYX_PIN);
   video.init(CAMERA_SWITCHER_PIN, CAMERA_FRONT_PIN, CAMERA_TOP_PIN);
+  color.init();
   //gyro.init();
 
   progStairsUp.init(truck, tail);
   progStairsDown.init(truck, tail);
   //progGoStraight.init(truck, gyro);
+  progRideTheLine.init(truck, hand, color);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -85,6 +92,7 @@ void loop() {
 
   tickAll();
 
+  // мигаем светодиодом если не подвисли
   if (millis() - changeLedTime >= 500) {
     changeLedTime = millis();
     ledStatus = !ledStatus;
@@ -93,9 +101,8 @@ void loop() {
 
   video.setActiveCamera(payload.frontBlackButtonSwitch);
 
-  if (progStairsUp.isRunning()
-      || progStairsDown.isRunning()
-      /*|| progGoStraight.isRunning()*/) {
+  // если какая-то программа запущена, то роботом не управляем с пульта
+  if (isAnyProgRunning()) {
     return;
   }
 
@@ -103,7 +110,8 @@ void loop() {
     progStairsUp.start();
   }
   else if (payload.frontWhiteButton) {
-    progStairsDown.start();
+    //progStairsDown.start();
+    progRideTheLine.start();
   }
   /*else if (payload.frontBlackButton) {
     progGoStraight.start();
@@ -143,6 +151,13 @@ void loop() {
   }
 }
 
+bool isAnyProgRunning() {
+  return progStairsUp.isRunning()
+         || progStairsDown.isRunning()
+         /*|| progGoStraight.isRunning()*/
+         || progRideTheLine.isRunning();
+}
+
 void stopAll() {
   truck.stop();
   hand.stop();
@@ -150,6 +165,7 @@ void stopAll() {
   video.stop();
   progStairsUp.stop();
   progStairsDown.stop();
+  progRideTheLine.stop();
   //progGoStraight.stop();
 }
 
@@ -158,8 +174,10 @@ void tickAll() {
   hand.tick();
   tail.tick();
   video.tick();
+  //color.tick();
   //gyro.tick();
   progStairsUp.tick();
   progStairsDown.tick();
+  progRideTheLine.tick();
   //progGoStraight.tick();
 }
