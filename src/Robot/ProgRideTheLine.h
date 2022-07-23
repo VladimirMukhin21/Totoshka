@@ -36,6 +36,7 @@ void ProgRideTheLine::init(Truck &truck, Hand &hand, Color &color) {
 void ProgRideTheLine::start() {
   if (!_isRunning) {
     //_hand->
+    _color->enable();
     _isRunning = true;
   }
 }
@@ -44,6 +45,7 @@ void ProgRideTheLine::stop() {
   _truck->stop();
   _hand->stop();
   _isRunning = false;
+  _color->disable();
 }
 
 void ProgRideTheLine::tick() {
