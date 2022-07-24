@@ -6,7 +6,7 @@ class Motor {
     void go(int speed);
     void stop();
   private:
-    const byte _minSpeed = 35;
+    const byte _minSpeed = 0;
     const byte _maxSpeed = 255;
 
     byte _enPin;

@@ -22,6 +22,10 @@ class Truck {
     Motor _left;
     Motor _right;
 
+    /*#ifdef DEBUG
+    unsigned long _printTime = millis();
+    #endif*/
+
     unsigned long _tickTime = millis();
 
     int _targetSpeedLeft;
@@ -38,19 +42,21 @@ void Truck::init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEn
 }
 
 void Truck::go(byte stickVert, byte stickHoriz) {
-  int speed = map(stickVert, _minStick, _maxStick, -_maxSpeed, _maxSpeed);
-  int turn = map(stickHoriz, _minStick, _maxStick, -_maxTurn, _maxTurn);
+  stickVert = filterStickDeadZone(stickVert);
+  stickHoriz = filterStickDeadZone(stickHoriz);
+  int speed = map(stickVert, _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+  int turn = map(stickHoriz, _minStick, _maxStick + 1, -_maxTurn, _maxTurn + 1);
 
   /*#ifdef DEBUG
-    if (millis() - _printTime >= 1000) {
-      _printTime = millis();
+  if (millis() - _printTime >= 1000) {
+    _printTime = millis();
 
-      Serial.print(speedPos);
-      Serial.print("\t");
-      Serial.print(speedValue);
-      Serial.println();
-    }
-    #endif*/
+    Serial.print(speed);
+    Serial.print("\t");
+    Serial.print(turn);
+    Serial.println();
+  }
+  #endif*/
 
   // -_maxSpeed <= speed <= _maxSpeed
   // -_maxTurn <= turn <= _maxTurn
