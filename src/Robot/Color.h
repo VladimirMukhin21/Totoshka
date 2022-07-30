@@ -37,7 +37,7 @@ int Color::getLeft() {
 int Color::getRight() {
   uint16_t r, g, b, c;
   tcsr.getRawData(&r, &g, &b, &c);
-  return int((double)c * 1.55);
+  return int((double)c * 1.75);
 }
 
 void Color::tick() {
