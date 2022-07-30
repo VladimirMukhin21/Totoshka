@@ -174,7 +174,6 @@ void tickAll() {
   hand.tick();
   tail.tick();
   video.tick();
-  //color.tick();
   //gyro.tick();
   progStairsUp.tick();
   progStairsDown.tick();

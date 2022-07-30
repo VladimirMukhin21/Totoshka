@@ -11,7 +11,6 @@
 class Color {
   public:
     void init();
-    void tick();
     void enable();
     void disable();
 
@@ -34,24 +33,17 @@ int Color::getLeft() {
   tcsl.getRawData(&r, &g, &b, &c);
   return c;
 }
+
 int Color::getRight() {
   uint16_t r, g, b, c;
   tcsr.getRawData(&r, &g, &b, &c);
   return int((double)c * 1.75);
 }
 
-void Color::tick() {
-
-}
-
 void Color::enable() {
-  //tcsl.enable();
-  //tcsr.enable();
   digitalWrite(COLOR_LED_PIN, HIGH);
 }
 
 void Color::disable() {
-  //tcsl.disable();
-  //tcsr.disable();
   digitalWrite(COLOR_LED_PIN, LOW);
 }
