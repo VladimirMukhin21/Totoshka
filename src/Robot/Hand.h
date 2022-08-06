@@ -17,7 +17,7 @@ class Hand {
     const byte _maxSpeed = 5;
     const byte _rotateCenterPos = 90;
     const byte _elbowUpHandPos = 105;
-    //const byte _shoulderThr = 50;
+    const byte _shoulderThr = 50;
 
     Servo _shoulder;
     Servo _elbow;
@@ -54,57 +54,57 @@ void Hand::init(byte shoulderPin, byte elbowPin, byte rotatePin, byte clawPin) {
 }
 
 void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
-  /*if(_shoulderAngle.toPoints() > shoulderThr * 100){
-    constrain(_elbowAngle.toDeg() ,0 ,_elbowUpHandPos)
-  }*/
+  /*if(_shoulderAngle.toDeg() > shoulderThr){
+    constrain(_elbowAngle.toDeg() ,0 ,_elbowUpHandPos);
+    }*/
 
   if (altMode) {
-      int speedVert = map(filterStickDeadZone(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
-      if (speedVert != 0) {
-        _elbowAngle.addPoints(speedVert);
-        _elbow.write(_elbowAngle.toDeg());
-        _upHandMode = false;
-      }
-
-      int speedHoriz = map(filterStickDeadZone(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
-      if (speedHoriz != 0) {
-        _rotateAngle.addPoints(speedHoriz);
-        _rotate.write(_rotateAngle.toDeg());
-        _upHandMode = false;
-      }
+    int speedVert = map(filterStickDeadZone(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    if (speedVert != 0) {
+      _elbowAngle.addPoints(speedVert);
+      _elbow.write(_elbowAngle.toDeg());
+      _upHandMode = false;
     }
-    else {
-      int speedVert = map(filterStickDeadZone(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
-      if (speedVert != 0) {
-        _shoulderAngle.addPoints(-speedVert);
-        _shoulder.write(_shoulderAngle.toDeg());
 
-        _elbowAngle.addPoints(-speedVert);
-        _elbow.write(_elbowAngle.toDeg());
-
-        _upHandMode = false;
-      }
-
-      int speedHoriz = map(filterStickDeadZone(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
-      if (speedHoriz != 0) {
-        _clawAngle.addPoints(-speedHoriz);
-        _claw.write(_clawAngle.toDeg());
-        _upHandMode = false;
-      }
-
-      /*#ifdef DEBUG
-          if (millis() - _printTime >= 1000) {
-            _printTime = millis();
-            Serial.print("stick = ");
-            Serial.print(stickHoriz);
-            Serial.print("\tangle = ");
-            Serial.print(_elbowAngle.toDeg());
-            Serial.print("\tspeed = ");
-            Serial.print(speedHoriz);
-            Serial.println();
-          }
-        #endif*/
+    int speedHoriz = map(filterStickDeadZone(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    if (speedHoriz != 0) {
+      _rotateAngle.addPoints(speedHoriz);
+      _rotate.write(_rotateAngle.toDeg());
+      _upHandMode = false;
     }
+  }
+  else {
+    int speedVert = map(filterStickDeadZone(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    if (speedVert != 0) {
+      _shoulderAngle.addPoints(-speedVert);
+      _shoulder.write(_shoulderAngle.toDeg());
+
+      _elbowAngle.addPoints(-speedVert);
+      _elbow.write(_elbowAngle.toDeg());
+
+      _upHandMode = false;
+    }
+
+    int speedHoriz = map(filterStickDeadZone(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    if (speedHoriz != 0) {
+      _clawAngle.addPoints(-speedHoriz);
+      _claw.write(_clawAngle.toDeg());
+      _upHandMode = false;
+    }
+
+    /*#ifdef DEBUG
+        if (millis() - _printTime >= 1000) {
+          _printTime = millis();
+          Serial.print("stick = ");
+          Serial.print(stickHoriz);
+          Serial.print("\tangle = ");
+          Serial.print(_elbowAngle.toDeg());
+          Serial.print("\tspeed = ");
+          Serial.print(speedHoriz);
+          Serial.println();
+        }
+      #endif*/
+  }
 }
 
 void Hand::upHand() {
@@ -116,6 +116,9 @@ void Hand::stop() {
 }
 
 void Hand::tick() {
+  _elbowAngle.setMinMax(0, constrain(0.75 * _shoulderAngle.toDeg() + 82.5, _elbowUpHandPos, 120));
+
+
   if (!_upHandMode) {
     return;
   }

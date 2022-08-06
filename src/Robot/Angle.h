@@ -6,6 +6,7 @@ class Angle {
     Angle(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
 
     void init(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
+    void setMinMax(int minDeg, int maxDeg);
     
     int toDeg();
     int toPoints();
@@ -33,6 +34,11 @@ Angle::Angle() {
 void Angle::init(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100) {
   _multiplier = countPointsInDeg;
   _points = startDeg * _multiplier;
+  _minPoints = minDeg * _multiplier;
+  _maxPoints = maxDeg * _multiplier;
+}
+
+void Angle::setMinMax(int minDeg, int maxDeg) {
   _minPoints = minDeg * _multiplier;
   _maxPoints = maxDeg * _multiplier;
 }
