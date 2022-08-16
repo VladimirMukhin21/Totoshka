@@ -20,7 +20,7 @@ class Tail {
 
     Servo _coccyx;
 
-    Angle _coccyxAngle = Angle(138, 15, 138, 80);
+    Angle _coccyxAngle = Angle(140, 15, 140, 80);
 
     //#define DEBUG
 #ifdef DEBUG

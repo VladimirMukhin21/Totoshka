@@ -16,7 +16,7 @@ class Hand {
     const byte _maxStick = 255;
     const byte _maxSpeed = 5;
     const byte _rotateCenterPos = 90;
-    const byte _elbowUpHandPos = 105;
+    const byte _elbowUpHandPos = 108;
     const byte _shoulderThr = 50;
 
     Servo _shoulder;
@@ -24,7 +24,7 @@ class Hand {
     Servo _rotate;
     Servo _claw;
 
-    Angle _shoulderAngle = Angle(154, 31, 154, 100); // 38
+    Angle _shoulderAngle = Angle(154, 30, 154, 100); // 38
     Angle _elbowAngle = Angle(120, 0, 120, 100);
     Angle _rotateAngle = Angle(_rotateCenterPos, 0, 180, 30);
     Angle _clawAngle = Angle(90, 58, 180, 50); // 56
