@@ -13,3 +13,4 @@
 * `\libraries\Adafruit_TCS34725_SoftI2C` - датчик цвета. [Источник](https://github.com/Fire7/Adafruit_TCS34725_SoftI2C), добавлена поддержка нашего типа датчика (метод begin, датчик 0x4D).
 * `\libraries\SoftwareWire` - программный i2c. Нужен для работы с двумя датчиками цвета, т.к. в них нельзя изменить адрес на шине i2c. [Источник](https://github.com/Fire7/SoftwareWire).
 * `\libraries\EncButton` - лёгкая и функциональная библиотека для энкодера, энкодера с кнопкой или просто кнопки с Arduino ([источник](https://github.com/GyverLibs/EncButton)).
+* `\libraries\GyverPID` - PID регулятор ([источник](https://github.com/GyverLibs/GyverPID)).
