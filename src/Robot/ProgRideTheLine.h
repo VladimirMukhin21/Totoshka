@@ -13,8 +13,8 @@ class ProgRideTheLine {
     bool isRunning();
 
   private:
-    const int _driveSpeed = 40;
-    GyverPID _pid = GyverPID(2.7, 0.2, 0.15, 100);
+    const int _driveSpeed = 40; // 70
+    GyverPID _pid = GyverPID(2.7, 0.2, 0.15, 100); // 4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
 
     Truck* _truck;
     Hand* _hand;
