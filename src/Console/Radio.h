@@ -7,22 +7,22 @@
 struct Stick {
   byte vert;
   byte horiz;
-  bool pressed: 1;
+  bool pressed; //: 1;
 };
 
 struct Payload {
   Stick leftStick;
   Stick rightStick;
 
-  byte frontSwitch: 2;
+  byte frontSwitch; //: 2;
 
-  bool frontRedButton: 1;
-  bool frontYellowButton: 1;
-  bool frontWhiteButton: 1;
-  byte frontBlackButtonSwitch: 2;
+  bool frontRedButton; //: 1;
+  bool frontYellowButton; //: 1;
+  bool frontWhiteButton; //: 1;
+  byte frontBlackButtonSwitch; //: 2;
 
-  bool upGreenButton: 1;
-  bool upBlueButton: 1;
+  bool upGreenButton; //: 1;
+  bool upBlueButton; //: 1;
 };
 
 class Radio {
@@ -113,21 +113,7 @@ void Radio::debugPrint(Payload payload) {
   if (millis() - _printTime >= 10) {
     _printTime = millis();
 
-    /*Serial.print("\tlsV = ");
-      Serial.print(payload.leftStick.vert);
-      Serial.print("\tlsH = ");
-      Serial.print(payload.leftStick.horiz);
-      Serial.print("\tlsP = ");
-      Serial.print(payload.leftStick.pressed);
-
-      Serial.print("\trsV = ");
-      Serial.print(payload.rightStick.vert);
-      Serial.print("\trsH = ");
-      Serial.print(payload.rightStick.horiz);
-      Serial.print("\trsP = ");
-      Serial.print(payload.rightStick.pressed);*/
-
-    Serial.print("\tfrontSwitch = ");
+    /*Serial.print("\tfrontSwitch = ");
     Serial.print(payload.frontSwitch);
 
     Serial.print("\tredB = ");
@@ -139,7 +125,7 @@ void Radio::debugPrint(Payload payload) {
     Serial.print("\tblackB = ");
     Serial.print(payload.frontBlackButtonSwitch);
 
-    Serial.println();
+    Serial.println();*/
   }
 }
 #endif

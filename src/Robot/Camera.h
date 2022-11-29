@@ -48,7 +48,7 @@ void Camera::operate(byte stickVert) {
     _servo.write(_direction.toDeg());
   }
 
-#ifdef DEBUG
+/*#ifdef DEBUG
   if (millis() - _printTime >= 1000) {
     _printTime = millis();
     Serial.print("stick = ");
@@ -59,7 +59,7 @@ void Camera::operate(byte stickVert) {
     Serial.print(speedVert);
     Serial.println();
   }
-#endif
+#endif*/
 }
 
 void Camera::moveTo(int deg) {

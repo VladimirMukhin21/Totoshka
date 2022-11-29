@@ -21,7 +21,14 @@
 #define PIN_UP_GREEN_BUTTON 31
 
 Radio radio;
+
+EncButton<EB_TICK, PIN_FRONT_RED_BUTTON> redButton;
+EncButton<EB_TICK, PIN_FRONT_YELLOW_BUTTON> yellowButton;
+EncButton<EB_TICK, PIN_FRONT_WHITE_BUTTON> whiteButton;
 EncButton<EB_TICK, PIN_FRONT_BLACK_BUTTON> blackButton;
+
+EncButton<EB_TICK, PIN_UP_GREEN_BUTTON> greenButton;
+
 byte blackButtonPos = 0;
 
 void setup() {
@@ -43,7 +50,12 @@ void setup() {
 }
 
 void loop() {
+  redButton.tick();
+  yellowButton.tick();
+  whiteButton.tick();
   blackButton.tick();
+  
+  greenButton.tick();
   
   Payload payload;
 
@@ -57,13 +69,13 @@ void loop() {
 
   payload.frontSwitch = mapSwitch3Pos(!digitalRead(PIN_FRONT_SWITCH_UP), !digitalRead(PIN_FRONT_SWITCH_DOWN));
 
-  payload.frontRedButton = !digitalRead(PIN_FRONT_RED_BUTTON);
-  payload.frontYellowButton = !digitalRead(PIN_FRONT_YELLOW_BUTTON);
-  payload.frontWhiteButton = !digitalRead(PIN_FRONT_WHITE_BUTTON);
+  payload.frontRedButton = redButton.press();
+  payload.frontYellowButton = yellowButton.press();
+  payload.frontWhiteButton = whiteButton.press();
   payload.frontBlackButtonSwitch = mapButtonSwitch(blackButton.press(), blackButtonPos, 2);
 
   payload.upBlueButton = !digitalRead(PIN_UP_BLUE_BUTTON);
-  payload.upGreenButton = !digitalRead(PIN_UP_GREEN_BUTTON);
+  payload.upGreenButton = greenButton.press();
 
   radio.write(payload);
 }
