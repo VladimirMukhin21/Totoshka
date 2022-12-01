@@ -106,10 +106,10 @@ void loop() {
     return;
   }
 
-  if (payload.frontYellowButton) {
+  if (payload.frontYellowButton && payload.upBlueButton) {
     progStairsUp.start();
   }
-  else if (payload.frontWhiteButton) {
+  else if (payload.frontWhiteButton && payload.upBlueButton) {
     //progStairsDown.start();
     progRideTheLine.start();
   }
