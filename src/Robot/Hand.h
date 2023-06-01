@@ -24,8 +24,8 @@ class Hand {
     Servo _rotate;
     Servo _claw;
 
-    Angle _shoulderAngle = Angle(154, 30, 154, 100); // 38
-    Angle _elbowAngle = Angle(120, 0, 120, 100);
+    Angle _shoulderAngle = Angle(30, 30, 154, 100);
+    Angle _elbowAngle = Angle(0, 0, 120, 100);
     Angle _rotateAngle = Angle(_rotateCenterPos, 0, 180, 30);
     Angle _clawAngle = Angle(97, 58, 180, 50); // 56
 
