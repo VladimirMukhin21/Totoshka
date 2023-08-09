@@ -11,15 +11,15 @@
 #include "Color.h"
 //#include "Gyro.h"
 
-#define L_EN_PIN  39
+#define L_EN_PIN 39
 #define L_INA_PIN 41
 #define L_INB_PIN 43
-#define L_PWM_PIN 4 // ШИМ
+#define L_PWM_PIN 4  // ШИМ
 
-#define R_EN_PIN  38
+#define R_EN_PIN 38
 #define R_INA_PIN 40
 #define R_INB_PIN 42
-#define R_PWM_PIN 5 // ШИМ
+#define R_PWM_PIN 5  // ШИМ
 
 // shoulder - elbow - rotate - claw
 #define HAND_SHOULDER_PIN 11
@@ -118,6 +118,10 @@ void loop() {
   }*/
   else {
     truck.go(payload.rightStick.vert, payload.rightStick.horiz);
+
+    if (payload.upBlueButton && payload.upGreenButton) {
+      hand.handRideTheLine();
+    }
 
     if (payload.upBlueButton) {
       video.moveCamera(payload.leftStick.vert);
