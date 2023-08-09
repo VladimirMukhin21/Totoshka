@@ -24,10 +24,10 @@ class Hand {
     Servo _rotate;
     Servo _claw;
 
-    Angle _shoulderAngle = Angle(30, 30, 154, 100);
+    Angle _shoulderAngle = Angle(30, 30, 154, 100);           // (115, 30, 154, 100)
     Angle _elbowAngle = Angle(0, 0, 120, 100);
-    Angle _rotateAngle = Angle(_rotateCenterPos, 0, 180, 30);
-    Angle _clawAngle = Angle(97, 58, 180, 50); // 56
+    Angle _rotateAngle = Angle(_rotateCenterPos, 0, 180, 30); // (3, 0, 180, 30)
+    Angle _clawAngle = Angle(97, 58, 180, 50);                // (58, 58, 180, 50)
 
     /*#ifdef DEBUG
         unsigned long _printTime = millis();

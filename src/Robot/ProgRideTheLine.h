@@ -13,8 +13,8 @@ class ProgRideTheLine {
     bool isRunning();
 
   private:
-    const int _driveSpeed = 40; // 70
-    GyverPID _pid = GyverPID(2.7, 0.2, 0.15, 100); // 4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
+    const int _driveSpeed = 65; // 70
+    GyverPID _pid = GyverPID(2.0, 0, 0.15, 100);//   2.7, 0.2, 0.15, 100   4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
 
     Truck* _truck;
     Hand* _hand;
@@ -57,7 +57,7 @@ void ProgRideTheLine::tick() {
   int l = _color->getLeft();
   int r = _color->getRight();
 
-  _pid.input = l - r;
+  _pid.input = r - l;
   int turn = _pid.getResult(); // ПИД-регулятор
   //int turn = (int)((double)(l - r) * 3); // П-регулятор
 

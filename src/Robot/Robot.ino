@@ -5,7 +5,7 @@
 #include "Video.h"
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
-#include "ProgGoStraight.h"
+//#include "ProgGoStraight.h"
 #include "ProgRideTheLine.h"
 #include "Average.h"
 #include "Color.h"

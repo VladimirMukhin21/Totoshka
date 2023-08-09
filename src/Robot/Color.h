@@ -9,17 +9,17 @@
 #define COLOR_LED_PIN 53
 
 class Color {
-  public:
-    void init();
-    void enable();
-    void disable();
+public:
+  void init();
+  void enable();
+  void disable();
 
-    int getLeft();
-    int getRight();
+  int getLeft();
+  int getRight();
 
-  private:
-    Adafruit_TCS34725softi2c tcsl = Adafruit_TCS34725softi2c(TCS34725_INTEGRATIONTIME_2_4MS, TCS34725_GAIN_1X, COLOR_L_SDA_PIN, COLOR_L_SCL_PIN);
-    Adafruit_TCS34725softi2c tcsr = Adafruit_TCS34725softi2c(TCS34725_INTEGRATIONTIME_2_4MS, TCS34725_GAIN_1X, COLOR_R_SDA_PIN, COLOR_R_SCL_PIN);
+private:
+  Adafruit_TCS34725softi2c tcsl = Adafruit_TCS34725softi2c(TCS34725_INTEGRATIONTIME_2_4MS, TCS34725_GAIN_1X, COLOR_L_SDA_PIN, COLOR_L_SCL_PIN);
+  Adafruit_TCS34725softi2c tcsr = Adafruit_TCS34725softi2c(TCS34725_INTEGRATIONTIME_2_4MS, TCS34725_GAIN_1X, COLOR_R_SDA_PIN, COLOR_R_SCL_PIN);
 };
 
 void Color::init() {
@@ -37,7 +37,8 @@ int Color::getLeft() {
 int Color::getRight() {
   uint16_t r, g, b, c;
   tcsr.getRawData(&r, &g, &b, &c);
-  return int((double)c * 1.75);
+  return c;
+  // return int((double)c * 1.75);
 }
 
 void Color::enable() {
