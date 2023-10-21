@@ -35,7 +35,7 @@ private:
   Angle _shoulderAngle = Angle(30, 30, 154, 100);  // (115, 30, 154, 100)
   Angle _elbowAngle = Angle(0, 0, 120, 100);
   Angle _rotateAngle = Angle(_rotateCenterPos, 0, 180, 30);  // (3, 0, 180, 30)
-  Angle _clawAngle = Angle(97, 58, 165, 50);                 // (58, 58, 180, 50)
+  Angle _clawAngle = Angle(97, 61, 110, 50);                 // (58, 58, 180, 50) 97 58 165 50
 
   /*#ifdef DEBUG
         unsigned long _printTime = millis();
