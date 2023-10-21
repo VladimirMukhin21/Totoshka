@@ -6,14 +6,14 @@ import cv2
 def draw_barcode(decoded, image, text):
     n_points = len(decoded.polygon)
     for i in range(n_points):
-        image = cv2.line(image, decoded.polygon[i], decoded.polygon[(i+1) % n_points], color=(0, 0, 255), thickness=5)
+        image = cv2.line(image, decoded.polygon[i], decoded.polygon[(i+1) % n_points], color=(0, 0, 255), thickness=3)
     # cv2.rectangle(
     #     image,
     #     (decoded.rect.left, decoded.rect.top), 
     #     (decoded.rect.left + decoded.rect.width, decoded.rect.top + decoded.rect.height),
     #     color = (0, 0, 255),
     #     thickness = 2)
-    cv2.putText(image, text, (decoded.rect.left, decoded.rect.top-10), font, 0.7, color=(0,0,255))
+    cv2.putText(image, text, (decoded.rect.left, decoded.rect.top-10), font, 1, color=(0,0,255))
 
 def decode(image):
     decoded_objects = pyzbar.decode(image)
@@ -47,7 +47,7 @@ def draw_captured_qrs(image):
     size = 0.7
     color=(0,255,0)
     index = 0
-    cv2.putText(image, "Захваченные QR-коды:", (5,(index+1)*20), font, size, color)
+    cv2.putText(image, "QR-коды:", (5,(index+1)*20), font, size, color)
     for qr in capturedQrs:
         index += 1
         text = str.format("{0}. {1}", index, qr) #str(index) + ". " + qr
