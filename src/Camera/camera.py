@@ -31,9 +31,9 @@ def decode(image):
         print("QR:", qr, "  HIST:",  ", ".join(capturedQrs))
 
 def x(x):
-    return int(width*scale*x/400/100)
+    return int(width*x/400)
 def y(y):
-    return int(height*scale*y/300/100)
+    return int(height*y/300)
 
 def draw_guides(image):
     thickness=1
@@ -85,21 +85,34 @@ scaleChangedTime = datetime.now()
 if __name__ == "__main__":
     cap = cv2.VideoCapture()
     cap.open(CAMERA_NUM)
+
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     scale = 100
-    change_scale(0)
+    size = (width, height)
+    # change_scale(0)
     # print(width, "x", height)
+
+    codec = cv2.VideoWriter_fourcc(*'DIVX')
+    # codec = cv2.VideoWriter_fourcc(*'XVID')
+    # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
+    file = cv2.VideoWriter('filename.avi', codec, 20, (width, height))
+
     while True:
         readed, frame = cap.read()
+
         if readed:
             decode(frame)
-            frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
+            
+            # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
             draw_captured_qrs(frame)
+            file.write(frame)
+
             draw_scale(frame)
-            # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
+            frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
             cv2.imshow("TOTOSHKA", frame)
+        
         key = cv2.waitKey(1)
         # print(key)
         if key >= ord("0") and key <= ord("9"):
@@ -113,5 +126,7 @@ if __name__ == "__main__":
             printCapturedQrs = not printCapturedQrs
         if key == 27: # Esc => exit
             break
+
+    file.release()
     cap.release()
     cv2.destroyAllWindows()
