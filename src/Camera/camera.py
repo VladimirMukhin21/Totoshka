@@ -4,6 +4,7 @@ import cv2
 from pyzbar import pyzbar
 from datetime import datetime
 
+CAMERA_NUM = 0 # номер камеры
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
 RED = (0,0,255)
 GREEN = (0,255,0)
@@ -83,7 +84,7 @@ scaleChangedTime = datetime.now()
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture()
-    cap.open(0) # номер камеры
+    cap.open(CAMERA_NUM)
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     scale = 100
@@ -112,3 +113,5 @@ if __name__ == "__main__":
             printCapturedQrs = not printCapturedQrs
         if key == 27: # Esc => exit
             break
+    cap.release()
+    cv2.destroyAllWindows()
