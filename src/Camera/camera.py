@@ -46,17 +46,18 @@ def draw_guides(image):
             cv2.line(image, (x(400), y(300)), (x(330), y(230)), GREEN, thickness) # наклон прав
 
 def draw_captured_qrs(image):
-    if not printCapturedQrs:
+    if not showCapturedQrs:
         return
     if len(capturedQrs) == 0:
         return
     size = 0.7
     index = 0
-    cv2.putText(image, "QR-коды:", (5,(index+1)*20), FONT, size, GREEN)
+    step = 15
+    cv2.putText(image, "QR-коды:", (x(5), y((index+1)*step)), FONT, size, GREEN)
     for qr in capturedQrs:
         index += 1
-        text = str.format("{0}. {1}", index, qr) #str(index) + ". " + qr
-        cv2.putText(image, text, (5,(index+1)*20), FONT, 0.7, GREEN)
+        text = str.format("{0}. {1}", index, qr)
+        cv2.putText(image, text, (x(5), y((index+1)*step)), FONT, size, GREEN)
 
 def switch_record():
     global file
@@ -76,13 +77,33 @@ def record(image):
         file.write(image)
         cv2.circle(image, (x(390), y(10)), radius=3, color=RED, thickness=-1)
 
+HELP = []
+HELP.append("shift-0: запись в файл")
+HELP.append("q: захваченные QR-коды")
+HELP.append("1: вкл гайдлайны")
+HELP.append("2: выкл гайдлайны")
+HELP.append("h: справка")
+HELP.append("esc: завершить работу")
+
+def draw_help(image):
+    if not showHelp:
+        return
+    cv2.rectangle(
+        image,
+        (x(0), y(100)),
+        (x(220), y(230)),
+        color = RED,
+        thickness = -1)
+    for i in range(len(HELP)):
+        cv2.putText(image, HELP[i], (x(5), y(100+(i+1)*20)), FONT, 0.7, GREEN)
+
 def draw_scale(image):
     now = datetime.now()
     delta = now - scaleChangedTime
     if (delta.total_seconds() > 1):
         return
     msg = str(scale) + "%"
-    cv2.putText(image, msg, (x(180),y(140)), FONT, 1, GREEN)
+    cv2.putText(image, msg, (x(180), y(140)), FONT, 1, GREEN)
 
 def change_scale(delta):
     global scale
@@ -97,9 +118,10 @@ def change_scale(delta):
 
 capturedQrs = set()
 guideMode = 1
-printCapturedQrs = True
+showCapturedQrs = True
 scaleChangedTime = datetime.now()
 recording = False
+showHelp = False
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture()
@@ -123,6 +145,7 @@ if __name__ == "__main__":
             draw_captured_qrs(frame)
             record(frame)
 
+            draw_help(frame)
             draw_scale(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
             cv2.imshow("TOTOSHKA", frame)
@@ -137,12 +160,15 @@ if __name__ == "__main__":
         if key == ord("-"):
             change_scale(-10)
         if key == ord("q"):
-            printCapturedQrs = not printCapturedQrs
+            showCapturedQrs = not showCapturedQrs
         if key == 41: # shift-0
             switch_record()
+        if key == ord("h"):
+            showHelp = not showHelp
         if key == 27: # Esc => exit
             break
 
-    file.release()
+    if recording:
+        file.release()
     cap.release()
     cv2.destroyAllWindows()
