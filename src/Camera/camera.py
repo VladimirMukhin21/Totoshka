@@ -9,6 +9,7 @@ FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содерж�
 RED = (0,0,255)
 GREEN = (0,255,0)
 BLUE = (255,0,0)
+BLACK = (0,0,0)
 
 def draw_barcode(decoded, image, text):
     n_points = len(decoded.polygon)
@@ -40,10 +41,11 @@ def draw_guides(image):
     match guideMode:
         case 1:
             # cv2.putText(image, "guides mode: 1", (x(5),y(10)), font, 1, GREEN, thickness=1, lineType=cv2.LINE_4)
-            cv2.line(image, (x(30), y(250)), (x(370), y(250)), GREEN, thickness) # горизонт
-            cv2.line(image, (x(200), y(240)), (x(200), y(300)), GREEN, thickness) # центр верт
-            cv2.line(image, (x(0), y(300)), (x(70), y(230)), GREEN, thickness) # наклон лев
-            cv2.line(image, (x(400), y(300)), (x(330), y(230)), GREEN, thickness) # наклон прав
+            # cv2.line(image, (x(30), y(250)), (x(370), y(250)), GREEN, thickness) # горизонт
+            cv2.line(image, (x(247), y(300)), (x(227), y(240)), GREEN, thickness) # центр
+            cv2.line(image, (x(112), y(300)), (x(150), y(230)), GREEN, thickness) # лев
+            cv2.line(image, (x(386), y(300)), (x(300), y(230)), GREEN, thickness) # прав
+            cv2.line(image, (x(142), y(297)), (x(351), y(264)), BLUE, thickness) # горизонт
 
 def draw_captured_qrs(image):
     if not showCapturedQrs:
@@ -78,6 +80,7 @@ def record(image):
         cv2.circle(image, (x(390), y(10)), radius=3, color=RED, thickness=-1)
 
 HELP = []
+HELP.append("shift-9: переподключить камеру")
 HELP.append("shift-0: запись в файл")
 HELP.append("q: захваченные QR-коды")
 HELP.append("1: вкл гайдлайны")
@@ -91,11 +94,11 @@ def draw_help(image):
     cv2.rectangle(
         image,
         (x(0), y(100)),
-        (x(220), y(230)),
-        color = RED,
+        (x(270), y(250)),
+        color = GREEN,
         thickness = -1)
     for i in range(len(HELP)):
-        cv2.putText(image, HELP[i], (x(5), y(100+(i+1)*20)), FONT, 0.7, GREEN)
+        cv2.putText(image, HELP[i], (x(5), y(100+(i+1)*20)), FONT, 0.7, BLACK)
 
 def draw_scale(image):
     now = datetime.now()
@@ -149,6 +152,9 @@ if __name__ == "__main__":
             draw_scale(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
             cv2.imshow("TOTOSHKA", frame)
+        else:
+            cap.release()
+            cap.open(CAMERA_NUM)
         
         key = cv2.waitKey(1)
         # print(key)
@@ -165,6 +171,9 @@ if __name__ == "__main__":
             switch_record()
         if key == ord("h"):
             showHelp = not showHelp
+        if key == 40: # shift-9
+            cap.release()
+            cap.open(CAMERA_NUM)
         if key == 27: # Esc => exit
             break
 
