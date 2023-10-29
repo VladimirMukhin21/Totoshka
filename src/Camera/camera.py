@@ -58,6 +58,24 @@ def draw_captured_qrs(image):
         text = str.format("{0}. {1}", index, qr) #str(index) + ". " + qr
         cv2.putText(image, text, (5,(index+1)*20), FONT, 0.7, GREEN)
 
+def switch_record():
+    global file
+    global recording
+    recording = not recording
+    if recording:
+        name = datetime.now().strftime("%Y%m%d_%H%M%S") + ".avi"
+        codec = cv2.VideoWriter_fourcc(*'DIVX')
+        # codec = cv2.VideoWriter_fourcc(*'XVID')
+        # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
+        file = cv2.VideoWriter(name, codec, 20, (width, height))
+    else:
+        file.release()
+
+def record(image):
+    if recording:
+        file.write(image)
+        cv2.circle(image, (x(390), y(10)), radius=3, color=RED, thickness=-1)
+
 def draw_scale(image):
     now = datetime.now()
     delta = now - scaleChangedTime
@@ -81,6 +99,7 @@ capturedQrs = set()
 guideMode = 1
 printCapturedQrs = True
 scaleChangedTime = datetime.now()
+recording = False
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture()
@@ -93,11 +112,6 @@ if __name__ == "__main__":
     # change_scale(0)
     # print(width, "x", height)
 
-    codec = cv2.VideoWriter_fourcc(*'DIVX')
-    # codec = cv2.VideoWriter_fourcc(*'XVID')
-    # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
-    file = cv2.VideoWriter('filename.avi', codec, 20, (width, height))
-
     while True:
         readed, frame = cap.read()
 
@@ -107,7 +121,7 @@ if __name__ == "__main__":
             # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
             draw_captured_qrs(frame)
-            file.write(frame)
+            record(frame)
 
             draw_scale(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
@@ -117,13 +131,15 @@ if __name__ == "__main__":
         # print(key)
         if key >= ord("0") and key <= ord("9"):
             guideMode = key - ord("0")
-            print("guideMode:", guideMode)
+            # print("guideMode:", guideMode)
         if key == ord("+"):
             change_scale(10)
         if key == ord("-"):
             change_scale(-10)
         if key == ord("q"):
             printCapturedQrs = not printCapturedQrs
+        if key == 41: # shift-0
+            switch_record()
         if key == 27: # Esc => exit
             break
 
