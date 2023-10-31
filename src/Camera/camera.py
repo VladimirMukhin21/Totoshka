@@ -110,6 +110,9 @@ HELP = []
 HELP.append("shift-9: переподключить камеру")
 HELP.append("shift-0: запись в файл")
 HELP.append("q: захваченные QR-коды")
+HELP.append("w: захват cv2")
+HELP.append("e: захват pyzbar")
+HELP.append("r: выкл захват")
 HELP.append("1: вкл гайдлайны")
 HELP.append("2: выкл гайдлайны")
 HELP.append("h: справка")
@@ -120,12 +123,12 @@ def draw_help(image):
         return
     cv2.rectangle(
         image,
-        (x(0), y(100)),
-        (x(270), y(250)),
+        (x(0), y(60)),
+        (x(270), y(270)),
         color = GREEN,
         thickness = -1)
     for i in range(len(HELP)):
-        cv2.putText(image, HELP[i], (x(5), y(100+(i+1)*20)), FONT, 0.7, BLACK)
+        cv2.putText(image, HELP[i], (x(5), y(60+(i+1)*20)), FONT, 0.7, BLACK)
 
 def draw_scale(image):
     now = datetime.now()
