@@ -3,6 +3,7 @@
 import cv2
 from pyzbar import pyzbar
 from datetime import datetime
+import time
 
 CAMERA_NUM = 0 # номер камеры
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
@@ -10,24 +11,53 @@ RED = (0,0,255)
 GREEN = (0,255,0)
 BLUE = (255,0,0)
 BLACK = (0,0,0)
+QR_OFF = ""
+QR_CV2 = "C"
+QR_PYZBAR = "P"
 
-def draw_barcode(decoded, image, text):
-    n_points = len(decoded.polygon)
-    for i in range(n_points):
-        image = cv2.line(image, decoded.polygon[i], decoded.polygon[(i+1) % n_points], RED, thickness=3)
-    # cv2.rectangle(
-    #     image,
-    #     (decoded.rect.left, decoded.rect.top), 
-    #     (decoded.rect.left + decoded.rect.width, decoded.rect.top + decoded.rect.height),
-    #     color = (0, 0, 255),
-    #     thickness = 2)
-    cv2.putText(image, text, (decoded.rect.left, decoded.rect.top-10), FONT, 1, RED)
+def decode(image):    
+    if qrMode == QR_CV2:
+        cv2Decode(image)
+    elif qrMode == QR_PYZBAR:
+        pyzbarDecode(image)
+    else:
+        return
+    cv2.putText(image, qrMode, (x(375), y(12)), FONT, 0.5, color=RED)
 
-def decode(image):
-    decoded_objects = pyzbar.decode(image)
-    for obj in decoded_objects:
-        qr = obj.data.decode()
-        draw_barcode(obj, image, qr)
+def pyzbarDecode(image):
+    try:
+        decoded_objects = pyzbar.decode(image)
+    except:
+        print("Ошибка распознавания QR-кода.")
+        return
+    for decoded in decoded_objects:
+        qr = decoded.data.decode()
+
+        n_points = len(decoded.polygon)
+        for i in range(n_points):
+            image = cv2.line(image, decoded.polygon[i], decoded.polygon[(i+1) % n_points], RED, thickness=3)
+        cv2.putText(image, qr, (decoded.rect.left, decoded.rect.top-10), FONT, 1, RED)
+
+        capturedQrs.add(qr)
+        print("QR:", qr, "  HIST:",  ", ".join(capturedQrs))
+
+def cv2Decode(image):
+    try:
+        qr, bbox, _ = cv2Decoder.detectAndDecode(image)
+    except:
+        print("Ошибка распознавания QR-кода.")
+        return
+    if qr:
+        rect = bbox[0]
+        thickness=3
+        cv2.line(image, (int(rect[0][0]), int(rect[0][1])), (int(rect[1][0]), int(rect[1][1])), RED, thickness)
+        cv2.line(image, (int(rect[1][0]), int(rect[1][1])), (int(rect[2][0]), int(rect[2][1])), RED, thickness)
+        cv2.line(image, (int(rect[2][0]), int(rect[2][1])), (int(rect[3][0]), int(rect[3][1])), RED, thickness)
+        cv2.line(image, (int(rect[3][0]), int(rect[3][1])), (int(rect[0][0]), int(rect[0][1])), RED, thickness)
+        x = int(min(rect[0][0], rect[1][0], rect[2][0], rect[3][0]))
+        y = int(min(rect[0][1], rect[1][1], rect[2][1], rect[3][1]))
+        cv2.putText(image, qr, (x, y-10), FONT, 1, RED)
+
         capturedQrs.add(qr)
         print("QR:", qr, "  HIST:",  ", ".join(capturedQrs))
 
@@ -38,14 +68,11 @@ def y(y):
 
 def draw_guides(image):
     thickness=1
-    match guideMode:
-        case 1:
-            # cv2.putText(image, "guides mode: 1", (x(5),y(10)), font, 1, GREEN, thickness=1, lineType=cv2.LINE_4)
-            # cv2.line(image, (x(30), y(250)), (x(370), y(250)), GREEN, thickness) # горизонт
-            cv2.line(image, (x(247), y(300)), (x(227), y(240)), GREEN, thickness) # центр
-            cv2.line(image, (x(112), y(300)), (x(150), y(230)), GREEN, thickness) # лев
-            cv2.line(image, (x(386), y(300)), (x(300), y(230)), GREEN, thickness) # прав
-            cv2.line(image, (x(142), y(297)), (x(351), y(264)), BLUE, thickness) # горизонт
+    if guideMode == 1:
+        cv2.line(image, (x(247), y(300)), (x(227), y(240)), GREEN, thickness) # центр
+        cv2.line(image, (x(112), y(300)), (x(150), y(230)), GREEN, thickness) # лев
+        cv2.line(image, (x(386), y(300)), (x(300), y(230)), GREEN, thickness) # прав
+        cv2.line(image, (x(142), y(297)), (x(351), y(264)), BLUE, thickness) # горизонт
 
 def draw_captured_qrs(image):
     if not showCapturedQrs:
@@ -125,6 +152,8 @@ showCapturedQrs = True
 scaleChangedTime = datetime.now()
 recording = False
 showHelp = False
+cv2Decoder = cv2.QRCodeDetector()
+qrMode = QR_OFF
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture()
@@ -167,6 +196,12 @@ if __name__ == "__main__":
             change_scale(-10)
         if key == ord("q"):
             showCapturedQrs = not showCapturedQrs
+        if key == ord("w"):
+            qrMode = QR_CV2
+        if key == ord("e"):
+            qrMode = QR_PYZBAR
+        if key == ord("r"):
+            qrMode = QR_OFF
         if key == 41: # shift-0
             switch_record()
         if key == ord("h"):
