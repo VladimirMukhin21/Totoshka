@@ -5,7 +5,7 @@ from pyzbar import pyzbar
 from datetime import datetime
 import time
 
-CAMERA_NUM = 0 # номер камеры
+CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
 RED = (0,0,255)
 GREEN = (0,255,0)
@@ -14,8 +14,9 @@ BLACK = (0,0,0)
 QR_OFF = ""
 QR_CV2 = "C"
 QR_PYZBAR = "P"
+EMPTY_STR = ""
 
-def decode(image):    
+def decode(image):
     if qrMode == QR_CV2:
         cv2Decode(image)
     elif qrMode == QR_PYZBAR:
@@ -25,41 +26,63 @@ def decode(image):
     cv2.putText(image, qrMode, (x(375), y(12)), FONT, 0.5, color=RED)
 
 def pyzbarDecode(image):
-    try:
-        decoded_objects = pyzbar.decode(image)
-    except:
-        print("Ошибка распознавания QR-кода.")
-        return
-    for decoded in decoded_objects:
-        qr = decoded.data.decode()
-
-        n_points = len(decoded.polygon)
-        for i in range(n_points):
-            image = cv2.line(image, decoded.polygon[i], decoded.polygon[(i+1) % n_points], RED, thickness=3)
-        cv2.putText(image, qr, (decoded.rect.left, decoded.rect.top-10), FONT, 1, RED)
-
+    global qrDecodeTime
+    global qr
+    global pyzbar_box
+    now = datetime.now()
+    delta = now - qrDecodeTime
+    if (delta.microseconds > 300000): # 300ms
+        qrDecodeTime = now
+        qr = EMPTY_STR
+        try:
+            decoded = pyzbar.decode(image)
+            pyzbar_box = decoded.pop()
+            qr = pyzbar_box.data.decode()
+        except:
+            qr = EMPTY_STR
+            # print("Ошибка распознавания QR-кода.")
+            return
+        if qr == EMPTY_STR:
+            return
         capturedQrs.add(qr)
         print("QR:", qr, "  HIST:",  ", ".join(capturedQrs))
+    if qr == EMPTY_STR:
+        return
+    n_points = len(pyzbar_box.polygon)
+    for i in range(n_points):
+        image = cv2.line(image, pyzbar_box.polygon[i], pyzbar_box.polygon[(i+1) % n_points], RED, thickness=3)
+    cv2.putText(image, qr, (pyzbar_box.rect.left, pyzbar_box.rect.top-10), FONT, 1, RED)
 
 def cv2Decode(image):
-    try:
-        qr, bbox, _ = cv2Decoder.detectAndDecode(image)
-    except:
-        print("Ошибка распознавания QR-кода.")
-        return
-    if qr:
-        rect = bbox[0]
-        thickness=3
-        cv2.line(image, (int(rect[0][0]), int(rect[0][1])), (int(rect[1][0]), int(rect[1][1])), RED, thickness)
-        cv2.line(image, (int(rect[1][0]), int(rect[1][1])), (int(rect[2][0]), int(rect[2][1])), RED, thickness)
-        cv2.line(image, (int(rect[2][0]), int(rect[2][1])), (int(rect[3][0]), int(rect[3][1])), RED, thickness)
-        cv2.line(image, (int(rect[3][0]), int(rect[3][1])), (int(rect[0][0]), int(rect[0][1])), RED, thickness)
-        x = int(min(rect[0][0], rect[1][0], rect[2][0], rect[3][0]))
-        y = int(min(rect[0][1], rect[1][1], rect[2][1], rect[3][1]))
-        cv2.putText(image, qr, (x, y-10), FONT, 1, RED)
-
+    global qrDecodeTime
+    global qr
+    global cv2_box
+    now = datetime.now()
+    delta = now - qrDecodeTime
+    if (delta.microseconds > 300000): # 300ms
+        qrDecodeTime = now
+        qr = EMPTY_STR
+        try:
+            qr, decoded, _ = cv2Decoder.detectAndDecode(image)
+            cv2_box = decoded[0]
+        except:
+            qr = EMPTY_STR
+            # print("Ошибка распознавания QR-кода.")
+            return
+        if qr == EMPTY_STR:
+            return
         capturedQrs.add(qr)
         print("QR:", qr, "  HIST:",  ", ".join(capturedQrs))
+    if qr == EMPTY_STR:
+        return
+    thickness=3
+    cv2.line(image, (int(cv2_box[0][0]), int(cv2_box[0][1])), (int(cv2_box[1][0]), int(cv2_box[1][1])), RED, thickness)
+    cv2.line(image, (int(cv2_box[1][0]), int(cv2_box[1][1])), (int(cv2_box[2][0]), int(cv2_box[2][1])), RED, thickness)
+    cv2.line(image, (int(cv2_box[2][0]), int(cv2_box[2][1])), (int(cv2_box[3][0]), int(cv2_box[3][1])), RED, thickness)
+    cv2.line(image, (int(cv2_box[3][0]), int(cv2_box[3][1])), (int(cv2_box[0][0]), int(cv2_box[0][1])), RED, thickness)
+    x = int(min(cv2_box[0][0], cv2_box[1][0], cv2_box[2][0], cv2_box[3][0]))
+    y = int(min(cv2_box[0][1], cv2_box[1][1], cv2_box[2][1], cv2_box[3][1]))
+    cv2.putText(image, qr, (x, y-10), FONT, 1, RED)
 
 def x(x):
     return int(width*x/400)
@@ -157,6 +180,10 @@ recording = False
 showHelp = False
 cv2Decoder = cv2.QRCodeDetector()
 qrMode = QR_OFF
+qrDecodeTime = datetime.now()
+cv2_box = []
+pyzbar_box = []
+qr = EMPTY_STR
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture()
@@ -201,10 +228,13 @@ if __name__ == "__main__":
             showCapturedQrs = not showCapturedQrs
         if key == ord("w"):
             qrMode = QR_CV2
+            qr = EMPTY_STR
         if key == ord("e"):
             qrMode = QR_PYZBAR
+            qr = EMPTY_STR
         if key == ord("r"):
             qrMode = QR_OFF
+            qr = EMPTY_STR
         if key == 41: # shift-0
             switch_record()
         if key == ord("h"):
