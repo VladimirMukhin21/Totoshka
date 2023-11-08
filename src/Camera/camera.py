@@ -4,6 +4,8 @@ import cv2
 from pyzbar import pyzbar
 from datetime import datetime
 import time
+from threading import Thread
+import winsound
 
 CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
@@ -15,6 +17,12 @@ QR_OFF = ""
 QR_CV2 = "C"
 QR_PYZBAR = "P"
 EMPTY_STR = ""
+
+def beep():
+    frequency = 2500
+    duration = 500
+    t = Thread(target=winsound.Beep, args=(frequency, duration))
+    t.start()
 
 def decode(image):
     if qrMode == QR_CV2:
@@ -38,6 +46,8 @@ def pyzbarDecode(image):
             decoded = pyzbar.decode(image)
             pyzbar_box = decoded.pop()
             qr = pyzbar_box.data.decode()
+            if qr != EMPTY_STR:
+                beep()
         except:
             qr = EMPTY_STR
             # print("Ошибка распознавания QR-кода.")
@@ -65,6 +75,8 @@ def cv2Decode(image):
         try:
             qr, decoded, _ = cv2Decoder.detectAndDecode(image)
             cv2_box = decoded[0]
+            if qr != EMPTY_STR:
+                beep()
         except:
             qr = EMPTY_STR
             # print("Ошибка распознавания QR-кода.")
