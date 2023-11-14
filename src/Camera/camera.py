@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
             draw_help(frame)
             draw_scale(frame)
-            frame = cv2.resize(frame, size, interpolation=cv2.INTER_AREA)
+            frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
             cv2.imshow("TOTOSHKA", frame)
         else:
             cap.release()
