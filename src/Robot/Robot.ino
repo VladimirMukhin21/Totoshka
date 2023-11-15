@@ -7,9 +7,11 @@
 #include "ProgStairsDown.h"
 //#include "ProgGoStraight.h"
 #include "ProgRideTheLine.h"
+#include "ProgTakeTin.h"
 #include "Average.h"
 #include "Color.h"
 //#include "Gyro.h"
+#include "DistMeter.h"
 
 #define L_EN_PIN 39
 #define L_INA_PIN 41
@@ -42,10 +44,12 @@ Tail tail;
 Video video;
 Color color;
 //Gyro gyro;
+DistMeter distMeter;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
 //ProgGoStraight progGoStraight;
 ProgRideTheLine progRideTheLine;
+ProgTakeTin progTakeTin;
 
 unsigned long lastRadioTime = millis();
 
@@ -61,11 +65,13 @@ void setup() {
   video.init(CAMERA_SWITCHER_PIN, CAMERA_FRONT_PIN, CAMERA_TOP_PIN);
   color.init();
   //gyro.init();
+  distMeter.init();
 
   progStairsUp.init(truck, tail);
   progStairsDown.init(truck, tail);
   //progGoStraight.init(truck, gyro);
   progRideTheLine.init(truck, hand, color);
+  progTakeTin.init(truck, hand, distMeter);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -85,7 +91,7 @@ void loop() {
 
   Payload payload = radio.read();
 
-  if (payload.frontRedButton) {
+  if (payload.frontRedButton && !payload.upBlueButton) {
     stopAll();
     return;
   }
@@ -116,11 +122,14 @@ void loop() {
   /*else if (payload.frontBlackButton) {
     progGoStraight.start();
   }*/
+  else if (payload.frontRedButton && payload.upBlueButton) {
+    progTakeTin.start();
+  }
   else {
     truck.go(payload.rightStick.vert, payload.rightStick.horiz);
 
     if (payload.upBlueButton && payload.upGreenButton) {
-      hand.handRideTheLine();
+      hand.handToRideTheLine();
     }
 
     if (payload.upBlueButton) {
@@ -130,7 +139,7 @@ void loop() {
 
     if (payload.frontSwitch == 0) {
       if (payload.upGreenButton) {
-        hand.upHand();
+        hand.handToBack();
       }
       else {
         hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1); // altMode
@@ -138,7 +147,7 @@ void loop() {
     }
     else if (payload.frontSwitch == 1) {
       if (payload.upGreenButton) {
-        hand.upHand();
+        hand.handToBack();
       }
       else {
         hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0);
@@ -158,8 +167,9 @@ void loop() {
 bool isAnyProgRunning() {
   return progStairsUp.isRunning()
          || progStairsDown.isRunning()
+         || progRideTheLine.isRunning()
          /*|| progGoStraight.isRunning()*/
-         || progRideTheLine.isRunning();
+         || progTakeTin.isRunning();
 }
 
 void stopAll() {
@@ -171,6 +181,7 @@ void stopAll() {
   progStairsDown.stop();
   progRideTheLine.stop();
   //progGoStraight.stop();
+  progTakeTin.stop();
 }
 
 void tickAll() {
@@ -183,4 +194,5 @@ void tickAll() {
   progStairsDown.tick();
   progRideTheLine.tick();
   //progGoStraight.tick();
+  progTakeTin.tick();
 }
