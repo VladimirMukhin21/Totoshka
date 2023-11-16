@@ -65,59 +65,53 @@ void ProgTakeTin::tick() {
     return;
   }
 
-  switch (_phase) {
-    case START:
-      // программа стартует => опускаем руку в нач. положение
-      _hand->handToTakeTin();
-      _phase = INIT_HAND;
-      //Serial.println("start");
-      break;
-
-    case INIT_HAND:
-      // ждем пока рука опустится...
-      //Serial.println("init hand");
-      if (!_hand->isRunning()) {
-        // рука опустилась => подъезжаем к маяку
-        _distMeter->enable();
-        _phase = DRIVE;
-      }
-      break;
-
-    case DRIVE:
-      // подъезжаем к маяку
-      int dist = _distMeter->getDist();
-      //Serial.print("drive ");
-      //Serial.println(dist);
-      if (dist > _minDist) {
-        _truck->goAndTurn(_driveSpeed, 0);
-      }
-      else {
-        // доехали до маяка
-        _truck->goAndTurn(0, 0);
-        _hand->takeTin();
-        _distMeter->disable();
-        _phase = TAKE;
-      }
-      break;
-
-    case TAKE:
-      // ждем пока рука сожмется...
-      //Serial.println("take");
-      if (!_hand->isRunning()) {
-        // рука сжалась => поднимаем маяк
-        _hand->handUp();
-        _phase = HAND_UP;
-      }
-      break;
-
-    case HAND_UP:
-      // ждем пока рука с маяком поднимается...
-      //Serial.println("hand up");
-      if (!_hand->isRunning()) {
-        // маяк подняли => стоп
-        stop();
-      }
-      break;
+  if (_phase == START) {
+    // программа стартует => опускаем руку в нач. положение
+    _hand->handToTakeTin();
+    _phase = INIT_HAND;
+    //Serial.println("start");
+  }
+  else if (_phase == INIT_HAND) {
+    // ждем пока рука опустится...
+    //Serial.println("init hand");
+    if (!_hand->isRunning()) {
+      // рука опустилась => подъезжаем к маяку
+      _distMeter->enable();
+      _phase = DRIVE;
+    }
+  }
+  else if (_phase == DRIVE) {
+    // подъезжаем к маяку
+    int dist = _distMeter->getDist();
+    //Serial.print("drive ");
+    //Serial.println(dist);
+    if (dist > _minDist) {
+      _truck->goAndTurn(_driveSpeed, 0);
+    }
+    else {
+      // доехали до маяка
+      _truck->goAndTurn(0, 0);
+      _distMeter->disable();
+      _hand->takeTin();
+      _phase = TAKE;
+    }
+  }
+  else if (_phase == TAKE) {
+    // ждем пока рука сожмется...
+    //Serial.println("take");
+    if (!_hand->isRunning()) {
+      // рука сжалась => поднимаем маяк
+      _hand->handUp();
+      _phase = HAND_UP;
+    }
+  }
+  else if (_phase == HAND_UP) {
+    // ждем пока рука с маяком поднимается...
+    //Serial.println("hand up");
+    if (!_hand->isRunning()) {
+      // маяк подняли => стоп
+      stop();
+    }
   }
 }
 
