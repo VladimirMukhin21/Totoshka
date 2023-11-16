@@ -15,7 +15,7 @@ class ProgTakeTin {
   private:
     enum Phase {
       NONE,
-      STARTING,
+      START,
       INIT_HAND,
       DRIVE,
       TAKE,
@@ -23,7 +23,7 @@ class ProgTakeTin {
     };
 
     const int _driveSpeed = 50;
-    const int _minDist = 30;
+    const int _minDist = 50;
     //GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);
 
     Truck* _truck;
@@ -48,7 +48,7 @@ void ProgTakeTin::init(Truck &truck, Hand &hand, DistMeter &distMeter) {
 
 void ProgTakeTin::start() {
   if (!isRunning()) {
-    _phase = STARTING;
+    _phase = START;
   }
 }
 
@@ -57,6 +57,7 @@ void ProgTakeTin::stop() {
   _hand->stop();
   _distMeter->disable();
   _phase = NONE;
+  //Serial.println("stop");
 }
 
 void ProgTakeTin::tick() {
@@ -65,14 +66,16 @@ void ProgTakeTin::tick() {
   }
 
   switch (_phase) {
-    case STARTING:
+    case START:
       // программа стартует => опускаем руку в нач. положение
       _hand->handToTakeTin();
       _phase = INIT_HAND;
+      //Serial.println("start");
       break;
 
     case INIT_HAND:
       // ждем пока рука опустится...
+      //Serial.println("init hand");
       if (!_hand->isRunning()) {
         // рука опустилась => подъезжаем к маяку
         _distMeter->enable();
@@ -83,6 +86,8 @@ void ProgTakeTin::tick() {
     case DRIVE:
       // подъезжаем к маяку
       int dist = _distMeter->getDist();
+      //Serial.print("drive ");
+      //Serial.println(dist);
       if (dist > _minDist) {
         _truck->goAndTurn(_driveSpeed, 0);
       }
@@ -97,6 +102,7 @@ void ProgTakeTin::tick() {
 
     case TAKE:
       // ждем пока рука сожмется...
+      //Serial.println("take");
       if (!_hand->isRunning()) {
         // рука сжалась => поднимаем маяк
         _hand->handUp();
@@ -106,20 +112,12 @@ void ProgTakeTin::tick() {
 
     case HAND_UP:
       // ждем пока рука с маяком поднимается...
+      //Serial.println("hand up");
       if (!_hand->isRunning()) {
         // маяк подняли => стоп
         stop();
       }
       break;
-  }
-
-  int dist = _distMeter->getDist();
-
-  if (dist > _minDist) {
-    _truck->goAndTurn(_driveSpeed, 0);
-  }
-  else {
-    _truck->goAndTurn(0, 0);
   }
 }
 

@@ -34,7 +34,7 @@ class Hand {
     const byte _elbowUpHandPos = 108;
     const byte _rotateCenterPos = 110;
     const byte _clawOpenPos = 97;
-    const byte _clawTakeTinPos = 85;
+    const byte _clawTakeTinPos = 73;
 
     const byte _shoulderRideTheLinePos = 115;
     const byte _elbowRideTheLinePos = 0;
@@ -211,7 +211,7 @@ void Hand::tick() {
       _shoulderAngle.addPoints(5);
       _shoulder.write(_shoulderAngle.toDeg());
 
-      _elbowAngle.addPoints(3);
+      _elbowAngle.addPoints(5);
       _elbow.write(_elbowAngle.toDeg());
 
       _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
