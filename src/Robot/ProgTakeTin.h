@@ -16,20 +16,20 @@ class ProgTakeTin {
     enum Phase {
       NONE,
       START,
-      INIT_HAND,
+      HAND_DOWN,
       DRIVE,
       TAKE,
       HAND_UP
     };
 
     const int _driveSpeed = 50;
-    const int _minDist = 50;
+    const int _distToTake = 50;
     //GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);
 
     Truck* _truck;
     Hand* _hand;
     DistMeter* _distMeter;
-    Phase _phase;
+    Phase _phase = NONE;
 
     unsigned long _tickTime = millis();
 };
@@ -38,7 +38,6 @@ void ProgTakeTin::init(Truck &truck, Hand &hand, DistMeter &distMeter) {
   _truck = &truck;
   _hand = &hand;
   _distMeter = &distMeter;
-  _phase = NONE;
 
   /*_pid.setpoint = 0;
     _pid.setMode(ON_RATE);
@@ -68,10 +67,10 @@ void ProgTakeTin::tick() {
   if (_phase == START) {
     // программа стартует => опускаем руку в нач. положение
     _hand->handToTakeTin();
-    _phase = INIT_HAND;
+    _phase = HAND_DOWN;
     //Serial.println("start");
   }
-  else if (_phase == INIT_HAND) {
+  else if (_phase == HAND_DOWN) {
     // ждем пока рука опустится...
     //Serial.println("init hand");
     if (!_hand->isRunning()) {
@@ -85,7 +84,7 @@ void ProgTakeTin::tick() {
     int dist = _distMeter->getDist();
     //Serial.print("drive ");
     //Serial.println(dist);
-    if (dist > _minDist) {
+    if (dist > _distToTake) {
       _truck->goAndTurn(_driveSpeed, 0);
     }
     else {
