@@ -5,12 +5,12 @@
 #include "Video.h"
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
-//#include "ProgGoStraight.h"
+#include "ProgGoStraight.h"
 #include "ProgRideTheLine.h"
 #include "ProgTakeTin.h"
 #include "Average.h"
 #include "Color.h"
-//#include "Gyro.h"
+#include "Gyro.h"
 #include "DistMeter.h"
 
 #define L_EN_PIN 39
@@ -43,11 +43,11 @@ Hand hand;
 Tail tail;
 Video video;
 Color color;
-//Gyro gyro;
+Gyro gyro;
 DistMeter distMeter;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
-//ProgGoStraight progGoStraight;
+ProgGoStraight progGoStraight;
 ProgRideTheLine progRideTheLine;
 ProgTakeTin progTakeTin;
 
@@ -58,18 +58,27 @@ bool ledStatus = true;
 
 void setup() {
   Serial.begin(9600);
+
+  // Эта строка устраняет зависание робота из-за гироскопа. Источник решения:
+  // https://github.com/jrowberg/i2cdevlib/issues/519#issuecomment-752023021
+  // Судя из описания метода setWireTimeout, это крайняя мера и лучше искать истинную проблему:
+  // https://www.arduino.cc/reference/en/language/functions/communication/wire/setwiretimeout/
+  // Другое решение говорит, что надо подключить пин AD0 гироскопа к GND:
+  // https://www.i2cdevlib.com/forums/topic/414-freezing-problem/
+  Wire.setWireTimeout(3000, true);
+
   radio.initReceiver();
   truck.init(L_EN_PIN, L_INA_PIN, L_INB_PIN, L_PWM_PIN, R_EN_PIN, R_INA_PIN, R_INB_PIN, R_PWM_PIN);
   hand.init(HAND_SHOULDER_PIN, HAND_ELBOW_PIN, HAND_ROTATE_PIN, HAND_CLAW_PIN);
   tail.init(TAIL_COCCYX_PIN);
   video.init(CAMERA_SWITCHER_PIN, CAMERA_FRONT_PIN, CAMERA_TOP_PIN);
   color.init();
-  //gyro.init();
+  gyro.init();
   distMeter.init();
 
   progStairsUp.init(truck, tail);
   progStairsDown.init(truck, tail);
-  //progGoStraight.init(truck, gyro);
+  progGoStraight.init(truck, gyro);
   progRideTheLine.init(truck, hand, color);
   progTakeTin.init(truck, hand, distMeter);
 
@@ -91,7 +100,7 @@ void loop() {
 
   Payload payload = radio.read();
 
-  if (payload.frontRedButton && !payload.upBlueButton) {
+  if (payload.frontRedButton) {
     stopAll();
     return;
   }
@@ -112,63 +121,62 @@ void loop() {
     return;
   }
 
-  if (payload.frontYellowButton && payload.upBlueButton) {
-    progStairsUp.start();
-  }
-  else if (payload.frontWhiteButton && payload.upBlueButton) {
-    //progStairsDown.start();
-    progRideTheLine.start();
-  }
-  /*else if (payload.frontBlackButton) {
-    progGoStraight.start();
-  }*/
-  else if (payload.frontRedButton && payload.upBlueButton) {
-    progTakeTin.start();
-  }
-  else {
-    truck.go(payload.rightStick.vert, payload.rightStick.horiz);
-
-    if (payload.upBlueButton && payload.upGreenButton) {
-      hand.handToRideTheLine();
+  if (payload.frontSwitch == 0) {
+    if (payload.upGreenButton) {
+      hand.handToBack();
     }
-
-    if (payload.upBlueButton) {
-      video.moveCamera(payload.leftStick.vert);
+    else if (!payload.upBlueButton) {
+      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1); // altMode
+    }
+  }
+  else if (payload.frontSwitch == 1) {
+    if (payload.upGreenButton) {
+      hand.handToBack();
+    }
+    else if (payload.frontYellowButton && payload.upBlueButton) {
+      progTakeTin.start();
       return;
     }
-
-    if (payload.frontSwitch == 0) {
-      if (payload.upGreenButton) {
-        hand.handToBack();
-      }
-      else {
-        hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1); // altMode
-      }
+    else if (payload.frontWhiteButton && payload.upBlueButton) {
+      progGoStraight.start();
+      return;
     }
-    else if (payload.frontSwitch == 1) {
-      if (payload.upGreenButton) {
-        hand.handToBack();
-      }
-      else {
-        hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0);
-      }
-    }
-    else if (payload.frontSwitch == 2) {
-      if (payload.upGreenButton) {
-        tail.upTail();
-      }
-      else {
-        tail.operate(payload.leftStick.vert);
-      }
+    else if (!payload.upBlueButton) {
+      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0); // НЕ altMode
     }
   }
+  else if (payload.frontSwitch == 2) {
+    if (payload.upGreenButton && !payload.upBlueButton) {
+      tail.upTail();
+    }
+    else if (payload.frontYellowButton && payload.upBlueButton) {
+      progStairsUp.start();
+      return;
+    }
+    else if (payload.frontWhiteButton && payload.upBlueButton) {
+      progRideTheLine.start();
+      return;
+    }
+    else if (payload.upGreenButton && payload.upBlueButton) {
+      hand.handToRideTheLine();
+    }
+    else if (!payload.upBlueButton) {
+      tail.operate(payload.leftStick.vert);
+    }
+  }
+
+  if (payload.upBlueButton) {
+    video.moveCamera(payload.leftStick.vert);
+  }
+
+  truck.go(payload.rightStick.vert, payload.rightStick.horiz);
 }
 
 bool isAnyProgRunning() {
   return progStairsUp.isRunning()
          || progStairsDown.isRunning()
          || progRideTheLine.isRunning()
-         /*|| progGoStraight.isRunning()*/
+         || progGoStraight.isRunning()
          || progTakeTin.isRunning();
 }
 
@@ -180,7 +188,7 @@ void stopAll() {
   progStairsUp.stop();
   progStairsDown.stop();
   progRideTheLine.stop();
-  //progGoStraight.stop();
+  progGoStraight.stop();
   progTakeTin.stop();
 }
 
@@ -189,10 +197,10 @@ void tickAll() {
   hand.tick();
   tail.tick();
   video.tick();
-  //gyro.tick();
+  gyro.tick();
   progStairsUp.tick();
   progStairsDown.tick();
   progRideTheLine.tick();
-  //progGoStraight.tick();
+  progGoStraight.tick();
   progTakeTin.tick();
 }

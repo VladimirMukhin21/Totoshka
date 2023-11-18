@@ -44,7 +44,7 @@ void ProgGoStraight::tick() {
 
   _deviation += _gyro->getCourse();
 
-  int turn = -_deviation / 10000;
+  int turn = -_deviation / 1000;
   _truck->goAndTurn(_driveSpeed, turn);
 }
 

@@ -36,30 +36,37 @@ void Gyro::init() {
   //_mpu.CalibrateGyro(6);
 }
 
+// курс
 int Gyro::getCourse() {
   return _mpu.getRotationZ();
 }
 
+// крен
 int Gyro::getRoll() {
   return _mpu.getRotationY();
 }
 
+// тангаж
 int Gyro::getPitch() {
   return _mpu.getRotationX();
 }
 
 void Gyro::tick() {
-  /*int ax, ay, az, gx, gy, gz, mx, my, mz;
-  _mpu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
-  Serial.print(gy);
-  Serial.print("\t");
-  Serial.print(_mpu.getRotationY());
-  Serial.print("\t");
-  //Serial.print(az);
+  //int ax, ay, az, gx, gy, gz;
+  //_mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+  /*ax = _mpu.getAccelerationX();
+  ay = _mpu.getAccelerationY();
+  az = _mpu.getAccelerationZ();
+  gx = _mpu.getRotationX();
+  gy = _mpu.getRotationY();
+  gz = _mpu.getRotationZ();*/
+
+  /*//Serial.print(az);
   //Serial.print("\t");
-  Serial.print(20000);
-  Serial.print("\t");
-  Serial.println(-20000);*/
+  Serial.print(gz);
+  //Serial.print("\t0\t20000\t-20000"); // линии для масштаба на графике
+  Serial.println();*/
 }
 
 /*byte Gyro::filterDeadZone(byte value) {
