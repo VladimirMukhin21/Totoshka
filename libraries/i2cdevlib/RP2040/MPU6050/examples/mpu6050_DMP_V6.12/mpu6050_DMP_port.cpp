@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
+#ifndef PICO_DEFAULT_LED_PIN // PICO w with WiFi
+#include "pico/cyw43_arch.h"
+#endif
 #include "MPU6050_6Axis_MotionApps_V6_12.h"
 
 MPU6050 mpu;
@@ -33,9 +36,45 @@ void dmpDataReady() {
     mpuInterrupt = true;
 }
 
+void initLED() {
+#ifndef PICO_DEFAULT_LED_PIN // PICO w with WiFi
+    printf ("we have board with wifi (pico w) \n");
+    if (cyw43_arch_init()) {
+        printf("WiFi init failed");
+        exit(3);
+    }
+#else
+    printf ("we have board without wifi\n");
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+#endif // PICO_DEFAULT_LED_PIN
+
+} // initLED()
+
+void  waitForUsbConnect() {
+#ifdef _PICO_STDIO_USB_H // We are using PICO_STDIO_USB. Have to wait for connection.
+    
+#ifndef PICO_DEFAULT_LED_PIN
+    while (!stdio_usb_connected()) { // blink the pico's led until usb connection is established
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
+        sleep_ms(250);
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+        sleep_ms(250);
+    }
+#else
+    while (!stdio_usb_connected()) { // blink the pico's led until usb connection is established
+        gpio_put(PICO_DEFAULT_LED_PIN, 0);
+        sleep_ms(250);
+        gpio_put(PICO_DEFAULT_LED_PIN, 1);
+        sleep_ms(250);
+    }
+#endif // PICO_DEFAULT_LED_PIN
+#endif // _PICO_STDIO_USB_H
+} //  waitForUsbConnect
+
 int main() {
     stdio_init_all();
-    // This example will use I2C0 on the default SDA and SCL pins (4, 5 on a Pico)
+    // This example will use I2C0 on the default SDA and SCL (pins 6, 7 on a Pico)
     i2c_init(i2c_default, 400 * 1000);
     gpio_set_function(PICO_DEFAULT_I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(PICO_DEFAULT_I2C_SCL_PIN, GPIO_FUNC_I2C);
@@ -44,14 +83,9 @@ int main() {
     // Make the I2C pins available to picotool
     
     // setup blink led
-    gpio_init(PICO_DEFAULT_LED_PIN);
-	gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
-	while (!stdio_usb_connected()) { // blink the pico's led until usb connection is established
-		gpio_put(PICO_DEFAULT_LED_PIN, 1);
-		sleep_ms(250);
-		gpio_put(PICO_DEFAULT_LED_PIN, 0);
-		sleep_ms(250);
-	}
+    // setup blink led
+    initLED();
+    waitForUsbConnect();
 
     // ================================================================
     // ===                      INITIAL SETUP                       ===
@@ -59,6 +93,19 @@ int main() {
 
     mpu.initialize();
     devStatus = mpu.dmpInitialize();
+
+    /* --- if you have calibration data then set the sensor offsets here --- */
+    // mpu.setXAccelOffset();
+    // mpu.setYAccelOffset();
+    // mpu.setZAccelOffset();
+    // mpu.setXGyroOffset();
+    // mpu.setYGyroOffset();
+    // mpu.setZGyroOffset();
+
+    /* --- alternatively you can try this (6 loops should be enough) --- */
+    // mpu.CalibrateAccel(6);
+    // mpu.CalibrateGyro(6);	
+	
     if (devStatus == 0) 
     {
         mpu.setDMPEnabled(true);                // turn on the DMP, now that it's ready
