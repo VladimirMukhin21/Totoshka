@@ -104,10 +104,20 @@ def y(y):
 def draw_guides(image):
     thickness=1
     if guideMode == 1:
+        cv2.line(image, (x(190), y(280)), (x(190), y(20)), BLUE, thickness) # центр
+        cv2.line(image, (x(131), y(170)), (x(154), y(120)), GREEN, thickness) # лев
+        cv2.line(image, (x(249), y(170)), (x(227), y(120)), GREEN, thickness) # прав
+        cv2.line(image, (x(100), y(170)), (x(280), y(170)), GREEN, thickness) # горизонт
+    elif guideMode == 2:
         cv2.line(image, (x(247), y(300)), (x(227), y(240)), GREEN, thickness) # центр
         cv2.line(image, (x(112), y(300)), (x(150), y(230)), GREEN, thickness) # лев
         cv2.line(image, (x(386), y(300)), (x(300), y(230)), GREEN, thickness) # прав
         cv2.line(image, (x(142), y(297)), (x(351), y(264)), BLUE, thickness) # горизонт
+    elif guideMode == 5:
+        for i in range(0, 400, 100):
+            cv2.line(image, (x(i), y(0)), (x(i), y(300)), GREEN, thickness)
+        for i in range(0, 300, 100):
+            cv2.line(image, (x(0), y(i)), (x(400), y(i)), GREEN, thickness)
 
 def draw_captured_qrs(image):
     if not showCapturedQrs:
@@ -148,8 +158,9 @@ HELP.append("q: захваченные QR-коды")
 HELP.append("w: захват cv2")
 HELP.append("e: захват pyzbar")
 HELP.append("r: выкл захват")
-HELP.append("1: вкл гайдлайны")
-HELP.append("2: выкл гайдлайны")
+HELP.append("1: гайдлайны верхней камеры")
+HELP.append("2: гайдлайны нижней камеры")
+HELP.append("3: выкл гайдлайны")
 HELP.append("h: справка")
 HELP.append("esc: завершить работу")
 
@@ -158,12 +169,12 @@ def draw_help(image):
         return
     cv2.rectangle(
         image,
-        (x(0), y(60)),
+        (x(0), y(40)),
         (x(270), y(270)),
         color = GREEN,
         thickness = -1)
     for i in range(len(HELP)):
-        cv2.putText(image, HELP[i], (x(5), y(60+(i+1)*20)), FONT, 0.7, BLACK)
+        cv2.putText(image, HELP[i], (x(5), y(40+(i+1)*20)), FONT, 0.7, BLACK)
 
 def draw_scale(image):
     now = datetime.now()
@@ -185,7 +196,7 @@ def change_scale(delta):
     print("scale:", scale, "%,  image size:", size[0], "x", size[1])
 
 capturedQrs = set()
-guideMode = 1
+guideMode = 0
 showCapturedQrs = True
 scaleChangedTime = datetime.now()
 recording = False
@@ -198,8 +209,10 @@ pyzbar_box = []
 qr = EMPTY_STR
 
 if __name__ == "__main__":
+    print("Connecting...")
     cap = cv2.VideoCapture()
     cap.open(CAMERA_NUM)
+    print("Connected")
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -252,8 +265,10 @@ if __name__ == "__main__":
         if key == ord("h"):
             showHelp = not showHelp
         if key == 40: # shift-9
+            print("Reconnecting...")
             cap.release()
             cap.open(CAMERA_NUM)
+            print("Reconnected")
         if key == 27: # Esc => exit
             break
 
