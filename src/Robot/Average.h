@@ -8,7 +8,7 @@ class Average {
     int getAverage();
 
   private:
-#define AVERAGE_ACC_COUNT 10
+#define AVERAGE_ACC_COUNT 100
     int _acc[AVERAGE_ACC_COUNT];
     int _sum = 0;
     byte _accumulatedCount = 0;

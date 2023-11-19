@@ -162,7 +162,7 @@ void Truck::tick() {
       return;
     }
 
-    _deviation += _gyro->getCourse();
+    _deviation += _gyro->getDeltaCourse();
     int turn = -_deviation / 1000;
     goAndTurn(_targetSpeed, turn);
   }
