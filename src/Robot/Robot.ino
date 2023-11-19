@@ -7,6 +7,7 @@
 #include "ProgStairsDown.h"
 #include "ProgRideTheLine.h"
 #include "ProgTakeTin.h"
+#include "ProgRotatePipe.h"
 #include "Average.h"
 #include "Color.h"
 #include "Gyro.h"
@@ -48,6 +49,7 @@ ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
 ProgRideTheLine progRideTheLine;
 ProgTakeTin progTakeTin;
+ProgRotatePipe progRotatePipe;
 
 unsigned long lastRadioTime = millis();
 
@@ -78,6 +80,7 @@ void setup() {
   progStairsDown.init(truck, tail);
   progRideTheLine.init(truck, hand, color);
   progTakeTin.init(truck, hand, distMeter);
+  progRotatePipe.init(hand);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -121,6 +124,10 @@ void loop() {
   if (payload.frontSwitch == 0) {
     if (payload.upGreenButton) {
       hand.handToBack();
+    }
+    else if (payload.frontYellowButton && payload.upBlueButton) {
+      progRotatePipe.start();
+      return;
     }
     else if (!payload.upBlueButton) {
       hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1); // altMode
@@ -173,7 +180,8 @@ bool isAnyProgRunning() {
   return progStairsUp.isRunning()
          || progStairsDown.isRunning()
          || progRideTheLine.isRunning()
-         || progTakeTin.isRunning();
+         || progTakeTin.isRunning()
+         || progRotatePipe.isRunning();
 }
 
 void stopAll() {
@@ -185,6 +193,7 @@ void stopAll() {
   progStairsDown.stop();
   progRideTheLine.stop();
   progTakeTin.stop();
+  progRotatePipe.stop();
 }
 
 void tickAll() {
@@ -197,4 +206,5 @@ void tickAll() {
   progStairsDown.tick();
   progRideTheLine.tick();
   progTakeTin.tick();
+  progRotatePipe.tick();
 }
