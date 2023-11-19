@@ -122,49 +122,38 @@ void loop() {
   }
 
   if (payload.frontSwitch == 0) {
-    if (payload.upGreenButton) {
+    if (payload.upGreenButton && !payload.upBlueButton) {
       hand.handToBack();
-    }
-    else if (payload.frontYellowButton && payload.upBlueButton) {
+    } else if (payload.frontYellowButton && payload.upBlueButton) {
       progRotatePipe.start();
       return;
+    } else if (!payload.upBlueButton) {
+      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1);  // altMode
     }
-    else if (!payload.upBlueButton) {
-      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1); // altMode
-    }
-  }
-  else if (payload.frontSwitch == 1) {
-    if (payload.upGreenButton) {
+  } else if (payload.frontSwitch == 1) {
+    if (payload.upGreenButton && !payload.upBlueButton) {
       hand.handToBack();
-    }
-    else if (payload.frontYellowButton && payload.upBlueButton) {
+    } else if (payload.upGreenButton && payload.upBlueButton) {
+      hand.handToRideTheLine();
+    } else if (payload.frontYellowButton && payload.upBlueButton) {
       progTakeTin.start();
       return;
-    }
-    else if (payload.frontWhiteButton && payload.upBlueButton) {
+    } else if (payload.frontWhiteButton && payload.upBlueButton) {
       truck.goStraight(180);
       return;
+    } else if (!payload.upBlueButton) {
+      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0);  // НЕ altMode
     }
-    else if (!payload.upBlueButton) {
-      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0); // НЕ altMode
-    }
-  }
-  else if (payload.frontSwitch == 2) {
+  } else if (payload.frontSwitch == 2) {
     if (payload.upGreenButton && !payload.upBlueButton) {
       tail.upTail();
-    }
-    else if (payload.frontYellowButton && payload.upBlueButton) {
+    } else if (payload.frontYellowButton && payload.upBlueButton) {
       progStairsUp.start();
       return;
-    }
-    else if (payload.frontWhiteButton && payload.upBlueButton) {
+    } else if (payload.frontWhiteButton && payload.upBlueButton) {
       progRideTheLine.start();
       return;
-    }
-    else if (payload.upGreenButton && payload.upBlueButton) {
-      hand.handToRideTheLine();
-    }
-    else if (!payload.upBlueButton) {
+    } else if (!payload.upBlueButton) {
       tail.operate(payload.leftStick.vert);
     }
   }
