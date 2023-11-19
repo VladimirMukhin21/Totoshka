@@ -5,7 +5,6 @@
 #include "Video.h"
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
-#include "ProgGoStraight.h"
 #include "ProgRideTheLine.h"
 #include "ProgTakeTin.h"
 #include "Average.h"
@@ -47,7 +46,6 @@ Gyro gyro;
 DistMeter distMeter;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
-ProgGoStraight progGoStraight;
 ProgRideTheLine progRideTheLine;
 ProgTakeTin progTakeTin;
 
@@ -68,17 +66,16 @@ void setup() {
   Wire.setWireTimeout(3000, true);
 
   radio.initReceiver();
-  truck.init(L_EN_PIN, L_INA_PIN, L_INB_PIN, L_PWM_PIN, R_EN_PIN, R_INA_PIN, R_INB_PIN, R_PWM_PIN);
-  hand.init(HAND_SHOULDER_PIN, HAND_ELBOW_PIN, HAND_ROTATE_PIN, HAND_CLAW_PIN);
-  tail.init(TAIL_COCCYX_PIN);
-  video.init(CAMERA_SWITCHER_PIN, CAMERA_FRONT_PIN, CAMERA_TOP_PIN);
   color.init();
   gyro.init();
   distMeter.init();
+  truck.init(L_EN_PIN, L_INA_PIN, L_INB_PIN, L_PWM_PIN, R_EN_PIN, R_INA_PIN, R_INB_PIN, R_PWM_PIN, gyro);
+  hand.init(HAND_SHOULDER_PIN, HAND_ELBOW_PIN, HAND_ROTATE_PIN, HAND_CLAW_PIN);
+  tail.init(TAIL_COCCYX_PIN);
+  video.init(CAMERA_SWITCHER_PIN, CAMERA_FRONT_PIN, CAMERA_TOP_PIN);
 
   progStairsUp.init(truck, tail);
   progStairsDown.init(truck, tail);
-  progGoStraight.init(truck, gyro);
   progRideTheLine.init(truck, hand, color);
   progTakeTin.init(truck, hand, distMeter);
 
@@ -138,7 +135,7 @@ void loop() {
       return;
     }
     else if (payload.frontWhiteButton && payload.upBlueButton) {
-      progGoStraight.start();
+      truck.goStraight(180);
       return;
     }
     else if (!payload.upBlueButton) {
@@ -169,14 +166,13 @@ void loop() {
     video.moveCamera(payload.leftStick.vert);
   }
 
-  truck.go(payload.rightStick.vert, payload.rightStick.horiz);
+  truck.operate(payload.rightStick.vert, payload.rightStick.horiz);
 }
 
 bool isAnyProgRunning() {
   return progStairsUp.isRunning()
          || progStairsDown.isRunning()
          || progRideTheLine.isRunning()
-         || progGoStraight.isRunning()
          || progTakeTin.isRunning();
 }
 
@@ -188,7 +184,6 @@ void stopAll() {
   progStairsUp.stop();
   progStairsDown.stop();
   progRideTheLine.stop();
-  progGoStraight.stop();
   progTakeTin.stop();
 }
 
@@ -201,6 +196,5 @@ void tickAll() {
   progStairsUp.tick();
   progStairsDown.tick();
   progRideTheLine.tick();
-  progGoStraight.tick();
   progTakeTin.tick();
 }

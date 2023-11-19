@@ -72,7 +72,7 @@ void ProgStairsDown::tick() {
   switch (_phase) {
     case STARTING:
       // программа стартует => подъезжаем к лестнице
-      _truck->autoGo(_driveSpeed, _driveSpeed, _driveToStairsTime);
+      _truck->autoGo(_driveSpeed, _driveToStairsTime);
       _phase = INIT_DRIVING;
       break;
 
@@ -87,7 +87,7 @@ void ProgStairsDown::tick() {
     case MOVING_TAIL_DOWN:
       if (!_tail->isRunning()) {
         // опустили хвост => опускаем корму
-        _truck->autoGo(_driveSpeed, _driveSpeed, _sternDownTime);
+        _truck->autoGo(_driveSpeed, _sternDownTime);
         _phase = DRIVING_STERN_DOWN;
       }
       break;
@@ -103,7 +103,7 @@ void ProgStairsDown::tick() {
     case MOVING_TAIL_UP:
       if (!_tail->isRunning()) {
         // хвост поднялся => опускаем нос
-        _truck->autoGo(_driveSpeed, _driveSpeed, _bowDownTime);
+        _truck->autoGo(_driveSpeed, _bowDownTime);
         _phase = DRIVING_BOW_DOWN;
       }
       break;
@@ -120,7 +120,7 @@ void ProgStairsDown::tick() {
         }
         else {
           // проехали все ступени => отъезжаем от ступеней
-          _truck->autoGo(_driveSpeed, _driveSpeed, _finishDriveTime);
+          _truck->autoGo(_driveSpeed, _finishDriveTime);
           _phase = FINISH_DRIVING;
           return;
         }
