@@ -23,7 +23,7 @@ class ProgTakeTin {
     };
 
     const int _driveSpeed = 50;
-    const int _distToTake = 50;
+    const int _distToTake = 70;
     //GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);
 
     Truck* _truck;

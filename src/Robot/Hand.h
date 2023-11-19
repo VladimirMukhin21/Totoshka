@@ -47,8 +47,8 @@ class Hand {
     Servo _rotate;
     Servo _claw;
 
-    Angle _shoulderAngle = Angle(30, 30, 154, 100);  // (115, 30, 154, 100)
-    Angle _elbowAngle = Angle(0, 0, 120, 100);
+    Angle _shoulderAngle = Angle(30, 30, 154, 70);  // (115, 30, 154, 100)
+    Angle _elbowAngle = Angle(0, 0, 120, 70);
     Angle _rotateAngle = Angle(_rotateCenterPos, 0, 180, 30);  // (3, 0, 180, 30)
     Angle _clawAngle = Angle(97, 61, 110, 50);                 // (58, 58, 180, 50) 97 58 165 50
 
@@ -59,7 +59,8 @@ class Hand {
     unsigned long _tickTime = millis();
     Mode _mode = NONE;
 
-    byte filterStickDeadZone(byte value);
+    byte filterStickDeadZoneHoriz(byte value);
+    byte filterStickDeadZoneVert(byte value);
 };
 
 void Hand::init(byte shoulderPin, byte elbowPin, byte rotatePin, byte clawPin) {
@@ -82,21 +83,21 @@ void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
     }*/
 
   if (altMode) {
-    int speedVert = map(filterStickDeadZone(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    int speedVert = map(filterStickDeadZoneVert(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
     if (speedVert != 0) {
       _elbowAngle.addPoints(speedVert);
       _elbow.write(_elbowAngle.toDeg());
       _mode = NONE;
     }
 
-    int speedHoriz = map(filterStickDeadZone(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    int speedHoriz = map(filterStickDeadZoneHoriz(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
     if (speedHoriz != 0) {
       _rotateAngle.addPoints(speedHoriz);
       _rotate.write(_rotateAngle.toDeg());
       _mode = NONE;
     }
   } else {
-    int speedVert = map(filterStickDeadZone(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    int speedVert = map(filterStickDeadZoneVert(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
     if (speedVert != 0) {
       _shoulderAngle.addPoints(-speedVert);
       _shoulder.write(_shoulderAngle.toDeg());
@@ -107,7 +108,7 @@ void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
       _mode = NONE;
     }
 
-    int speedHoriz = map(filterStickDeadZone(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    int speedHoriz = map(filterStickDeadZoneHoriz(stickHoriz), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
     if (speedHoriz != 0) {
       _clawAngle.addPoints(-speedHoriz);
       _claw.write(_clawAngle.toDeg());
@@ -169,10 +170,10 @@ void Hand::tick() {
 
   switch (_mode) {
     case HAND_TO_BACK:
-      _shoulderAngle.addPoints(-5);
+      _shoulderAngle.addPoints(-7);
       _shoulder.write(_shoulderAngle.toDeg());
 
-      _elbowAngle.addPoints(constrain(_elbowUpHandPos - _elbowAngle.toDeg(), -5, 5));
+      _elbowAngle.addPoints(constrain(_elbowUpHandPos - _elbowAngle.toDeg(), -7, 7));
       _elbow.write(_elbowAngle.toDeg());
 
       _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
@@ -181,10 +182,10 @@ void Hand::tick() {
       break;
 
     case HAND_UP:
-      _shoulderAngle.addPoints(-5);
+      _shoulderAngle.addPoints(-7);
       _shoulder.write(_shoulderAngle.toDeg());
 
-      _elbowAngle.addPoints(-5);
+      _elbowAngle.addPoints(-7);
       _elbow.write(_elbowAngle.toDeg());
 
       _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
@@ -208,22 +209,22 @@ void Hand::tick() {
       break;
 
     case TO_TAKE_TIN:
-      _shoulderAngle.addPoints(5);
+      _shoulderAngle.addPoints(6);
       _shoulder.write(_shoulderAngle.toDeg());
 
-      _elbowAngle.addPoints(5);
+      _elbowAngle.addPoints(6);
       _elbow.write(_elbowAngle.toDeg());
 
       _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
       _rotate.write(_rotateAngle.toDeg());
 
-      _clawAngle.addPoints(constrain(_clawOpenPos - _clawAngle.toDeg(), -3, 3));
+      _clawAngle.addPoints(constrain(_clawOpenPos - _clawAngle.toDeg(), -4, 4));
       _claw.write(_clawAngle.toDeg());
 
       break;
 
     case TAKE_TIN:
-      _clawAngle.addPoints(constrain(_clawTakeTinPos - _clawAngle.toDeg(), -3, 3));
+      _clawAngle.addPoints(constrain(_clawTakeTinPos - _clawAngle.toDeg(), -4, 4));
       _claw.write(_clawAngle.toDeg());
 
       break;
@@ -241,8 +242,15 @@ bool Hand::isRunning() {
   return _mode != NONE;
 }
 
-byte Hand::filterStickDeadZone(byte value) {
+byte Hand::filterStickDeadZoneHoriz(byte value) {
   if (value > 88 && value < 168)
+    return 128;
+  else
+    return value;
+}
+
+byte Hand::filterStickDeadZoneVert(byte value) {
+  if (value > 100 && value < 156)
     return 128;
   else
     return value;
