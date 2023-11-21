@@ -4,34 +4,34 @@
 #include "Angle.h"
 
 class Tail {
-  public:
-    void init(byte coccyxPin);
-    void operate(byte stickVert);
-    void moveTo(int deg);
-    void upTail();
-    void stop();
-    void tick();
-    bool isRunning();
+public:
+  void init(byte coccyxPin);
+  void operate(byte stickVert);
+  void moveTo(int deg);
+  void upTail();
+  void stop();
+  void tick();
+  bool isRunning();
 
-  private:
-    const byte _minStick = 0;
-    const byte _maxStick = 255;
-    const byte _maxSpeed = 5;
+private:
+  const byte _minStick = 0;
+  const byte _maxStick = 255;
+  const byte _maxSpeed = 5;
 
-    Servo _coccyx;
+  Servo _coccyx;
 
-    Angle _coccyxAngle = Angle(140, 15, 140, 60);
+  Angle _coccyxAngle = Angle(140, 15, 140, 60);
 
-    //#define DEBUG
+  //#define DEBUG
 #ifdef DEBUG
-    unsigned long _printTime = millis();
+  unsigned long _printTime = millis();
 #endif
 
-    unsigned long _tickTime = millis();
-    int _targetDeg;
-    bool _isRunning = false;
+  unsigned long _tickTime = millis();
+  int _targetDeg;
+  bool _isRunning = false;
 
-    byte filterStickDeadZone(byte value);
+  byte filterStickDeadZone(byte value);
 };
 
 void Tail::init(byte coccyxPin) {
@@ -48,7 +48,7 @@ void Tail::operate(byte stickVert) {
     _coccyx.write(_coccyxAngle.toDeg());
   }
 
-/*#ifdef DEBUG
+  /*#ifdef DEBUG
   if (millis() - _printTime >= 1000) {
     _printTime = millis();
     Serial.print("stick = ");

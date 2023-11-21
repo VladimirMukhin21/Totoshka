@@ -1,27 +1,27 @@
 #pragma once
 
 class Angle {
-  public:
-    Angle();
-    Angle(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
+public:
+  Angle();
+  Angle(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
 
-    void init(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
-    void setMinMax(int minDeg, int maxDeg);
-    
-    int toDeg();
-    int toPoints();
-    
-    void addDeg(int deg);
-    void addPoints(int points);
+  void init(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
+  void setMinMax(int minDeg, int maxDeg);
 
-    void setDeg(int deg);
-    void setPoints(int points);
+  int toDeg();
+  int toPoints();
 
-  private:
-    int _multiplier;
-    int _points;
-    int _minPoints;
-    int _maxPoints;
+  void addDeg(int deg);
+  void addPoints(int points);
+
+  void setDeg(int deg);
+  void setPoints(int points);
+
+private:
+  int _multiplier;
+  int _points;
+  int _minPoints;
+  int _maxPoints;
 };
 
 Angle::Angle(int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100) {

@@ -95,7 +95,8 @@ void Truck::operate(byte stickVert, byte stickHoriz) {
 
   if (_mode == NONE) {
     goAndTurn(speed, turn);
-  } else {
+  }
+  else {
     if (speed != 0 || turn != 0) {
       goAndTurn(speed, turn);
       _mode = NONE;
@@ -186,14 +187,16 @@ void Truck::stop() {
 void Truck::tick() {
   if (_mode == NONE) {
     return;
-  } else if (_mode == AUTO_GO) {
+  }
+  else if (_mode == AUTO_GO) {
     if (_targetTime > 0 && millis() > _targetTime) {
       stop();
       return;
     }
 
     goAndTurn(_targetSpeed, 0);
-  } else if (_mode == GO_STRAIGHT) {
+  }
+  else if (_mode == GO_STRAIGHT) {
     if (_targetTime > 0 && millis() > _targetTime) {
       stop();
       return;
@@ -202,7 +205,8 @@ void Truck::tick() {
     _deviation += _gyro->getDeltaCourse();
     int turn = -_deviation / 1000;
     goAndTurn(_targetSpeed, turn);
-  } else if (_mode == GO_TO_HILL) {
+  }
+  else if (_mode == GO_TO_HILL) {
     if (_targetTime > 0 && millis() > _targetTime) {
       stop();
       return;
@@ -216,7 +220,8 @@ void Truck::tick() {
     _deviation += _gyro->getDeltaCourse();
     int turn = -_deviation / 1000;
     goAndTurn(_targetSpeed, turn);
-  } else if (_mode == GO_TO_HORIZ) {
+  }
+  else if (_mode == GO_TO_HORIZ) {
     if (_targetTime > 0 && millis() > _targetTime) {
       stop();
       return;
@@ -230,7 +235,8 @@ void Truck::tick() {
     _deviation += _gyro->getDeltaCourse();
     int turn = -_deviation / 1000;
     goAndTurn(_targetSpeed, turn);
-  } else if (_mode == GO_WHILE_PITCH_IN_RANGE) {
+  }
+  else if (_mode == GO_WHILE_PITCH_IN_RANGE) {
     if (_targetTime > 0 && millis() > _targetTime) {
       stop();
       return;

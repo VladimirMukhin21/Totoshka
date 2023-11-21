@@ -3,18 +3,18 @@
 #include "Camera.h"
 
 class Video {
-  public:
-    void init(byte switcherPin, byte frontServoPin, byte topServoPin);
-    void setActiveCamera(byte activeCam);
-    void moveCamera(byte stickVert);
-    void stop();
-    void tick();
+public:
+  void init(byte switcherPin, byte frontServoPin, byte topServoPin);
+  void setActiveCamera(byte activeCam);
+  void moveCamera(byte stickVert);
+  void stop();
+  void tick();
 
-  private:
-    byte _switcherPin;
-    byte _activeCam = 0;
-    Camera _front;
-    Camera _top;
+private:
+  byte _switcherPin;
+  byte _activeCam = 0;
+  Camera _front;
+  Camera _top;
 };
 
 void Video::init(byte switcherPin, byte frontServoPin, byte topServoPin) {

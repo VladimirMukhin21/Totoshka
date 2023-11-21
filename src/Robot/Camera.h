@@ -4,33 +4,33 @@
 #include "Angle.h"
 
 class Camera {
-  public:
-    void init(byte servoPin, int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
-    void operate(byte stickVert);
-    void moveTo(int deg);
-    void toInitialPos();
-    void stop();
-    void tick();
-    bool isRunning();
+public:
+  void init(byte servoPin, int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100);
+  void operate(byte stickVert);
+  void moveTo(int deg);
+  void toInitialPos();
+  void stop();
+  void tick();
+  bool isRunning();
 
-  private:
-    const byte _minStick = 255;
-    const byte _maxStick = 0;
-    const byte _maxSpeed = 5;
+private:
+  const byte _minStick = 255;
+  const byte _maxStick = 0;
+  const byte _maxSpeed = 5;
 
-    Servo _servo;
-    Angle _direction;
+  Servo _servo;
+  Angle _direction;
 
-    //#define DEBUG
+  //#define DEBUG
 #ifdef DEBUG
-    unsigned long _printTime = millis();
+  unsigned long _printTime = millis();
 #endif
 
-    unsigned long _tickTime = millis();
-    int _targetDeg;
-    bool _isRunning = false;
+  unsigned long _tickTime = millis();
+  int _targetDeg;
+  bool _isRunning = false;
 
-    byte filterStickDeadZone(byte value);
+  byte filterStickDeadZone(byte value);
 };
 
 void Camera::init(byte servoPin, int startDeg, int minDeg, int maxDeg, int countPointsInDeg = 100) {
@@ -48,7 +48,7 @@ void Camera::operate(byte stickVert) {
     _servo.write(_direction.toDeg());
   }
 
-/*#ifdef DEBUG
+  /*#ifdef DEBUG
   if (millis() - _printTime >= 1000) {
     _printTime = millis();
     Serial.print("stick = ");

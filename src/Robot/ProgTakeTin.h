@@ -69,7 +69,8 @@ void ProgTakeTin::tick() {
     _hand->handToTakeTin();
     _phase = HAND_DOWN;
     //Serial.println("start");
-  } else if (_phase == HAND_DOWN) {
+  }
+  else if (_phase == HAND_DOWN) {
     // ждем пока рука опустится...
     //Serial.println("init hand");
     if (!_hand->isRunning()) {
@@ -78,7 +79,8 @@ void ProgTakeTin::tick() {
       _truck->goStraight(_driveSpeed);
       _phase = DRIVE;
     }
-  } else if (_phase == DRIVE) {
+  }
+  else if (_phase == DRIVE) {
     // подъезжаем к маяку
     int dist = _distMeter->getDist();
     //Serial.print("drive ");
@@ -90,7 +92,8 @@ void ProgTakeTin::tick() {
       _hand->takeTin();
       _phase = TAKE;
     }
-  } else if (_phase == TAKE) {
+  }
+  else if (_phase == TAKE) {
     // ждем пока рука сожмется...
     //Serial.println("take");
     if (!_hand->isRunning()) {
@@ -98,7 +101,8 @@ void ProgTakeTin::tick() {
       _hand->handUp();
       _phase = HAND_UP;
     }
-  } else if (_phase == HAND_UP) {
+  }
+  else if (_phase == HAND_UP) {
     // ждем пока рука с маяком поднимается...
     //Serial.println("hand up");
     if (!_hand->isRunning()) {

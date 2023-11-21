@@ -45,35 +45,42 @@ void ProgRotatePipe::stop() {
 void ProgRotatePipe::tick() {
   if (_phase == NONE) {
     return;
-  } else if (_phase == START) {
+  }
+  else if (_phase == START) {
     _hand->unclench();
     _phase = UNCLENCH;
-  } else if (_phase == UNCLENCH) {
+  }
+  else if (_phase == UNCLENCH) {
     if (!_hand->isRunning()) {
       if (_rotateCount-- > 0) {
         _hand->rotate(10);
         _phase = CLOCKWIZE;
-      } else {
+      }
+      else {
         _hand->rotateToCenter();
         _phase = STOP;
       }
     }
-  } else if (_phase == CLOCKWIZE) {
+  }
+  else if (_phase == CLOCKWIZE) {
     if (!_hand->isRunning()) {
       _hand->clenchPipe();
       _phase = CLENCH;
     }
-  } else if (_phase == CLENCH) {
+  }
+  else if (_phase == CLENCH) {
     if (!_hand->isRunning()) {
       _hand->rotate(170);
       _phase = COUNTERCLOCKWIZE;
     }
-  } else if (_phase == COUNTERCLOCKWIZE) {
+  }
+  else if (_phase == COUNTERCLOCKWIZE) {
     if (!_hand->isRunning()) {
       _hand->unclench();
       _phase = UNCLENCH;
     }
-  } else if (_phase == STOP) {
+  }
+  else if (_phase == STOP) {
     if (!_hand->isRunning()) {
       _phase = NONE;
     }

@@ -1,17 +1,17 @@
 #pragma once
 
 class Average {
-  public:
-    Average();
-    void add(int value);
-    void reset();
-    int getAverage();
+public:
+  Average();
+  void add(int value);
+  void reset();
+  int getAverage();
 
-  private:
+private:
 #define AVERAGE_ACC_COUNT 100
-    int _acc[AVERAGE_ACC_COUNT];
-    int _sum = 0;
-    byte _accumulatedCount = 0;
+  int _acc[AVERAGE_ACC_COUNT];
+  int _sum = 0;
+  byte _accumulatedCount = 0;
 };
 
 Average::Average() {

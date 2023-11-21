@@ -1,27 +1,27 @@
 #pragma once
 
 class Motor {
-  public:
-    void init(byte enPin, byte inaPin, byte inbPin, byte pwmPin);
-    void go(int speed);
-    void stop();
-  private:
-    const byte _minSpeed = 0;
-    const byte _maxSpeed = 255;
+public:
+  void init(byte enPin, byte inaPin, byte inbPin, byte pwmPin);
+  void go(int speed);
+  void stop();
+private:
+  const byte _minSpeed = 0;
+  const byte _maxSpeed = 255;
 
-    byte _enPin;
-    byte _inaPin;
-    byte _inbPin;
-    byte _pwmPin;
+  byte _enPin;
+  byte _inaPin;
+  byte _inbPin;
+  byte _pwmPin;
 };
 
 void Motor::init(byte enPin, byte inaPin, byte inbPin, byte pwmPin) {
-  _enPin  = enPin;
+  _enPin = enPin;
   _inaPin = inaPin;
   _inbPin = inbPin;
   _pwmPin = pwmPin;
 
-  pinMode(enPin,  OUTPUT);
+  pinMode(enPin, OUTPUT);
   pinMode(inaPin, OUTPUT);
   pinMode(inbPin, OUTPUT);
   pinMode(pwmPin, OUTPUT);
@@ -42,7 +42,7 @@ void Motor::go(int speed) {
 
   digitalWrite(_inaPin, forward);
   digitalWrite(_inbPin, !forward);
-  analogWrite (_pwmPin, speed);
+  analogWrite(_pwmPin, speed);
 
   /*if (speed > 0) {
     digitalWrite(_inaPin, forward);

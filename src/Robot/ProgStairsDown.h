@@ -3,46 +3,46 @@
 #include "Tail.h"
 
 class ProgStairsDown {
-  public:
-    void init(Truck &truck, Tail &tail);
-    void start();
-    void stop();
-    void tick();
-    bool isRunning();
+public:
+  void init(Truck &truck, Tail &tail);
+  void start();
+  void stop();
+  void tick();
+  bool isRunning();
 
-  private:
-    enum Phase {
-      STARTING,
-      INIT_DRIVING,
-      MOVING_TAIL_DOWN,
-      DRIVING_STERN_DOWN,
-      MOVING_TAIL_UP,
-      DRIVING_BOW_DOWN,
-      FINISH_DRIVING,
-      STOPPING
-    };
+private:
+  enum Phase {
+    STARTING,
+    INIT_DRIVING,
+    MOVING_TAIL_DOWN,
+    DRIVING_STERN_DOWN,
+    MOVING_TAIL_UP,
+    DRIVING_BOW_DOWN,
+    FINISH_DRIVING,
+    STOPPING
+  };
 
-    const byte _stairsCount = 5;
-    const byte _tailUpDeg = 125;
-    const byte _tailDownDeg = 15;
-    const int _driveSpeed = -50;
-    const int _driveToStairsTime = 1000; //500
-    const int _bowDownTime = 1250; //500
-    const int _sternDownTime = 750; //250
-    const int _finishDriveTime = 500; //500
+  const byte _stairsCount = 5;
+  const byte _tailUpDeg = 125;
+  const byte _tailDownDeg = 15;
+  const int _driveSpeed = -50;
+  const int _driveToStairsTime = 1000;  //500
+  const int _bowDownTime = 1250;        //500
+  const int _sternDownTime = 750;       //250
+  const int _finishDriveTime = 500;     //500
 
-    Truck* _truck;
-    Tail* _tail;
-    Phase _phase;
-    byte _passedStairs;
+  Truck *_truck;
+  Tail *_tail;
+  Phase _phase;
+  byte _passedStairs;
 
-    //#define DEBUG
+  //#define DEBUG
 #ifdef DEBUG
-    unsigned long _printTime = millis();
+  unsigned long _printTime = millis();
 #endif
 
-    unsigned long _tickTime = millis();
-    bool _isRunning = false;
+  unsigned long _tickTime = millis();
+  bool _isRunning = false;
 };
 
 void ProgStairsDown::init(Truck &truck, Tail &tail) {

@@ -105,7 +105,8 @@ void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
       _rotate.write(_rotateAngle.toDeg());
       _mode = NONE;
     }
-  } else {
+  }
+  else {
     int speedVert = map(filterStickDeadZoneVert(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
     if (speedVert != 0) {
       _shoulderAngle.addPoints(-speedVert);
@@ -208,7 +209,8 @@ void Hand::tick() {
 
     _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
     _rotate.write(_rotateAngle.toDeg());
-  } else if (_mode == HAND_UP) {
+  }
+  else if (_mode == HAND_UP) {
     _shoulderAngle.addPoints(-7);
     _shoulder.write(_shoulderAngle.toDeg());
 
@@ -217,7 +219,8 @@ void Hand::tick() {
 
     _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
     _rotate.write(_rotateAngle.toDeg());
-  } else if (_mode == TO_RIDE_LINE) {
+  }
+  else if (_mode == TO_RIDE_LINE) {
     _shoulderAngle.addPoints(constrain(_shoulderRideTheLinePos - _shoulderAngle.toDeg(), -5, 5));
     _shoulder.write(_shoulderAngle.toDeg());
 
@@ -229,7 +232,8 @@ void Hand::tick() {
 
     _clawAngle.addPoints(-3);
     _claw.write(_clawAngle.toDeg());
-  } else if (_mode == TO_TAKE_TIN) {
+  }
+  else if (_mode == TO_TAKE_TIN) {
     _shoulderAngle.addPoints(6);
     _shoulder.write(_shoulderAngle.toDeg());
 
@@ -241,10 +245,12 @@ void Hand::tick() {
 
     _clawAngle.addPoints(constrain(_clawOpenPos - _clawAngle.toDeg(), -4, 4));
     _claw.write(_clawAngle.toDeg());
-  } else if (_mode == ROTATE) {
+  }
+  else if (_mode == ROTATE) {
     _rotateAngle.addPoints(constrain(_targetRotatePos - _rotateAngle.toDeg(), -5, 5));
     _rotate.write(_rotateAngle.toDeg());
-  } else if (_mode == CLAW) {
+  }
+  else if (_mode == CLAW) {
     _clawAngle.addPoints(constrain(_targetClawPos - _clawAngle.toDeg(), -4, 4));
     _claw.write(_clawAngle.toDeg());
   }

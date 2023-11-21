@@ -5,23 +5,23 @@
 #include "Color.h"
 
 class ProgRideTheLine {
-  public:
-    void init(Truck &truck, Hand &hand, Color &color);
-    void start();
-    void stop();
-    void tick();
-    bool isRunning();
+public:
+  void init(Truck &truck, Hand &hand, Color &color);
+  void start();
+  void stop();
+  void tick();
+  bool isRunning();
 
-  private:
-    const int _driveSpeed = 65; // 70
-    GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100); //   4.5, 0.1, 0.3, 100      3.1, 0.15, 0.25, 100     // 2.0, 0, 0.2, 100  //   2.7, 0.2, 0.15, 100   4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
+private:
+  const int _driveSpeed = 65;                     // 70
+  GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);  //   4.5, 0.1, 0.3, 100      3.1, 0.15, 0.25, 100     // 2.0, 0, 0.2, 100  //   2.7, 0.2, 0.15, 100   4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
 
-    Truck* _truck;
-    Hand* _hand;
-    Color* _color;
+  Truck *_truck;
+  Hand *_hand;
+  Color *_color;
 
-    unsigned long _tickTime = millis();
-    bool _isRunning = false;
+  unsigned long _tickTime = millis();
+  bool _isRunning = false;
 };
 
 void ProgRideTheLine::init(Truck &truck, Hand &hand, Color &color) {
@@ -58,7 +58,7 @@ void ProgRideTheLine::tick() {
   int r = _color->getRight();
 
   _pid.input = r - l;
-  int turn = _pid.getResult(); // ПИД-регулятор
+  int turn = _pid.getResult();  // ПИД-регулятор
   //int turn = (int)((double)(l - r) * 3); // П-регулятор
 
   _truck->goAndTurn(_driveSpeed, turn);

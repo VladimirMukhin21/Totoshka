@@ -1,11 +1,11 @@
 #include <EncButton.h>
 #include "Radio.h"
 
-#define PIN_LEFT_STICK_VERT  A13
+#define PIN_LEFT_STICK_VERT A13
 #define PIN_LEFT_STICK_HORIZ A15
 #define PIN_LEFT_STICK_BUTTON 33
 
-#define PIN_RIGHT_STICK_VERT  A12
+#define PIN_RIGHT_STICK_VERT A12
 #define PIN_RIGHT_STICK_HORIZ A14
 #define PIN_RIGHT_STICK_BUTTON 32
 
@@ -44,14 +44,14 @@ void setup() {
 
 void loop() {
   blackButton.tick();
-  
+
   Payload payload;
 
-  payload.leftStick.vert   = map(analogRead(PIN_LEFT_STICK_VERT), 0, 1023, 255, 0);
-  payload.leftStick.horiz  = map(analogRead(PIN_LEFT_STICK_HORIZ), 0, 1023, 0, 255);
+  payload.leftStick.vert = map(analogRead(PIN_LEFT_STICK_VERT), 0, 1023, 255, 0);
+  payload.leftStick.horiz = map(analogRead(PIN_LEFT_STICK_HORIZ), 0, 1023, 0, 255);
   payload.leftStick.pressed = !digitalRead(PIN_LEFT_STICK_BUTTON);
 
-  payload.rightStick.vert  = map(analogRead(PIN_RIGHT_STICK_VERT), 0, 1023, 255, 0);
+  payload.rightStick.vert = map(analogRead(PIN_RIGHT_STICK_VERT), 0, 1023, 255, 0);
   payload.rightStick.horiz = map(analogRead(PIN_RIGHT_STICK_HORIZ), 0, 1023, 0, 255);
   payload.rightStick.pressed = !digitalRead(PIN_RIGHT_STICK_BUTTON);
 
@@ -76,6 +76,6 @@ byte mapButtonSwitch(bool fired, byte& currentPos, byte posCount) {
   if (fired) {
     currentPos++;
   }
-  
+
   return currentPos % posCount;
 }
