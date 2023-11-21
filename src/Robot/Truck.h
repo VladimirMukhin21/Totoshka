@@ -11,6 +11,8 @@ public:
   void speedGo(int speedLeft, int speedRight);
   void autoGo(int speed, int msec = -1);
   void goStraight(int speed, int msec = -1);
+  void goHill(int speed, int thresholdSlopeAngle = 3000, int thresholdHorizAngle = 100, int msec = -1);
+  void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
   void stop();
   void tick();
   bool isRunning();
@@ -19,7 +21,10 @@ private:
   enum Mode {
     NONE,
     AUTO_GO,
-    GO_STRAIGHT
+    GO_STRAIGHT,
+    GO_TO_HILL,
+    GO_TO_HORIZ,
+    GO_WHILE_PITCH_IN_RANGE
   };
 
   const byte _minStick = 0;
@@ -38,9 +43,14 @@ private:
 
   unsigned long _tickTime = millis();
 
-  int _targetSpeed;
-  unsigned long _targetTime;
   Mode _mode = NONE;
+  int _targetSpeed = 0;
+  unsigned long _targetTime = 0;
+  int _thresholdHillAngle = 0;
+  int _thresholdHorizAngle = 0;
+  int _minPitchAngle = 0;
+  int _maxPitchAngle = 0;
+  bool _absolutePitch = false;
 
   byte filterStickDeadZone(byte value);
 };
@@ -140,6 +150,33 @@ void Truck::goStraight(int speed, int msec = -1) {
   _mode = GO_STRAIGHT;
 }
 
+void Truck::goHill(int speed, int thresholdHillAngle = 3000, int thresholdHorizAngle = 100, int msec = -1) {
+  _targetSpeed = speed;
+  _thresholdHillAngle = thresholdHillAngle;
+  _thresholdHorizAngle = thresholdHorizAngle;
+  _targetTime = -1;
+  if (msec > 0) {
+    _targetTime = millis() + msec;
+  }
+
+  _deviation = 0;
+  _mode = GO_TO_HILL;
+}
+
+void Truck::goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1) {
+  _targetSpeed = speed;
+  _minPitchAngle = minPitchAngle;
+  _maxPitchAngle = maxPitchAngle;
+  _absolutePitch = absolutePitch;
+  _targetTime = -1;
+  if (msec > 0) {
+    _targetTime = millis() + msec;
+  }
+
+  _deviation = 0;
+  _mode = GO_WHILE_PITCH_IN_RANGE;
+}
+
 void Truck::stop() {
   _left.stop();
   _right.stop();
@@ -158,6 +195,53 @@ void Truck::tick() {
     goAndTurn(_targetSpeed, 0);
   } else if (_mode == GO_STRAIGHT) {
     if (_targetTime > 0 && millis() > _targetTime) {
+      stop();
+      return;
+    }
+
+    _deviation += _gyro->getDeltaCourse();
+    int turn = -_deviation / 1000;
+    goAndTurn(_targetSpeed, turn);
+  } else if (_mode == GO_TO_HILL) {
+    if (_targetTime > 0 && millis() > _targetTime) {
+      stop();
+      return;
+    }
+
+    if (abs(_gyro->getPitch()) >= _thresholdHillAngle) {
+      _mode = GO_TO_HORIZ;
+      return;
+    }
+
+    _deviation += _gyro->getDeltaCourse();
+    int turn = -_deviation / 1000;
+    goAndTurn(_targetSpeed, turn);
+  } else if (_mode == GO_TO_HORIZ) {
+    if (_targetTime > 0 && millis() > _targetTime) {
+      stop();
+      return;
+    }
+
+    if (abs(_gyro->getPitch()) <= _thresholdHorizAngle) {
+      stop();
+      return;
+    }
+
+    _deviation += _gyro->getDeltaCourse();
+    int turn = -_deviation / 1000;
+    goAndTurn(_targetSpeed, turn);
+  } else if (_mode == GO_WHILE_PITCH_IN_RANGE) {
+    if (_targetTime > 0 && millis() > _targetTime) {
+      stop();
+      return;
+    }
+
+    int pitch = _gyro->getPitch();
+    if (_absolutePitch) {
+      pitch = abs(pitch);
+    }
+
+    if (pitch < _minPitchAngle || pitch > _maxPitchAngle) {
       stop();
       return;
     }
