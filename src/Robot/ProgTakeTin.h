@@ -18,12 +18,15 @@ private:
     START,
     INIT_HAND,
     DRIVE,
+    SLOW_DRIVE,
     TAKE,
     TIN_UP
   };
 
-  const int _driveSpeed = 70;  // скорость подъезда к маяку
-  const int _distToTake = 75;  // расстояние, на котором останавливаемся и хватаем маяк
+  const int _driveSpeed = 70;        // скорость подъезда к маяку
+  const int _driveSlowSpeed = 40;    // скорость медленного подъезда к маяку когда маяк близко
+  const int _distToSlowDrive = 150;  // расстояние до маяка, на котором снижаем скорость
+  const int _distToTake = 75;        // расстояние до маяка, на котором останавливаемся и хватаем маяк
   //GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);
 
   Truck *_truck;
@@ -76,15 +79,29 @@ void ProgTakeTin::tick() {
     if (!_hand->isRunning()) {
       // рука опустилась => подъезжаем к маяку
       _distMeter->enable();
-      _truck->goStraight(_driveSpeed);
-      _phase = DRIVE;
+      int dist = _distMeter->getDist();
+      if (dist <= _distToSlowDrive) {
+        _truck->goStraight(_driveSlowSpeed);
+        _phase = SLOW_DRIVE;
+      }
+      else {
+        _truck->goStraight(_driveSpeed);
+        _phase = DRIVE;
+      }
     }
   }
   else if (_phase == DRIVE) {
     // подъезжаем к маяку
     int dist = _distMeter->getDist();
-    //Serial.print("drive ");
-    //Serial.println(dist);
+    if (dist <= _distToSlowDrive) {
+      // подъехали к маяку близко => снижаем скорость, девиацию не сбрасываем
+      _truck->goStraight(_driveSlowSpeed, false);
+      _phase = SLOW_DRIVE;
+    }
+  }
+  else if (_phase == SLOW_DRIVE) {
+    // медленно подъезжаем к маяку
+    int dist = _distMeter->getDist();
     if (dist <= _distToTake) {
       // доехали до маяка
       _truck->stop();

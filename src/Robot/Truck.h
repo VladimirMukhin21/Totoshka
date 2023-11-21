@@ -10,7 +10,7 @@ public:
   void goAndTurn(int speed, int turn);
   void speedGo(int speedLeft, int speedRight);
   void autoGo(int speed, int msec = -1);
-  void goStraight(int speed, int msec = -1);
+  void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdSlopeAngle = 3000, int thresholdHorizAngle = 100, int msec = -1);
   void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
   void stop();
@@ -140,14 +140,17 @@ void Truck::autoGo(int speed, int msec = -1) {
   _mode = AUTO_GO;
 }
 
-void Truck::goStraight(int speed, int msec = -1) {
+void Truck::goStraight(int speed, bool resetDeviation = true, int msec = -1) {
   _targetSpeed = speed;
   _targetTime = -1;
   if (msec > 0) {
     _targetTime = millis() + msec;
   }
 
-  _deviation = 0;
+  if (resetDeviation) {
+    _deviation = 0;
+  }
+
   _mode = GO_STRAIGHT;
 }
 
