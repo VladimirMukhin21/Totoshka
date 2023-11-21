@@ -70,7 +70,7 @@ void ProgRotatePipe::tick() {
   }
   else if (_phase == CLENCH) {
     if (!_hand->isRunning()) {
-      _hand->rotate(170);
+      _hand->rotate(180);
       _phase = COUNTERCLOCKWIZE;
     }
   }

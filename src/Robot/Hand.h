@@ -8,7 +8,7 @@ public:
   void init(byte shoulderPin, byte elbowPin, byte rotatePin, byte clawPin);
   void operate(byte stickVert, byte stickHoriz, bool altMode);
   void handToBack();
-  void handUp();
+  void tinUp();
   void handToRideTheLine();
   void handToTakeTin();
   void takeTin();
@@ -25,7 +25,8 @@ private:
   enum Mode {
     NONE,
     HAND_TO_BACK,
-    HAND_UP,
+    TIN_UP_FROM_LOW_POS,
+    TIN_UP_FROM_HIGH_POS,
     TO_RIDE_LINE,
     TO_TAKE_TIN,
     ROTATE,
@@ -38,10 +39,10 @@ private:
 
   const byte _shoulderThr = 50;
   const byte _elbowUpHandPos = 108;
-  const byte _rotateCenterPos = 110;
-  const byte _clawOpenPos = 97;
-  const byte _clawTakeTinPos = 73;
-  const byte _clenchPipePos = 73;
+  const byte _rotateCenterPos = 107;
+  const byte _clawOpenPos = 110;    // разжатие руки при захвате маяка и вращении трубок
+  const byte _clawTakeTinPos = 77;  // сжатие руки при захвате маяка
+  const byte _clenchPipePos = 77;   // сжатие руки при вращении трубок
 
   const byte _shoulderRideTheLinePos = 115;
   const byte _elbowRideTheLinePos = 0;
@@ -54,10 +55,10 @@ private:
   Servo _rotate;
   Servo _claw;
 
-  Angle _shoulderAngle = Angle(30, 30, 154, 70);  // (115, 30, 154, 100)
-  Angle _elbowAngle = Angle(0, 0, 120, 70);
-  Angle _rotateAngle = Angle(_rotateCenterPos, 3, 180, 30);  // (3, 0, 180, 30)
-  Angle _clawAngle = Angle(97, 61, 110, 50);                 // (58, 58, 180, 50) 97 58 165 50
+  Angle _shoulderAngle = Angle(30, 30, 154, 70);             // вверх-вниз
+  Angle _elbowAngle = Angle(0, 0, 120, 70);                  // вниз-вверх
+  Angle _rotateAngle = Angle(_rotateCenterPos, 3, 180, 30);  // против-по часовой (смотреть по ходу движения робота)
+  Angle _clawAngle = Angle(105, 65, 130, 40);                // сжатие-разжатие
 
   /*#ifdef DEBUG
           unsigned long _printTime = millis();
@@ -144,8 +145,13 @@ void Hand::handToBack() {
   _mode = HAND_TO_BACK;
 }
 
-void Hand::handUp() {
-  _mode = HAND_UP;
+void Hand::tinUp() {
+  if (_shoulderAngle.toDeg() > 100) {
+    _mode = TIN_UP_FROM_LOW_POS;
+  }
+  else {
+    _mode = TIN_UP_FROM_HIGH_POS;
+  }
 }
 
 void Hand::handToRideTheLine() {
@@ -201,20 +207,30 @@ void Hand::tick() {
   int clawPointsPre = _clawAngle.toPoints();
 
   if (_mode == HAND_TO_BACK) {
-    _shoulderAngle.addPoints(-7);
+    _shoulderAngle.addPoints(-6);
     _shoulder.write(_shoulderAngle.toDeg());
 
-    _elbowAngle.addPoints(constrain(_elbowUpHandPos - _elbowAngle.toDeg(), -7, 7));
+    _elbowAngle.addPoints(constrain(_elbowUpHandPos - _elbowAngle.toDeg(), -6, 6));
     _elbow.write(_elbowAngle.toDeg());
 
     _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
     _rotate.write(_rotateAngle.toDeg());
   }
-  else if (_mode == HAND_UP) {
-    _shoulderAngle.addPoints(-7);
+  else if (_mode == TIN_UP_FROM_LOW_POS) {
+    _shoulderAngle.addPoints(-6);
     _shoulder.write(_shoulderAngle.toDeg());
 
-    _elbowAngle.addPoints(-7);
+    _elbowAngle.addPoints(-6);
+    _elbow.write(_elbowAngle.toDeg());
+
+    _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
+    _rotate.write(_rotateAngle.toDeg());
+  }
+  else if (_mode == TIN_UP_FROM_HIGH_POS) {
+    _shoulderAngle.addPoints(constrain(60 - _shoulderAngle.toDeg(), -6, 6));
+    _shoulder.write(_shoulderAngle.toDeg());
+
+    _elbowAngle.addPoints(constrain(90 - _elbowAngle.toDeg(), -6, 6));
     _elbow.write(_elbowAngle.toDeg());
 
     _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
@@ -224,7 +240,7 @@ void Hand::tick() {
     _shoulderAngle.addPoints(constrain(_shoulderRideTheLinePos - _shoulderAngle.toDeg(), -5, 5));
     _shoulder.write(_shoulderAngle.toDeg());
 
-    _elbowAngle.addPoints(-8);
+    _elbowAngle.addPoints(-7);
     _elbow.write(_elbowAngle.toDeg());
 
     _rotateAngle.addPoints(constrain(_rotateRideTheLinePos - _rotateAngle.toDeg(), -5, 5));
@@ -234,11 +250,12 @@ void Hand::tick() {
     _claw.write(_clawAngle.toDeg());
   }
   else if (_mode == TO_TAKE_TIN) {
-    _shoulderAngle.addPoints(6);
-    _shoulder.write(_shoulderAngle.toDeg());
+    // опускание руки пока убрали, т.к. пока не надо (но оно работает)
+    // _shoulderAngle.addPoints(6);
+    // _shoulder.write(_shoulderAngle.toDeg());
 
-    _elbowAngle.addPoints(6);
-    _elbow.write(_elbowAngle.toDeg());
+    // _elbowAngle.addPoints(6);
+    // _elbow.write(_elbowAngle.toDeg());
 
     _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
     _rotate.write(_rotateAngle.toDeg());

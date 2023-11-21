@@ -16,14 +16,14 @@ private:
   enum Phase {
     NONE,
     START,
-    HAND_DOWN,
+    INIT_HAND,
     DRIVE,
     TAKE,
-    HAND_UP
+    TIN_UP
   };
 
-  const int _driveSpeed = 70;
-  const int _distToTake = 70;
+  const int _driveSpeed = 70;  // скорость подъезда к маяку
+  const int _distToTake = 75;  // расстояние, на котором останавливаемся и хватаем маяк
   //GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);
 
   Truck *_truck;
@@ -67,10 +67,10 @@ void ProgTakeTin::tick() {
   if (_phase == START) {
     // программа стартует => опускаем руку в нач. положение
     _hand->handToTakeTin();
-    _phase = HAND_DOWN;
+    _phase = INIT_HAND;
     //Serial.println("start");
   }
-  else if (_phase == HAND_DOWN) {
+  else if (_phase == INIT_HAND) {
     // ждем пока рука опустится...
     //Serial.println("init hand");
     if (!_hand->isRunning()) {
@@ -98,11 +98,11 @@ void ProgTakeTin::tick() {
     //Serial.println("take");
     if (!_hand->isRunning()) {
       // рука сжалась => поднимаем маяк
-      _hand->handUp();
-      _phase = HAND_UP;
+      _hand->tinUp();
+      _phase = TIN_UP;
     }
   }
-  else if (_phase == HAND_UP) {
+  else if (_phase == TIN_UP) {
     // ждем пока рука с маяком поднимается...
     //Serial.println("hand up");
     if (!_hand->isRunning()) {
