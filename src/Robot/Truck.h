@@ -11,7 +11,7 @@ public:
   void speedGo(int speedLeft, int speedRight);
   void autoGo(int speed, int msec = -1);
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
-  void goHill(int speed, int thresholdHillAngle = 5000, int thresholdHorizAngle = 1000, int msec = -1);
+  void goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
   void stop();
   void tick();
@@ -51,6 +51,8 @@ private:
   int _minPitchAngle = 0;
   int _maxPitchAngle = 0;
   bool _absolutePitch = false;
+  int _fixTimeMsec = 0;  // показывает сколько мсек надо для четкой фиксации показаний (защита от плавающих показаний)
+  unsigned long _timeOfStartFixing = 0; // время начала фиксации требуемых показаний
 
   byte filterStickDeadZone(byte value);
 };
@@ -154,15 +156,17 @@ void Truck::goStraight(int speed, bool resetDeviation = true, int msec = -1) {
   _mode = GO_STRAIGHT;
 }
 
-void Truck::goHill(int speed, int thresholdHillAngle = 5000, int thresholdHorizAngle = 1000, int msec = -1) {
+void Truck::goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1) {
   _targetSpeed = speed;
   _thresholdHillAngle = thresholdHillAngle;
   _thresholdHorizAngle = thresholdHorizAngle;
+  _fixTimeMsec = fixTimeMsec;
   _targetTime = -1;
-  if (msec > 0) {
-    _targetTime = millis() + msec;
+  if (maxTimeMsec > 0) {
+    _targetTime = millis() + maxTimeMsec;
   }
 
+  _timeOfStartFixing = 0;
   _deviation = 0;
   _mode = GO_TO_HILL;
 }
@@ -215,9 +219,21 @@ void Truck::tick() {
       return;
     }
 
+    // Serial.print(0); Serial.print("\t"); Serial.println(_gyro->getPitch());
     if (abs(_gyro->getPitch()) >= _thresholdHillAngle) {
-      _mode = GO_TO_HORIZ;
-      return;
+      if (_timeOfStartFixing <= 0) {
+        _timeOfStartFixing = millis();
+      }
+
+      if (millis() - _timeOfStartFixing > _fixTimeMsec) {
+        _timeOfStartFixing = 0;
+        _mode = GO_TO_HORIZ;
+        // stop();//
+        return;
+      }
+    }
+    else {
+      _timeOfStartFixing = 0;
     }
 
     _deviation += _gyro->getDeltaCourse();
@@ -230,9 +246,20 @@ void Truck::tick() {
       return;
     }
 
-    if (abs(_gyro->getPitch()) <= _thresholdHorizAngle) {
-      stop();
-      return;
+    int pitch = _gyro->getPitch();
+    if (abs(pitch) <= _thresholdHorizAngle) {
+      if (_timeOfStartFixing <= 0) {
+        _timeOfStartFixing = millis();
+      }
+
+      if (millis() - _timeOfStartFixing > _fixTimeMsec) {
+        _timeOfStartFixing = 0;
+        stop();
+        return;
+      }
+    }
+    else {
+      _timeOfStartFixing = 0;
     }
 
     _deviation += _gyro->getDeltaCourse();

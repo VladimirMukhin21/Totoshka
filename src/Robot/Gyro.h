@@ -7,7 +7,8 @@
 class Gyro {
 public:
   void init();
-
+  void enable();
+  void disable();
   int getDeltaCourse();
   int getDeltaRoll();
   int getDeltaPitch();
@@ -17,16 +18,9 @@ public:
 
 private:
   MPU6050 _mpu;
-
-  /*int16_t accel_x, accel_y, accel_z;
-      int16_t gyro_x, gyro_y, gyro_z;*/
-
-  // Average avgAX;
-  // Average avgAY;
-  // Average avgAZ;
-  // Average avgGX;
-  // Average avgGY;
-  // Average avgGZ;
+  Average _avgAX, _avgAY, _avgAZ, _avgGX, _avgGY, _avgGZ;
+  bool _enabled = true;  //false;
+  unsigned long _tickTime = millis();
 
   void calibrate();
   //byte filterDeadZone(byte value);
@@ -40,49 +34,75 @@ void Gyro::init() {
   // _mpu.CalibrateGyro(10);
 }
 
+void Gyro::enable() {
+  _enabled = true;
+}
+
+void Gyro::disable() {
+  _enabled = false;
+  _avgAX.reset();
+  _avgAY.reset();
+  _avgAZ.reset();
+  _avgGX.reset();
+  _avgGY.reset();
+  _avgGZ.reset();
+}
+
 // изменение курса
 int Gyro::getDeltaCourse() {
-  return _mpu.getRotationZ();
+  return _avgGZ.getAverage();
+  // return _mpu.getRotationZ();
 }
 
 // изменение крена
 int Gyro::getDeltaRoll() {
-  return _mpu.getRotationY();
+  return _avgGY.getAverage();
+  // return _mpu.getRotationY();
 }
 
 // изменение тангажа
 int Gyro::getDeltaPitch() {
-  return _mpu.getRotationX();
+  return _avgGX.getAverage();
+  // return _mpu.getRotationX();
 }
 
 // крен
 int Gyro::getRoll() {
-  return _mpu.getAccelerationX();
+  return _avgAX.getAverage();
+  // return _mpu.getAccelerationX();
 }
 
 // тангаж
 int Gyro::getPitch() {
-  return _mpu.getAccelerationY();
+  return _avgAY.getAverage();
+  // return _mpu.getAccelerationY();
 }
 
 void Gyro::tick() {
-  // Serial.print(getPitch());
+  if (!_enabled) {
+    return;
+  }
+
+  // if (millis() - _tickTime < 1) {
+  //   return;
+  // }
+  // _tickTime = millis();
+
+  int ax, ay, az, gx, gy, gz;
+  _mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+  _avgAX.add(ax);
+  _avgAY.add(ay);
+  _avgAZ.add(az);
+  _avgGX.add(gx);
+  _avgGY.add(gy);
+  _avgGZ.add(gz);
+
+  // Serial.print(_avgGX.getAverage());
   // Serial.print("\t");
-
-  // int ax, ay, az, gx, gy, gz;
-  // _mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-
-  // avgGX.add(gx);
-  // avgGY.add(gy);
-  // avgGZ.add(gz);
-
-  //gz = (int)(gz / 32768 * 250);
-
-  // Serial.print(avgGX.getAverage());
+  // Serial.print(_avgGY.getAverage());
   // Serial.print("\t");
-  // Serial.print(avgGY.getAverage());
-  // Serial.print("\t");
-  // Serial.print(avgGZ.getAverage());
+  // Serial.print(_avgGZ.getAverage());
   // Serial.print("\t");
 
   // Serial.print(ax);
@@ -92,11 +112,11 @@ void Gyro::tick() {
   // Serial.print(az);
   // Serial.print("\t");
 
-  // Serial.print(gx);
+  // Serial.print(ax);
   // Serial.print("\t");
-  // Serial.print(gy);
+  // Serial.print(ay);
   // Serial.print("\t");
-  // Serial.print(gz);
+  // Serial.print(az);
   // Serial.print("\t");
 
   // Serial.print("0\t50\t-50");  // линии для масштаба на графике

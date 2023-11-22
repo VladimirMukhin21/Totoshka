@@ -130,7 +130,7 @@ void loop() {
       return;
     }
     else if (payload.frontWhiteButton && payload.upBlueButton) {
-      truck.goHill(255);
+      truck.goHill(180);
       return;
     }
     else if (!payload.upBlueButton) {
