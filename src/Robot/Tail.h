@@ -20,7 +20,7 @@ private:
 
   Servo _coccyx;
 
-  Angle _coccyxAngle = Angle(140, 15, 140, 60);
+  Angle _coccyxAngle = Angle(145, 15, 145, 60); // вниз-вверх; макс вверх для больших колес - 140, для маленьких - 145
 
   //#define DEBUG
 #ifdef DEBUG
