@@ -11,7 +11,7 @@ public:
   void speedGo(int speedLeft, int speedRight);
   void autoGo(int speed, int msec = -1);
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
-  void goHill(int speed, int thresholdSlopeAngle = 3000, int thresholdHorizAngle = 100, int msec = -1);
+  void goHill(int speed, int thresholdHillAngle = 5000, int thresholdHorizAngle = 1000, int msec = -1);
   void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
   void stop();
   void tick();
@@ -154,7 +154,7 @@ void Truck::goStraight(int speed, bool resetDeviation = true, int msec = -1) {
   _mode = GO_STRAIGHT;
 }
 
-void Truck::goHill(int speed, int thresholdHillAngle = 3000, int thresholdHorizAngle = 100, int msec = -1) {
+void Truck::goHill(int speed, int thresholdHillAngle = 5000, int thresholdHorizAngle = 1000, int msec = -1) {
   _targetSpeed = speed;
   _thresholdHillAngle = thresholdHillAngle;
   _thresholdHorizAngle = thresholdHorizAngle;
