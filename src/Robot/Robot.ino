@@ -129,6 +129,10 @@ void loop() {
       progRotatePipe.start();
       return;
     }
+    else if (payload.frontWhiteButton && payload.upBlueButton) {
+      truck.goHill(255);
+      return;
+    }
     else if (!payload.upBlueButton) {
       hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1);  // altMode
     }

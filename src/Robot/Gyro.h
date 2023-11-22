@@ -66,38 +66,38 @@ int Gyro::getPitch() {
 }
 
 void Gyro::tick() {
-  // int ax, ay, az, gx, gy, gz;
-  // _mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-
-  // // avgGX.add(gx);
-  // // avgGY.add(gy);
-  // // avgGZ.add(gz);
-
-  // //gz = (int)(gz / 32768 * 250);
-
-  // // Serial.print(avgGX.getAverage());
-  // // Serial.print("\t");
-  // // Serial.print(avgGY.getAverage());
-  // // Serial.print("\t");
-  // // Serial.print(avgGZ.getAverage());
-  // // Serial.print("\t");
-
   // Serial.print(getPitch());
   // Serial.print("\t");
 
-  // // Serial.print(ax);
-  // // Serial.print("\t");
-  // // Serial.print(ay);
-  // // Serial.print("\t");
-  // // Serial.print(az);
-  // // Serial.print("\t");
+  // int ax, ay, az, gx, gy, gz;
+  // _mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-  // // Serial.print(gx);
-  // // Serial.print("\t");
-  // // Serial.print(gy);
-  // // Serial.print("\t");
-  // // Serial.print(gz);
-  // // Serial.print("\t");
+  // avgGX.add(gx);
+  // avgGY.add(gy);
+  // avgGZ.add(gz);
+
+  //gz = (int)(gz / 32768 * 250);
+
+  // Serial.print(avgGX.getAverage());
+  // Serial.print("\t");
+  // Serial.print(avgGY.getAverage());
+  // Serial.print("\t");
+  // Serial.print(avgGZ.getAverage());
+  // Serial.print("\t");
+
+  // Serial.print(ax);
+  // Serial.print("\t");
+  // Serial.print(ay);
+  // Serial.print("\t");
+  // Serial.print(az);
+  // Serial.print("\t");
+
+  // Serial.print(gx);
+  // Serial.print("\t");
+  // Serial.print(gy);
+  // Serial.print("\t");
+  // Serial.print(gz);
+  // Serial.print("\t");
 
   // Serial.print("0\t50\t-50");  // линии для масштаба на графике
   // Serial.println();
