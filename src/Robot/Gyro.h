@@ -17,13 +17,17 @@ public:
   void tick();
 
 private:
+  static const int DEFAULT_AUTO_DISABLE_TIME = 3000;
   MPU6050 _mpu;
   Average _avgAX, _avgAY, _avgAZ, _avgGX, _avgGY, _avgGZ;
-  bool _enabled = true;  //false;
-  unsigned long _tickTime = millis();
+  bool _enabled = false;
+  int _autoDisableTime = DEFAULT_AUTO_DISABLE_TIME;  // если гироскоп не используется, то через это время он выключается
+  unsigned long _lastGetTime = millis();             // время последнего вызова одного из методов get
+  // unsigned long _tickTime = millis();
 
   void calibrate();
-  //byte filterDeadZone(byte value);
+  void onBeforeGet();
+  void setAutoDisableTime(int msec = DEFAULT_AUTO_DISABLE_TIME);
 };
 
 void Gyro::init() {
@@ -35,7 +39,12 @@ void Gyro::init() {
 }
 
 void Gyro::enable() {
+  if (_enabled) {
+    return;
+  }
+
   _enabled = true;
+  tick();  // сразу читаем показания, чтобы их можно было получить методами get
 }
 
 void Gyro::disable() {
@@ -50,36 +59,46 @@ void Gyro::disable() {
 
 // изменение курса
 int Gyro::getDeltaCourse() {
+  onBeforeGet();
   return _avgGZ.getAverage();
   // return _mpu.getRotationZ();
 }
 
 // изменение крена
 int Gyro::getDeltaRoll() {
+  onBeforeGet();
   return _avgGY.getAverage();
   // return _mpu.getRotationY();
 }
 
 // изменение тангажа
 int Gyro::getDeltaPitch() {
+  onBeforeGet();
   return _avgGX.getAverage();
   // return _mpu.getRotationX();
 }
 
 // крен
 int Gyro::getRoll() {
+  onBeforeGet();
   return _avgAX.getAverage();
   // return _mpu.getAccelerationX();
 }
 
 // тангаж
 int Gyro::getPitch() {
+  onBeforeGet();
   return _avgAY.getAverage();
   // return _mpu.getAccelerationY();
 }
 
 void Gyro::tick() {
   if (!_enabled) {
+    return;
+  }
+
+  if ((_autoDisableTime >= 0) && (millis() - _lastGetTime > _autoDisableTime)) {
+    disable();  // гироскоп долго не используется => выключаем его
     return;
   }
 
@@ -103,13 +122,6 @@ void Gyro::tick() {
   // Serial.print(_avgGY.getAverage());
   // Serial.print("\t");
   // Serial.print(_avgGZ.getAverage());
-  // Serial.print("\t");
-
-  // Serial.print(ax);
-  // Serial.print("\t");
-  // Serial.print(ay);
-  // Serial.print("\t");
-  // Serial.print(az);
   // Serial.print("\t");
 
   // Serial.print(ax);
@@ -176,9 +188,11 @@ void Gyro::calibrate() {
   }
 }
 
-/*byte Gyro::filterDeadZone(byte value) {
-  if (value > -5 && value < 5)
-    return 0;
-  else
-    return value;
-  }*/
+void Gyro::onBeforeGet() {
+  enable();
+  _lastGetTime = millis();
+}
+
+void Gyro::setAutoDisableTime(int msec = DEFAULT_AUTO_DISABLE_TIME) {
+  _autoDisableTime = msec;
+}
