@@ -15,10 +15,12 @@
   Вручную добавлена поддержка нашего типа датчика 0x4D - файл Adafruit_TCS34725softi2c.cpp, метод begin, стр. 157: `if ((x != 0x44) && (x != 0x4D))`.
 * `\libraries\SoftwareWire` - программный i2c. Нужен для работы с двумя датчиками цвета, т.к. в них нельзя изменить адрес на шине i2c.
   [Источник](https://github.com/Fire7/SoftwareWire).
-* `\libraries\EncButton` - лёгкая и функциональная библиотека для энкодера, энкодера с кнопкой или просто кнопки с Arduino.
+* `\libraries\EncButton` - библиотека для энкодера, энкодера с кнопкой или просто кнопки с Arduino.
   [Источник](https://github.com/GyverLibs/EncButton).
 * `\libraries\GyverPID` - PID регулятор.
   [Источник](https://github.com/GyverLibs/GyverPID).
+* `\libraries\Keypad` - работа с матричной клавиатурой.
+  [Источник](https://github.com/Chris--A/Keypad).
 
 
 ## Управление пультом
