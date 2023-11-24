@@ -25,6 +25,7 @@ private:
   byte _smoothPercent = SMOOTH_OFF;
 
   unsigned long _tickTime = millis();
+  unsigned long _smoothTime = millis();
 
   int smooth(int speed);
   void setSpeed(int speed);
@@ -50,6 +51,14 @@ void Motor::go(int speed, byte smoothPercent = SMOOTH_SOFT) {
   _smoothPercent = smoothPercent;
   int smoothed = smooth(_targetSpeed);
   setSpeed(smoothed);
+
+  // Serial.print("_targetSpeed\t");
+  // Serial.println(_targetSpeed);
+  // Serial.print("_smoothPercent\t");
+  // Serial.println(_smoothPercent);
+  // Serial.print("smoothed\t");
+  // Serial.println(smoothed);
+  // Serial.println("--------------------------");
 }
 
 void Motor::stop(byte smoothPercent = SMOOTH_SOFT) {
@@ -57,33 +66,37 @@ void Motor::stop(byte smoothPercent = SMOOTH_SOFT) {
 }
 
 void Motor::tick() {
-  if (_smoothPercent <= 0
-      || _currentSpeed == _targetSpeed
-      || millis() - _tickTime < SMOOTH_PERIOD) {
-    return;
-  }
-
-  _tickTime = millis();
-
   int smoothed = smooth(_targetSpeed);
   setSpeed(smoothed);
 }
 
 int Motor::smooth(int speed) {
-  if (_smoothPercent <= 0) {
+  if (_smoothPercent <= 0 || speed == _currentSpeed) {
     return speed;
   }
 
-  int min = _currentSpeed * (100 - _smoothPercent) / 100;
-  if (speed <= min) {
-    return min;
+  if (millis() - _smoothTime < SMOOTH_PERIOD) {
+    return _currentSpeed;
   }
 
-  int max = _currentSpeed * (100 + _smoothPercent) / 100;
-  if (speed >= max) {
-    return max;
+  _smoothTime = millis();
+
+  // Serial.print("_currentSpeed\t");
+  // Serial.println(_currentSpeed);
+
+  int delta = abs(speed - _currentSpeed);
+  if (delta > _smoothPercent) {
+    delta = _smoothPercent;
   }
 
+  if (speed > _currentSpeed) {
+    speed = _currentSpeed + delta;
+  }
+  else if (speed < _currentSpeed) {
+    speed = _currentSpeed - delta;
+  }
+
+  speed = constrainSpeed(speed);
   return speed;
 }
 
@@ -97,17 +110,6 @@ void Motor::setSpeed(int speed) {
   digitalWrite(_inaPin, forward);
   digitalWrite(_inbPin, !forward);
   analogWrite(_pwmPin, speed);
-
-  /*if (speed > 0) {
-    digitalWrite(_inaPin, forward);
-    digitalWrite(_inbPin, !forward);
-    analogWrite (_pwmPin, speed);
-    digitalWrite(_enPin, HIGH);
-    }
-    else {
-    analogWrite (_pwmPin, 0);
-    digitalWrite(_enPin, LOW);
-    }*/
 }
 
 int Motor::constrainSpeed(int speed) {

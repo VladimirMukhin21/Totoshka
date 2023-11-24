@@ -13,7 +13,7 @@ public:
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
-  void stop();
+  void stop(byte smoothPercent = Motor::SMOOTH_SOFT);
   void tick();
   bool isRunning();
 
@@ -185,9 +185,9 @@ void Truck::goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle,
   _mode = GO_WHILE_PITCH_IN_RANGE;
 }
 
-void Truck::stop() {
-  _left.stop();
-  _right.stop();
+void Truck::stop(byte smoothPercent = Motor::SMOOTH_SOFT) {
+  _left.stop(smoothPercent);
+  _right.stop(smoothPercent);
   _mode = NONE;
 }
 
@@ -200,11 +200,11 @@ void Truck::tick() {
   }
   else if (_mode == AUTO_GO) {
     if (_targetTime > 0 && millis() > _targetTime) {
-      stop();
+      stop(Motor::SMOOTH_OFF);
       return;
     }
 
-    goAndTurn(_targetSpeed, 0);
+    goAndTurn(_targetSpeed, 0, Motor::SMOOTH_OFF);
   }
   else if (_mode == GO_STRAIGHT) {
     if (_targetTime > 0 && millis() > _targetTime) {
@@ -231,7 +231,6 @@ void Truck::tick() {
       if (millis() - _timeOfStartFixing > _fixTimeMsec) {
         _timeOfStartFixing = 0;
         _mode = GO_TO_HORIZ;
-        // stop();//
         return;
       }
     }
