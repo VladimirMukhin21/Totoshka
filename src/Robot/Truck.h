@@ -7,8 +7,8 @@ class Truck {
 public:
   void init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro);
   void operate(byte stickVert, byte stickHoriz);
-  void goAndTurn(int speed, int turn);
-  void speedGo(int speedLeft, int speedRight);
+  void goAndTurn(int speed, int turn, byte smoothPercent = Motor::SMOOTH_SOFT);
+  void speedGo(int speedLeft, int speedRight, byte smoothPercent = Motor::SMOOTH_SOFT);
   void autoGo(int speed, int msec = -1);
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
@@ -51,8 +51,8 @@ private:
   int _minPitchAngle = 0;
   int _maxPitchAngle = 0;
   bool _absolutePitch = false;
-  int _fixTimeMsec = 0;  // показывает сколько мсек надо для четкой фиксации показаний (защита от плавающих показаний)
-  unsigned long _timeOfStartFixing = 0; // время начала фиксации требуемых показаний
+  int _fixTimeMsec = 0;                  // показывает сколько мсек надо для четкой фиксации показаний (защита от плавающих показаний)
+  unsigned long _timeOfStartFixing = 0;  // время начала фиксации требуемых показаний
 
   byte filterStickDeadZone(byte value);
 };
@@ -96,17 +96,17 @@ void Truck::operate(byte stickVert, byte stickHoriz) {
   // speed < 0 & turn < 0 => едем назад и подворачиваем влево
 
   if (_mode == NONE) {
-    goAndTurn(speed, turn);
+    goAndTurn(speed, turn, Motor::SMOOTH_OFF);
   }
   else {
     if (speed != 0 || turn != 0) {
-      goAndTurn(speed, turn);
+      goAndTurn(speed, turn, Motor::SMOOTH_OFF);
       _mode = NONE;
     }
   }
 }
 
-void Truck::goAndTurn(int speed, int turn) {
+void Truck::goAndTurn(int speed, int turn, byte smoothPercent = Motor::SMOOTH_SOFT) {
   speed = constrain(speed, -_maxSpeed, _maxSpeed);
   turn = constrain(turn, -_maxTurn, _maxTurn);
 
@@ -124,12 +124,12 @@ void Truck::goAndTurn(int speed, int turn) {
     }
     #endif*/
 
-  speedGo(speedLeft, speedRight);
+  speedGo(speedLeft, speedRight, smoothPercent);
 }
 
-void Truck::speedGo(int speedLeft, int speedRight) {
-  _left.go(speedLeft);
-  _right.go(speedRight);
+void Truck::speedGo(int speedLeft, int speedRight, byte smoothPercent = Motor::SMOOTH_SOFT) {
+  _left.go(speedLeft, smoothPercent);
+  _right.go(speedRight, smoothPercent);
 }
 
 void Truck::autoGo(int speed, int msec = -1) {
@@ -192,6 +192,9 @@ void Truck::stop() {
 }
 
 void Truck::tick() {
+  _left.tick();
+  _right.tick();
+
   if (_mode == NONE) {
     return;
   }
