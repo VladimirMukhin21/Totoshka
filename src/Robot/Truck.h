@@ -7,13 +7,13 @@ class Truck {
 public:
   void init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro);
   void operate(byte stickVert, byte stickHoriz);
-  void goAndTurn(int speed, int turn, byte smoothPercent = Motor::SMOOTH_SOFT);
-  void speedGo(int speedLeft, int speedRight, byte smoothPercent = Motor::SMOOTH_SOFT);
+  void goAndTurn(int speed, int turn, byte smoothStep = Motor::SMOOTH_SOFT);
+  void speedGo(int speedLeft, int speedRight, byte smoothStep = Motor::SMOOTH_SOFT);
   void autoGo(int speed, int msec = -1);
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
-  void stop(byte smoothPercent = Motor::SMOOTH_SOFT);
+  void stop(byte smoothStep = Motor::SMOOTH_SOFT);
   void tick();
   bool isRunning();
 
@@ -106,7 +106,7 @@ void Truck::operate(byte stickVert, byte stickHoriz) {
   }
 }
 
-void Truck::goAndTurn(int speed, int turn, byte smoothPercent = Motor::SMOOTH_SOFT) {
+void Truck::goAndTurn(int speed, int turn, byte smoothStep = Motor::SMOOTH_SOFT) {
   speed = constrain(speed, -_maxSpeed, _maxSpeed);
   turn = constrain(turn, -_maxTurn, _maxTurn);
 
@@ -124,12 +124,12 @@ void Truck::goAndTurn(int speed, int turn, byte smoothPercent = Motor::SMOOTH_SO
     }
     #endif*/
 
-  speedGo(speedLeft, speedRight, smoothPercent);
+  speedGo(speedLeft, speedRight, smoothStep);
 }
 
-void Truck::speedGo(int speedLeft, int speedRight, byte smoothPercent = Motor::SMOOTH_SOFT) {
-  _left.go(speedLeft, smoothPercent);
-  _right.go(speedRight, smoothPercent);
+void Truck::speedGo(int speedLeft, int speedRight, byte smoothStep = Motor::SMOOTH_SOFT) {
+  _left.go(speedLeft, smoothStep);
+  _right.go(speedRight, smoothStep);
 }
 
 void Truck::autoGo(int speed, int msec = -1) {
@@ -185,10 +185,15 @@ void Truck::goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle,
   _mode = GO_WHILE_PITCH_IN_RANGE;
 }
 
-void Truck::stop(byte smoothPercent = Motor::SMOOTH_SOFT) {
-  _left.stop(smoothPercent);
-  _right.stop(smoothPercent);
+void Truck::stop(byte smoothStep = Motor::SMOOTH_SOFT) {
+  _left.stop(smoothStep);
+  _right.stop(smoothStep);
   _mode = NONE;
+  if (smoothStep == Motor::SMOOTH_OFF) {
+    // сглаживание отключено => стоп сразу => гироскоп можно выключить
+    // полезно, например, при захвате банки, чтобы рука не тормозила
+    _gyro->disable();
+  }
 }
 
 void Truck::tick() {

@@ -48,6 +48,10 @@ void Gyro::enable() {
 }
 
 void Gyro::disable() {
+  if (!_enabled) {
+    return;
+  }
+  
   _enabled = false;
   _avgAX.reset();
   _avgAY.reset();

@@ -1,6 +1,7 @@
 #pragma once
 
 //#include <GyverPID.h>
+#include "Truck.h"
 #include "Hand.h"
 #include "DistMeter.h"
 
@@ -80,13 +81,13 @@ void ProgTakeTin::tick() {
       // рука опустилась => подъезжаем к маяку
       _distMeter->enable();
       int dist = _distMeter->getDist();
-      if (dist <= _distToSlowDrive) {
-        _truck->goStraight(_driveSlowSpeed);
-        _phase = SLOW_DRIVE;
-      }
-      else {
+      if (dist > _distToSlowDrive) {
         _truck->goStraight(_driveSpeed);
         _phase = DRIVE;
+      }
+      else {
+        _truck->goStraight(_driveSlowSpeed);
+        _phase = SLOW_DRIVE;
       }
     }
   }
@@ -104,7 +105,7 @@ void ProgTakeTin::tick() {
     int dist = _distMeter->getDist();
     if (dist <= _distToTake) {
       // доехали до маяка
-      _truck->stop();
+      _truck->stop(Motor::SMOOTH_OFF);
       _distMeter->disable();
       _hand->takeTin();
       _phase = TAKE;

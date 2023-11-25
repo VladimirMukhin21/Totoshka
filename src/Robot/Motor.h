@@ -7,8 +7,8 @@ public:
   static const byte SMOOTH_HARD = 50;
 
   void init(byte enPin, byte inaPin, byte inbPin, byte pwmPin);
-  void go(int speed, byte smoothPercent = SMOOTH_SOFT);
-  void stop(byte smoothPercent = SMOOTH_SOFT);
+  void go(int speed, byte smoothStep = SMOOTH_SOFT);
+  void stop(byte smoothStep = SMOOTH_SOFT);
   void tick();
 private:
   static const byte MIN_SPEED = 0;
@@ -22,7 +22,7 @@ private:
 
   int _targetSpeed = 0;
   int _currentSpeed = 0;
-  byte _smoothPercent = SMOOTH_OFF;
+  byte _smoothStep = SMOOTH_OFF;
 
   unsigned long _tickTime = millis();
   unsigned long _smoothTime = millis();
@@ -46,23 +46,23 @@ void Motor::init(byte enPin, byte inaPin, byte inbPin, byte pwmPin) {
   digitalWrite(enPin, HIGH);
 }
 
-void Motor::go(int speed, byte smoothPercent = SMOOTH_SOFT) {
+void Motor::go(int speed, byte smoothStep = SMOOTH_SOFT) {
   _targetSpeed = constrainSpeed(speed);
-  _smoothPercent = smoothPercent;
+  _smoothStep = smoothStep;
   int smoothed = smooth(_targetSpeed);
   setSpeed(smoothed);
 
   // Serial.print("_targetSpeed\t");
   // Serial.println(_targetSpeed);
-  // Serial.print("_smoothPercent\t");
-  // Serial.println(_smoothPercent);
+  // Serial.print("_smoothStep\t");
+  // Serial.println(_smoothStep);
   // Serial.print("smoothed\t");
   // Serial.println(smoothed);
   // Serial.println("--------------------------");
 }
 
-void Motor::stop(byte smoothPercent = SMOOTH_SOFT) {
-  go(0, smoothPercent);
+void Motor::stop(byte smoothStep = SMOOTH_SOFT) {
+  go(0, smoothStep);
 }
 
 void Motor::tick() {
@@ -71,7 +71,7 @@ void Motor::tick() {
 }
 
 int Motor::smooth(int speed) {
-  if (_smoothPercent <= 0 || speed == _currentSpeed) {
+  if (_smoothStep <= 0 || speed == _currentSpeed) {
     return speed;
   }
 
@@ -85,8 +85,8 @@ int Motor::smooth(int speed) {
   // Serial.println(_currentSpeed);
 
   int delta = abs(speed - _currentSpeed);
-  if (delta > _smoothPercent) {
-    delta = _smoothPercent;
+  if (delta > _smoothStep) {
+    delta = _smoothStep;
   }
 
   if (speed > _currentSpeed) {
