@@ -189,7 +189,7 @@ bool isAnyProgRunning() {
 }
 
 void stopAll() {
-  truck.stop();
+  truck.stop(Motor::SMOOTH_OFF);
   hand.stop();
   tail.stop();
   video.stop();
