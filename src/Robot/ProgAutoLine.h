@@ -4,7 +4,7 @@
 #include "Hand.h"
 #include "Color.h"
 
-class ProgRideTheLine {
+class ProgAutoLine {
 public:
   void init(Truck &truck, Hand &hand, Color &color);
   void start();
@@ -24,7 +24,7 @@ private:
   bool _isRunning = false;
 };
 
-void ProgRideTheLine::init(Truck &truck, Hand &hand, Color &color) {
+void ProgAutoLine::init(Truck &truck, Hand &hand, Color &color) {
   _truck = &truck;
   _hand = &hand;
   _color = &color;
@@ -35,21 +35,21 @@ void ProgRideTheLine::init(Truck &truck, Hand &hand, Color &color) {
   _pid.setLimits(-255, 255);
 }
 
-void ProgRideTheLine::start() {
+void ProgAutoLine::start() {
   if (!_isRunning) {
     _color->enable();
     _isRunning = true;
   }
 }
 
-void ProgRideTheLine::stop() {
+void ProgAutoLine::stop() {
   _truck->stop();
   _hand->stop();
   _isRunning = false;
   _color->disable();
 }
 
-void ProgRideTheLine::tick() {
+void ProgAutoLine::tick() {
   if (!_isRunning) {
     return;
   }
@@ -74,6 +74,6 @@ void ProgRideTheLine::tick() {
     Serial.println((double)l / (double)r);*/
 }
 
-bool ProgRideTheLine::isRunning() {
+bool ProgAutoLine::isRunning() {
   return _isRunning;
 }

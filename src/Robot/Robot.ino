@@ -5,7 +5,7 @@
 #include "Video.h"
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
-#include "ProgRideTheLine.h"
+#include "ProgAutoLine.h"
 #include "ProgTakeTin.h"
 #include "ProgRotatePipe.h"
 #include "Average.h"
@@ -47,7 +47,7 @@ Gyro gyro;
 DistMeter distMeter;
 ProgStairsUp progStairsUp;
 ProgStairsDown progStairsDown;
-ProgRideTheLine progRideTheLine;
+ProgAutoLine progAutoLine;
 ProgTakeTin progTakeTin;
 ProgRotatePipe progRotatePipe;
 
@@ -78,7 +78,7 @@ void setup() {
 
   progStairsUp.init(truck, tail);
   progStairsDown.init(truck, tail);
-  progRideTheLine.init(truck, hand, color);
+  progAutoLine.init(truck, hand, color);
   progTakeTin.init(truck, hand, distMeter);
   progRotatePipe.init(hand);
 
@@ -174,7 +174,7 @@ void loop() {
       hand.handToRideTheLine();
     }
     else if (payload.key == 0xB2) {
-      progRideTheLine.start();
+      progAutoLine.start();
       return;
     }
     else if (payload.key == 0xC2) {
@@ -236,7 +236,7 @@ void loop() {
 bool isAnyProgRunning() {
   return progStairsUp.isRunning()
          || progStairsDown.isRunning()
-         || progRideTheLine.isRunning()
+         || progAutoLine.isRunning()
          || progTakeTin.isRunning()
          || progRotatePipe.isRunning();
 }
@@ -248,7 +248,7 @@ void stopAll() {
   video.stop();
   progStairsUp.stop();
   progStairsDown.stop();
-  progRideTheLine.stop();
+  progAutoLine.stop();
   progTakeTin.stop();
   progRotatePipe.stop();
 }
@@ -261,7 +261,7 @@ void tickAll() {
   gyro.tick();
   progStairsUp.tick();
   progStairsDown.tick();
-  progRideTheLine.tick();
+  progAutoLine.tick();
   progTakeTin.tick();
   progRotatePipe.tick();
 }
