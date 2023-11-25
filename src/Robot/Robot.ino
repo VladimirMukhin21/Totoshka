@@ -159,7 +159,7 @@ void loop() {
       return;
     }
     else if (payload.key == 0xB1) {
-      truck.goStraight(40);
+      truck.goStraight(60);
       return;
     }
     else if (payload.key == 0xC1) {
@@ -167,7 +167,7 @@ void loop() {
       return;
     }
     else if (payload.key == 0xD1) {
-      truck.goStraight(-40);
+      truck.goStraight(-60);
       return;
     }
     else if (payload.key == 0xA2) {
