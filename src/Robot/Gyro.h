@@ -31,20 +31,16 @@ private:
 
   void onBeforeGet();
   void setAutoDisableTime(int msec = DEFAULT_AUTO_DISABLE_TIME);
+
+  void saveOffsets();
+  void loadOffsets();
+  void printOffsets();
 };
 
 void Gyro::init() {
   Wire.begin();
   _mpu.initialize();
-
-  int offsets[6];
-  EEPROM.get(OFFSETS_ADDRESS, offsets);
-  _mpu.setXAccelOffset(offsets[0]);
-  _mpu.setYAccelOffset(offsets[1]);
-  _mpu.setZAccelOffset(offsets[2]);
-  _mpu.setXGyroOffset(offsets[3]);
-  _mpu.setYGyroOffset(offsets[4]);
-  _mpu.setZGyroOffset(offsets[5]);
+  loadOffsets();
 }
 
 void Gyro::enable() {
@@ -204,7 +200,7 @@ void Gyro::calibrate() {
     delay(2);
   }
 
-  EEPROM.put(OFFSETS_ADDRESS, offsets);
+  saveOffsets();
 }
 
 void Gyro::onBeforeGet() {
@@ -214,4 +210,56 @@ void Gyro::onBeforeGet() {
 
 void Gyro::setAutoDisableTime(int msec = DEFAULT_AUTO_DISABLE_TIME) {
   _autoDisableTime = msec;
+}
+
+void Gyro::saveOffsets() {
+  int offsets[6];
+  offsets[0] = _mpu.getXAccelOffset();
+  offsets[1] = _mpu.getYAccelOffset();
+  offsets[2] = _mpu.getZAccelOffset();
+  offsets[3] = _mpu.getXGyroOffset();
+  offsets[4] = _mpu.getYGyroOffset();
+  offsets[5] = _mpu.getZGyroOffset();
+
+  EEPROM.put(OFFSETS_ADDRESS, offsets);
+
+  Serial.print("Gyro offsets (saved): ");
+  printOffsets();
+}
+
+void Gyro::loadOffsets() {
+  int offsets[6];
+  EEPROM.get(OFFSETS_ADDRESS, offsets);
+
+  _mpu.setXAccelOffset(offsets[0]);
+  _mpu.setYAccelOffset(offsets[1]);
+  _mpu.setZAccelOffset(offsets[2]);
+  _mpu.setXGyroOffset(offsets[3]);
+  _mpu.setYGyroOffset(offsets[4]);
+  _mpu.setZGyroOffset(offsets[5]);
+
+  Serial.print("Gyro offsets (loaded): ");
+  printOffsets();
+}
+
+void Gyro::printOffsets() {
+  Serial.print("ax = ");
+  Serial.print(_mpu.getXAccelOffset());
+
+  Serial.print("; ay = ");
+  Serial.print(_mpu.getYAccelOffset());
+
+  Serial.print("; az = ");
+  Serial.print(_mpu.getZAccelOffset());
+
+  Serial.print("; gx = ");
+  Serial.print(_mpu.getXGyroOffset());
+
+  Serial.print("; gy = ");
+  Serial.print(_mpu.getYGyroOffset());
+
+  Serial.print("; gz = ");
+  Serial.print(_mpu.getZGyroOffset());
+
+  Serial.println();
 }
