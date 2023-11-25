@@ -8,12 +8,12 @@ public:
 
   void init(byte enPin, byte inaPin, byte inbPin, byte pwmPin);
   void go(int speed, byte smoothStep = SMOOTH_SOFT);
-  void stop(byte smoothStep = SMOOTH_SOFT);
+  void stop(byte smoothStep = SMOOTH_HARD);
   void tick();
 private:
   static const byte MIN_SPEED = 0;
   static const byte MAX_SPEED = 255;
-  static const byte SMOOTH_PERIOD = 100;
+  static const byte SMOOTH_PERIOD = 50;
 
   byte _enPin;
   byte _inaPin;
@@ -61,7 +61,7 @@ void Motor::go(int speed, byte smoothStep = SMOOTH_SOFT) {
   // Serial.println("--------------------------");
 }
 
-void Motor::stop(byte smoothStep = SMOOTH_SOFT) {
+void Motor::stop(byte smoothStep = SMOOTH_HARD) {
   go(0, smoothStep);
 }
 

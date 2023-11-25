@@ -13,7 +13,7 @@ public:
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
-  void stop(byte smoothStep = Motor::SMOOTH_SOFT);
+  void stop(byte smoothStep = Motor::SMOOTH_HARD);
   void tick();
   bool isRunning();
 
@@ -185,7 +185,7 @@ void Truck::goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle,
   _mode = GO_WHILE_PITCH_IN_RANGE;
 }
 
-void Truck::stop(byte smoothStep = Motor::SMOOTH_SOFT) {
+void Truck::stop(byte smoothStep = Motor::SMOOTH_HARD) {
   _left.stop(smoothStep);
   _right.stop(smoothStep);
   _mode = NONE;
