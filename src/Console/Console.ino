@@ -1,5 +1,6 @@
 #include <EncButton.h>
 #include "Radio.h"
+#include "ButtonPad.h"
 
 #define PIN_LEFT_STICK_VERT A13
 #define PIN_LEFT_STICK_HORIZ A15
@@ -23,6 +24,7 @@
 Radio radio;
 EncButton<EB_TICK, PIN_FRONT_BLACK_BUTTON> blackButton;
 byte blackButtonPos = 0;
+ButtonPad buttonPad;
 
 void setup() {
   Serial.begin(9600);
@@ -64,6 +66,10 @@ void loop() {
 
   payload.upBlueButton = !digitalRead(PIN_UP_BLUE_BUTTON);
   payload.upGreenButton = !digitalRead(PIN_UP_GREEN_BUTTON);
+
+  if (payload.upBlueButton) {
+    payload.key = buttonPad.getKey();
+  }
 
   radio.write(payload);
 }

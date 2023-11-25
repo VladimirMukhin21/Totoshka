@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SPI.h>
-#include "nRF24L01.h"
-#include "RF24.h"
+#include <nRF24L01.h>
+#include <RF24.h>
 
 struct Stick {
   byte vert;
@@ -23,6 +23,7 @@ struct Payload {
 
   bool upGreenButton;  //: 1;
   bool upBlueButton;   //: 1;
+  byte key;
 };
 
 class Radio {
