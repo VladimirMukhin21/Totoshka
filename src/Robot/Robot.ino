@@ -8,6 +8,7 @@
 #include "ProgAutoLine.h"
 #include "ProgTakeTin.h"
 #include "ProgRotatePipe.h"
+#include "ProgHillWithPipes.h"
 #include "Average.h"
 #include "Color.h"
 #include "Gyro.h"
@@ -50,6 +51,7 @@ ProgStairsDown progStairsDown;
 ProgAutoLine progAutoLine;
 ProgTakeTin progTakeTin;
 ProgRotatePipe progRotatePipe;
+ProgHillWithPipes progHillWithPipes;
 
 unsigned long lastRadioTime = millis();
 
@@ -81,6 +83,7 @@ void setup() {
   progAutoLine.init(truck, hand, color);
   progTakeTin.init(truck, hand, distMeter);
   progRotatePipe.init(hand);
+  progHillWithPipes.init(truck, tail);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -189,7 +192,9 @@ void loop() {
       progRotatePipe.start();
       return;
     }
-    else if (payload.key == 0xB3) {  // СВОБОДНО
+    else if (payload.key == 0xB3) {  // Горка с трубами
+      progHillWithPipes.start();
+      return;
     }
     else if (payload.key == 0xC3) {  // СВОБОДНО
     }
@@ -233,7 +238,8 @@ bool isAnyProgRunning() {
          || progStairsDown.isRunning()
          || progAutoLine.isRunning()
          || progTakeTin.isRunning()
-         || progRotatePipe.isRunning();
+         || progRotatePipe.isRunning()
+         || progHillWithPipes.isRunning();
 }
 
 void stopAll() {
@@ -246,6 +252,7 @@ void stopAll() {
   progAutoLine.stop();
   progTakeTin.stop();
   progRotatePipe.stop();
+  progHillWithPipes.stop();
 }
 
 void tickAll() {
@@ -259,4 +266,5 @@ void tickAll() {
   progAutoLine.tick();
   progTakeTin.tick();
   progRotatePipe.tick();
+  progHillWithPipes.tick();
 }
