@@ -114,7 +114,7 @@ void loop() {
     digitalWrite(LED_PIN, ledStatus);
   }
 
-  video.setActiveCamera(payload.frontBlackButtonSwitch);
+  video.setActiveCamera(payload.frontBlackButtonSwitch);  // Переключение между камерами
 
   // если какая-то программа запущена, то роботом не управляем с пульта
   if (isAnyProgRunning()) {
@@ -122,7 +122,7 @@ void loop() {
   }
 
   if (payload.frontSwitch == 0) {
-    if (payload.upGreenButton) {
+    if (payload.upGreenButton) {  // Рука на спину
       hand.handToBack();
     }
     else if (!payload.upBlueButton) {
@@ -130,7 +130,7 @@ void loop() {
     }
   }
   else if (payload.frontSwitch == 1) {
-    if (payload.upGreenButton) {
+    if (payload.upGreenButton) {  // Рука на спину
       hand.handToBack();
     }
     else if (!payload.upBlueButton) {
@@ -138,7 +138,7 @@ void loop() {
     }
   }
   else if (payload.frontSwitch == 2) {
-    if (payload.upGreenButton) {
+    if (payload.upGreenButton) {  // Хвост наверх
       tail.upTail();
     }
     else if (!payload.upBlueButton) {
@@ -147,68 +147,63 @@ void loop() {
   }
 
   if (payload.upBlueButton) {
-    video.moveCamera(payload.leftStick.vert);
+    video.moveCamera(payload.leftStick.vert);  // Поворот камеры
 
-    if (payload.frontYellowButton) {
+    if (payload.frontYellowButton) {  // Захват маяка
       progTakeTin.start();
       return;
     }
 
-    if (payload.key == 0xA1) {
+    if (payload.key == 0xA1) {  // Езда прямо
       truck.goStraight(180);
       return;
     }
-    else if (payload.key == 0xB1) {
+    else if (payload.key == 0xB1) {  // Езда прямо медленно
       truck.goStraight(60);
       return;
     }
-    else if (payload.key == 0xC1) {
+    else if (payload.key == 0xC1) {  // Езда прямо задом
       truck.goStraight(-180);
       return;
     }
-    else if (payload.key == 0xD1) {
+    else if (payload.key == 0xD1) {  // Езда прямо задом медленно
       truck.goStraight(-60);
       return;
     }
-    else if (payload.key == 0xA2) {
+    else if (payload.key == 0xA2) {  // Рука на линию
       hand.handToRideTheLine();
     }
-    else if (payload.key == 0xB2) {
+    else if (payload.key == 0xB2) {  // Авто-линия
       progAutoLine.start();
       return;
     }
-    else if (payload.key == 0xC2) {
-      truck.goHill(180);
+    else if (payload.key == 0xC2) {  // Подъем по наклонной
+      truck.goHill(200);             // едем быстро
       return;
     }
-    else if (payload.key == 0xD2) {
-      truck.goHill(180);
+    else if (payload.key == 0xD2) {  // Спуск по наклонной
+      truck.goHill(100);             // едем медленно
       return;
     }
-    else if (payload.key == 0xA3) {
+    else if (payload.key == 0xA3) {  // Поворот трубки
       progRotatePipe.start();
       return;
     }
-    else if (payload.key == 0xB3) {
-      // СВОБОДНО
+    else if (payload.key == 0xB3) {  // СВОБОДНО
     }
-    else if (payload.key == 0xC3) {
-      // СВОБОДНО
+    else if (payload.key == 0xC3) {  // СВОБОДНО
     }
-    else if (payload.key == 0xD3) {
-      // СВОБОДНО
+    else if (payload.key == 0xD3) {  // СВОБОДНО
     }
-    else if (payload.key == 0xA4) {
+    else if (payload.key == 0xA4) {  // Подъем по лестнице
       progStairsUp.start();
       return;
     }
-    else if (payload.key == 0xB4) {
-      // СВОБОДНО
+    else if (payload.key == 0xB4) {  // СВОБОДНО
     }
-    else if (payload.key == 0xC4) {
-      // СВОБОДНО
+    else if (payload.key == 0xC4) {  // СВОБОДНО
     }
-    else if (payload.frontWhiteButton && payload.key == 0xD4) {
+    else if (payload.frontWhiteButton && payload.key == 0xD4) {  // Калибровка гироскопа
       // хвостом показываем, что калибровка началась
       tail.moveTo(0);
       for (int i = 0; i < 100; i++) {
