@@ -218,7 +218,7 @@ void Truck::tick() {
     }
 
     _deviation += _gyro->getDeltaCourse();
-    int turn = -_deviation / 1000;
+    int turn = -_deviation / 1800;
     goAndTurn(_targetSpeed, turn, Motor::SMOOTH_OFF);
   }
   else if (_mode == GO_TO_HILL) {
