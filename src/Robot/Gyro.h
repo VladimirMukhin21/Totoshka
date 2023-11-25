@@ -2,6 +2,7 @@
 
 #include <Wire.h>
 #include <MPU6050.h>
+#include <EEPROM.h>
 #include "Average.h"
 
 class Gyro {
@@ -15,9 +16,12 @@ public:
   int getRoll();
   int getPitch();
   void tick();
+  void calibrate();
 
 private:
   static const int DEFAULT_AUTO_DISABLE_TIME = 3000;
+  static const byte OFFSETS_ADDRESS = 0;
+
   MPU6050 _mpu;
   Average _avgAX, _avgAY, _avgAZ, _avgGX, _avgGY, _avgGZ;
   bool _enabled = false;
@@ -25,7 +29,6 @@ private:
   unsigned long _lastGetTime = millis();             // время последнего вызова одного из методов get
   // unsigned long _tickTime = millis();
 
-  void calibrate();
   void onBeforeGet();
   void setAutoDisableTime(int msec = DEFAULT_AUTO_DISABLE_TIME);
 };
@@ -33,9 +36,15 @@ private:
 void Gyro::init() {
   Wire.begin();
   _mpu.initialize();
-  calibrate();
-  // _mpu.CalibrateAccel(10);
-  // _mpu.CalibrateGyro(10);
+
+  int offsets[6];
+  EEPROM.get(OFFSETS_ADDRESS, offsets);
+  _mpu.setXAccelOffset(offsets[0]);
+  _mpu.setYAccelOffset(offsets[1]);
+  _mpu.setZAccelOffset(offsets[2]);
+  _mpu.setXGyroOffset(offsets[3]);
+  _mpu.setYGyroOffset(offsets[4]);
+  _mpu.setZGyroOffset(offsets[5]);
 }
 
 void Gyro::enable() {
@@ -51,7 +60,7 @@ void Gyro::disable() {
   if (!_enabled) {
     return;
   }
-  
+
   _enabled = false;
   _avgAX.reset();
   _avgAY.reset();
@@ -140,6 +149,10 @@ void Gyro::tick() {
 }
 
 void Gyro::calibrate() {
+  // _mpu.CalibrateAccel(10);
+  // _mpu.CalibrateGyro(10);
+  // return;
+
   long offsets[6];
   long offsetsOld[6];
   int16_t mpuGet[6];
@@ -190,6 +203,8 @@ void Gyro::calibrate() {
     _mpu.setZGyroOffset(offsets[5] / 4);
     delay(2);
   }
+
+  EEPROM.put(OFFSETS_ADDRESS, offsets);
 }
 
 void Gyro::onBeforeGet() {

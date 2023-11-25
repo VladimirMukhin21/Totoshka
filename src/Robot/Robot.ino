@@ -208,8 +208,25 @@ void loop() {
     else if (payload.key == 0xC4) {
       // СВОБОДНО
     }
-    else if (payload.key == 0xD4) {
-      // СВОБОДНО
+    else if (payload.frontWhiteButton && payload.key == 0xD4) {
+      // хвостом показываем, что калибровка началась
+      tail.moveTo(0);
+      for (int i = 0; i < 100; i++) {
+        tail.tick();
+        delay(2);
+      }
+
+      delay(500);  // ждем, чтобы все успокоилось после движения хвоста
+      gyro.calibrate();
+
+      // хвостом показываем, что калибровка завершилась
+      tail.moveTo(180);
+      for (int i = 0; i < 100; i++) {
+        tail.tick();
+        delay(2);
+      }
+
+      return;
     }
   }
 
