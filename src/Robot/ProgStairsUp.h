@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Truck.h"
 #include "Tail.h"
 
 class ProgStairsUp {
