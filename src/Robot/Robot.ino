@@ -122,51 +122,24 @@ void loop() {
   }
 
   if (payload.frontSwitch == 0) {
-    if (payload.upGreenButton && !payload.upBlueButton) {
+    if (payload.upGreenButton) {
       hand.handToBack();
-    }
-    else if (payload.frontYellowButton && payload.upBlueButton) {
-      progRotatePipe.start();
-      return;
-    }
-    else if (payload.frontWhiteButton && payload.upBlueButton) {
-      truck.goHill(180);
-      return;
     }
     else if (!payload.upBlueButton) {
       hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1);  // altMode
     }
   }
   else if (payload.frontSwitch == 1) {
-    if (payload.upGreenButton && !payload.upBlueButton) {
+    if (payload.upGreenButton) {
       hand.handToBack();
-    }
-    else if (payload.upGreenButton && payload.upBlueButton) {
-      hand.handToRideTheLine();
-    }
-    else if (payload.frontYellowButton && payload.upBlueButton) {
-      progTakeTin.start();
-      return;
-    }
-    else if (payload.frontWhiteButton && payload.upBlueButton) {
-      truck.goStraight(180);
-      return;
     }
     else if (!payload.upBlueButton) {
       hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0);  // НЕ altMode
     }
   }
   else if (payload.frontSwitch == 2) {
-    if (payload.upGreenButton && !payload.upBlueButton) {
+    if (payload.upGreenButton) {
       tail.upTail();
-    }
-    else if (payload.frontYellowButton && payload.upBlueButton) {
-      progStairsUp.start();
-      return;
-    }
-    else if (payload.frontWhiteButton && payload.upBlueButton) {
-      progRideTheLine.start();
-      return;
     }
     else if (!payload.upBlueButton) {
       tail.operate(payload.leftStick.vert);
@@ -175,6 +148,69 @@ void loop() {
 
   if (payload.upBlueButton) {
     video.moveCamera(payload.leftStick.vert);
+
+    if (payload.frontYellowButton) {
+      progTakeTin.start();
+      return;
+    }
+
+    if (payload.key == 0xA1) {
+      truck.goStraight(180);
+      return;
+    }
+    else if (payload.key == 0xB1) {
+      truck.goStraight(80);
+      return;
+    }
+    else if (payload.key == 0xC1) {
+      truck.goStraight(-180);
+      return;
+    }
+    else if (payload.key == 0xD1) {
+      truck.goStraight(-80);
+      return;
+    }
+    else if (payload.key == 0xA2) {
+      hand.handToRideTheLine();
+    }
+    else if (payload.key == 0xB2) {
+      progRideTheLine.start();
+      return;
+    }
+    else if (payload.key == 0xC2) {
+      truck.goHill(180);
+      return;
+    }
+    else if (payload.key == 0xD2) {
+      truck.goHill(180);
+      return;
+    }
+    else if (payload.key == 0xA3) {
+      progRotatePipe.start();
+      return;
+    }
+    else if (payload.key == 0xB3) {
+      // СВОБОДНО
+    }
+    else if (payload.key == 0xC3) {
+      // СВОБОДНО
+    }
+    else if (payload.key == 0xD3) {
+      // СВОБОДНО
+    }
+    else if (payload.key == 0xA4) {
+      progStairsUp.start();
+      return;
+    }
+    else if (payload.key == 0xB4) {
+      // СВОБОДНО
+    }
+    else if (payload.key == 0xC4) {
+      // СВОБОДНО
+    }
+    else if (payload.key == 0xD4) {
+      // СВОБОДНО
+    }
   }
 
   truck.operate(payload.rightStick.vert, payload.rightStick.horiz);
