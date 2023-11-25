@@ -59,7 +59,7 @@ private:
 
 void Truck::init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro) {
   _left.init(lEnPin, lInaPin, lInbPin, lPwmPin);
-  _right.init(rEnPin, rInaPin, rInbPin, rPwmPin);
+  _right.init(rEnPin, rInaPin, rInbPin, rPwmPin, 90, 60);
   _gyro = &gyro;
 }
 
@@ -219,7 +219,7 @@ void Truck::tick() {
 
     _deviation += _gyro->getDeltaCourse();
     int turn = -_deviation / 1000;
-    goAndTurn(_targetSpeed, turn);
+    goAndTurn(_targetSpeed, turn, Motor::SMOOTH_OFF);
   }
   else if (_mode == GO_TO_HILL) {
     if (_targetTime > 0 && millis() > _targetTime) {
@@ -243,9 +243,7 @@ void Truck::tick() {
       _timeOfStartFixing = 0;
     }
 
-    _deviation += _gyro->getDeltaCourse();
-    int turn = -_deviation / 1000;
-    goAndTurn(_targetSpeed, turn);
+    goAndTurn(_targetSpeed, 0);
   }
   else if (_mode == GO_TO_HORIZ) {
     if (_targetTime > 0 && millis() > _targetTime) {
@@ -269,9 +267,7 @@ void Truck::tick() {
       _timeOfStartFixing = 0;
     }
 
-    _deviation += _gyro->getDeltaCourse();
-    int turn = -_deviation / 1000;
-    goAndTurn(_targetSpeed, turn);
+    goAndTurn(_targetSpeed, 0);
   }
   else if (_mode == GO_WHILE_PITCH_IN_RANGE) {
     if (_targetTime > 0 && millis() > _targetTime) {
@@ -289,9 +285,7 @@ void Truck::tick() {
       return;
     }
 
-    _deviation += _gyro->getDeltaCourse();
-    int turn = -_deviation / 1000;
-    goAndTurn(_targetSpeed, turn);
+    goAndTurn(_targetSpeed, 0);
   }
 }
 
