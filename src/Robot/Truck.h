@@ -11,8 +11,8 @@ public:
   void speedGo(int speedLeft, int speedRight, byte smoothStep = Motor::SMOOTH_SOFT);
   void autoGo(int speed, int msec = -1);
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
-  void goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
-  void goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1);
+  void goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
+  void goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool absolutePitch = true, int msec = -1);
   void stop(byte smoothStep = Motor::SMOOTH_HARD);
   void tick();
   bool isRunning();
@@ -46,10 +46,10 @@ private:
   Mode _mode = NONE;
   int _targetSpeed = 0;
   unsigned long _targetTime = 0;
-  int _thresholdHillAngle = 0;
-  int _thresholdHorizAngle = 0;
-  int _minPitchAngle = 0;
-  int _maxPitchAngle = 0;
+  int _thresholdHillPitch = 0;
+  int _thresholdHorizPitch = 0;
+  int _minPitch = 0;
+  int _maxPitch = 0;
   bool _absolutePitch = false;
   int _fixTimeMsec = 0;                  // показывает сколько мсек надо для четкой фиксации показаний (защита от плавающих показаний)
   unsigned long _timeOfStartFixing = 0;  // время начала фиксации требуемых показаний
@@ -156,10 +156,10 @@ void Truck::goStraight(int speed, bool resetDeviation = true, int msec = -1) {
   _mode = GO_STRAIGHT;
 }
 
-void Truck::goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizAngle = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1) {
+void Truck::goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1) {
   _targetSpeed = speed;
-  _thresholdHillAngle = thresholdHillAngle;
-  _thresholdHorizAngle = thresholdHorizAngle;
+  _thresholdHillPitch = thresholdHillPitch;
+  _thresholdHorizPitch = thresholdHorizPitch;
   _fixTimeMsec = fixTimeMsec;
   _targetTime = -1;
   if (maxTimeMsec > 0) {
@@ -171,10 +171,10 @@ void Truck::goHill(int speed, int thresholdHillAngle = 4000, int thresholdHorizA
   _mode = GO_TO_HILL;
 }
 
-void Truck::goWhilePitchInRange(int speed, int minPitchAngle, int maxPitchAngle, bool absolutePitch = true, int msec = -1) {
+void Truck::goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool absolutePitch = true, int msec = -1) {
   _targetSpeed = speed;
-  _minPitchAngle = minPitchAngle;
-  _maxPitchAngle = maxPitchAngle;
+  _minPitch = minPitch;
+  _maxPitch = maxPitch;
   _absolutePitch = absolutePitch;
   _targetTime = -1;
   if (msec > 0) {
@@ -228,7 +228,7 @@ void Truck::tick() {
     }
 
     // Serial.print(0); Serial.print("\t"); Serial.println(_gyro->getPitch());
-    if (abs(_gyro->getPitch()) >= _thresholdHillAngle) {
+    if (abs(_gyro->getPitch()) >= _thresholdHillPitch) {
       if (_timeOfStartFixing <= 0) {
         _timeOfStartFixing = millis();
       }
@@ -252,7 +252,7 @@ void Truck::tick() {
     }
 
     int pitch = _gyro->getPitch();
-    if (abs(pitch) <= _thresholdHorizAngle) {
+    if (abs(pitch) <= _thresholdHorizPitch) {
       if (_timeOfStartFixing <= 0) {
         _timeOfStartFixing = millis();
       }
@@ -271,7 +271,7 @@ void Truck::tick() {
   }
   else if (_mode == GO_WHILE_PITCH_IN_RANGE) {
     if (_targetTime > 0 && millis() > _targetTime) {
-      stop();
+      stop(Motor::SMOOTH_OFF);
       return;
     }
 
@@ -280,12 +280,12 @@ void Truck::tick() {
       pitch = abs(pitch);
     }
 
-    if (pitch < _minPitchAngle || pitch > _maxPitchAngle) {
-      stop();
+    if (pitch < _minPitch || pitch > _maxPitch) {
+      stop(Motor::SMOOTH_OFF);
       return;
     }
 
-    goAndTurn(_targetSpeed, 0);
+    goAndTurn(_targetSpeed, 0, Motor::SMOOTH_OFF);
   }
 }
 
