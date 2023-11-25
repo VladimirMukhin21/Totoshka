@@ -2,7 +2,7 @@
 
 #include <Keypad.h>
 
-class ButtonPad {
+class Keyboard {
 public:
   byte getKey();
 
@@ -23,7 +23,7 @@ private:
   Keypad keypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 };
 
-byte ButtonPad::getKey() {
+byte Keyboard::getKey() {
   byte key = keypad.getKey();
   if (key == NO_KEY) {
     return 0;
