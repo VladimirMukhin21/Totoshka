@@ -204,7 +204,9 @@ void loop() {
       progStairsUp.start();
       return;
     }
-    else if (payload.key == 0xB4) {  // СВОБОДНО
+    else if (payload.key == 0xB4) {  // Поворот вправо на 90 град
+      truck.turn(10000);
+      return;
     }
     else if (payload.key == 0xC4) {  // СВОБОДНО
     }

@@ -13,6 +13,7 @@ public:
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool absolutePitch = true, int msec = -1);
+  void turn(int deltaCourse, int msec = -1);
   void stop(byte smoothStep = Motor::SMOOTH_HARD);
   void tick();
   bool isRunning();
@@ -24,7 +25,8 @@ private:
     GO_STRAIGHT,
     GO_TO_HILL,
     GO_TO_HORIZ,
-    GO_WHILE_PITCH_IN_RANGE
+    GO_WHILE_PITCH_IN_RANGE,
+    TURN
   };
 
   const byte _minStick = 0;
@@ -185,6 +187,16 @@ void Truck::goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool abso
   _mode = GO_WHILE_PITCH_IN_RANGE;
 }
 
+void Truck::turn(int deltaCourse, int msec = -1) {
+  _targetTime = -1;
+  if (msec > 0) {
+    _targetTime = millis() + msec;
+  }
+
+  _deviation = deltaCourse;
+  _mode = TURN;
+}
+
 void Truck::stop(byte smoothStep = Motor::SMOOTH_HARD) {
   _left.stop(smoothStep);
   _right.stop(smoothStep);
@@ -285,7 +297,22 @@ void Truck::tick() {
       return;
     }
 
-    goAndTurn(_targetSpeed, 0, Motor::SMOOTH_OFF);
+    goAndTurn(_targetSpeed, 0, Motor::SMOOTH_SOFT);
+  }
+  else if (_mode == TURN) {
+    if (_targetTime > 0 && millis() > _targetTime) {
+      stop(Motor::SMOOTH_OFF);
+      return;
+    }
+
+    _deviation += _gyro->getDeltaCourse();
+    int turn = -_deviation / 1800;
+    goAndTurn(0, turn, Motor::SMOOTH_OFF);
+
+    if (abs(_deviation) < 100) {
+      stop(Motor::SMOOTH_OFF);
+      return;
+    }
   }
 }
 
