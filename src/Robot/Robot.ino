@@ -205,7 +205,7 @@ void loop() {
       return;
     }
     else if (payload.key == 0xB4) {  // Поворот вправо на 90 град
-      truck.turn(10000);
+      truck.turn(2000000);//470000);
       return;
     }
     else if (payload.key == 0xC4) {  // СВОБОДНО

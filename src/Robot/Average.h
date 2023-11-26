@@ -2,7 +2,7 @@
 
 class Average {
 public:
-  Average();
+  Average(bool momentary);
   void add(int value);
   void reset();
   int getAverage();
@@ -12,9 +12,14 @@ private:
   int _acc[AVERAGE_ACC_COUNT];
   long _sum = 0;
   byte _accumulatedCount = 0;
+
+  bool _momentary = false;
+  int _preValue = 0;
+  unsigned long _getValueTime = 0;
 };
 
-Average::Average() {
+Average::Average(bool momentary) {
+  _momentary = momentary;
   reset();
 }
 
@@ -39,6 +44,9 @@ void Average::reset() {
   for (byte i = 0; i < AVERAGE_ACC_COUNT; i++) {
     _acc[i] = 0;
   }
+
+  _preValue = 0;
+  _getValueTime = 0;
 }
 
 int Average::getAverage() {
@@ -47,5 +55,19 @@ int Average::getAverage() {
   }
 
   int average = _sum / _accumulatedCount;
-  return average;
+
+  if (_momentary) {
+    return average;
+  }
+
+  // величина не моментальная => надо считать как площадь трапеции:  S = (a + b) * h / 2
+  unsigned long now = millis();
+  int s = _getValueTime > 0
+            ? (_preValue + average) * (now - _getValueTime) / 2  // площадь трапеции
+            : average;                                           // предыдущего измерения еще нет => площадь нельзя вычислить => вернем текущее среднее
+
+  // запасаем данные для будущих расчетов
+  _getValueTime = now;
+  _preValue = average;  // сюда запасаем не площадь, а текущее среднее
+  return s;             // а клиенту вернем площадь
 }

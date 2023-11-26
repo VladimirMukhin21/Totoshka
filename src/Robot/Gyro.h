@@ -23,7 +23,14 @@ private:
   static const byte OFFSETS_ADDRESS = 0;
 
   MPU6050 _mpu;
-  Average _avgAX, _avgAY, _avgAZ, _avgGX, _avgGY, _avgGZ;
+
+  Average _avgAX = Average(false);
+  Average _avgAY = Average(false);
+  Average _avgAZ = Average(false);
+  Average _avgGX = Average(true);
+  Average _avgGY = Average(true);
+  Average _avgGZ = Average(true);
+
   bool _enabled = false;
   int _autoDisableTime = DEFAULT_AUTO_DISABLE_TIME;  // если гироскоп не используется, то через это время он выключается
   unsigned long _lastGetTime = millis();             // время последнего вызова одного из методов get
@@ -138,6 +145,11 @@ void Gyro::tick() {
   // Serial.print(ay);
   // Serial.print("\t");
   // Serial.print(az);
+  // Serial.print("\t");
+
+  // static long dc;
+  // dc += getDeltaCourse();
+  // Serial.print(dc);
   // Serial.print("\t");
 
   // Serial.print("0\t50\t-50");  // линии для масштаба на графике
