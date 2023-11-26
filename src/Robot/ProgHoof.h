@@ -2,7 +2,7 @@
 
 #include "Truck.h"
 
-class ProgTruncatedPyramid {
+class ProgHoof {
 public:
   void init(Truck &truck);
   void start(int turnOnTopAngleDeg);
@@ -20,18 +20,18 @@ private:
   };
 
   const int _driveSpeed = 100;
-  const int _slowDriveSpeed = 80;
+  const int _slowDriveSpeed = 40;
 
   Truck *_truck;
   Phase _phase = NONE;
   int _turnOnTopAngleDeg = 0;
 };
 
-void ProgTruncatedPyramid::init(Truck &truck) {
+void ProgHoof::init(Truck &truck) {
   _truck = &truck;
 }
 
-void ProgTruncatedPyramid::start(int turnOnTopAngleDeg) {
+void ProgHoof::start(int turnOnTopAngleDeg) {
   if (isRunning()) {
     return;
   }
@@ -40,12 +40,12 @@ void ProgTruncatedPyramid::start(int turnOnTopAngleDeg) {
   _phase = STARTING;
 }
 
-void ProgTruncatedPyramid::stop() {
+void ProgHoof::stop() {
   _truck->stop();
   _phase = NONE;
 }
 
-void ProgTruncatedPyramid::tick() {
+void ProgHoof::tick() {
   if (_phase == NONE) {
     return;
   }
@@ -76,6 +76,6 @@ void ProgTruncatedPyramid::tick() {
   }
 }
 
-bool ProgTruncatedPyramid::isRunning() {
+bool ProgHoof::isRunning() {
   return _phase != NONE;
 }

@@ -14,6 +14,7 @@
 #include "ProgRotatePipe.h"
 #include "ProgHillWithPipes.h"
 #include "ProgTruncatedPyramid.h"
+#include "ProgHoof.h"
 
 #define L_EN_PIN 39
 #define L_INA_PIN 41
@@ -54,6 +55,7 @@ ProgTakeTin progTakeTin;
 ProgRotatePipe progRotatePipe;
 ProgHillWithPipes progHillWithPipes;
 ProgTruncatedPyramid progTruncatedPyramid;
+ProgHoof progHoof;
 
 unsigned long lastRadioTime = millis();
 
@@ -87,6 +89,7 @@ void setup() {
   progRotatePipe.init(hand);
   progHillWithPipes.init(truck, tail);
   progTruncatedPyramid.init(truck);
+  progHoof.init(truck);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -251,7 +254,6 @@ void loop() {
     else if (payload.key == 0xD1) {  // СВОБОДНО
     }
     else if (payload.key == 0xA2) {  // СВОБОДНО
-      hand.handToRideTheLine();
     }
     else if (payload.key == 0xB2) {  // СВОБОДНО
     }
@@ -273,9 +275,13 @@ void loop() {
       progTruncatedPyramid.start(90);
       return;
     }
-    else if (payload.key == 0xA4) {  // СВОБОДНО
+    else if (payload.key == 0xA4) {  // Копыто налево
+      progHoof.start(-95);
+      return;
     }
-    else if (payload.key == 0xB4) {  // СВОБОДНО
+    else if (payload.key == 0xB4) {  // Копыто направо
+      progHoof.start(95);
+      return;
     }
     else if (payload.key == 0xC4) {  // СВОБОДНО
     }
@@ -294,7 +300,8 @@ bool isAnyProgRunning() {
          || progTakeTin.isRunning()
          || progRotatePipe.isRunning()
          || progHillWithPipes.isRunning()
-         || progTruncatedPyramid.isRunning();
+         || progTruncatedPyramid.isRunning()
+         || progHoof.isRunning();
 }
 
 void stopAll() {
@@ -309,6 +316,7 @@ void stopAll() {
   progRotatePipe.stop();
   progHillWithPipes.stop();
   progTruncatedPyramid.stop();
+  progHoof.stop();
 }
 
 void tickAll() {
@@ -324,4 +332,5 @@ void tickAll() {
   progRotatePipe.tick();
   progHillWithPipes.tick();
   progTruncatedPyramid.tick();
+  progHoof.tick();
 }
