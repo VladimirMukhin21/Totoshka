@@ -204,11 +204,13 @@ void loop() {
       progStairsUp.start();
       return;
     }
-    else if (payload.key == 0xB4) {  // Поворот вправо на 90 град
-      truck.turn(4250000);
+    else if (payload.key == 0xB4) {  // Поворот влево на 90 град
+      truck.turn(-90);
       return;
     }
-    else if (payload.key == 0xC4) {  // СВОБОДНО
+    else if (payload.key == 0xC4) {  // Поворот вправо на 90 град
+      truck.turn(90);
+      return;
     }
     else if (payload.frontWhiteButton && payload.key == 0xD4) {  // Калибровка гироскопа
       // хвостом показываем, что калибровка началась

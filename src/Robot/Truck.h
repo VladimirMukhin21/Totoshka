@@ -13,7 +13,7 @@ public:
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool absolutePitch = true, int msec = -1);
-  void turn(long turnAngle, int msec = -1);
+  void turn(int turnAngleDeg, int msec = -1);
   void stop(byte smoothStep = Motor::SMOOTH_HARD);
   void tick();
   bool isRunning();
@@ -187,13 +187,13 @@ void Truck::goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool abso
   _mode = GO_WHILE_PITCH_IN_RANGE;
 }
 
-void Truck::turn(long turnAngle, int msec = -1) {
+void Truck::turn(int turnAngleDeg, int msec = -1) {
   _targetTime = -1;
   if (msec > 0) {
     _targetTime = millis() + msec;
   }
 
-  _deviation = -turnAngle;
+  _deviation = -turnAngleDeg * 47200;  // пересчет градусов в коэффициент для гироскопа
   _mode = TURN;
 }
 
