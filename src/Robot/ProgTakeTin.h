@@ -25,7 +25,7 @@ private:
   };
 
   const int _driveSpeed = 70;        // скорость подъезда к маяку
-  const int _driveSlowSpeed = 40;    // скорость медленного подъезда к маяку когда маяк близко
+  const int _driveSlowSpeed = 60;    // скорость медленного подъезда к маяку когда маяк близко
   const int _distToSlowDrive = 150;  // расстояние до маяка, на котором снижаем скорость
   const int _distToTake = 75;        // расстояние до маяка, на котором останавливаемся и хватаем маяк
   //GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);
