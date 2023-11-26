@@ -26,9 +26,9 @@ private:
 
   MPU6050 _mpu;
 
-  Average _avgAX = Average(false);
-  Average _avgAY = Average(false);
-  Average _avgAZ = Average(false);
+  Average _avgAX = Average(true);
+  Average _avgAY = Average(true);
+  Average _avgAZ = Average(true);
   Average _avgGX = Average(true);
   Average _avgGY = Average(true);
   Average _avgGZ = Average(true);
