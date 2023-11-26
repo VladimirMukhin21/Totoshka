@@ -13,7 +13,7 @@ public:
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
   void goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool absolutePitch = true, int msec = -1);
-  void turn(int deltaCourse, int msec = -1);
+  void turn(long turnAngle, int msec = -1);
   void stop(byte smoothStep = Motor::SMOOTH_HARD);
   void tick();
   bool isRunning();
@@ -187,13 +187,13 @@ void Truck::goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool abso
   _mode = GO_WHILE_PITCH_IN_RANGE;
 }
 
-void Truck::turn(int deltaCourse, int msec = -1) {
+void Truck::turn(long turnAngle, int msec = -1) {
   _targetTime = -1;
   if (msec > 0) {
     _targetTime = millis() + msec;
   }
 
-  _deviation = deltaCourse;
+  _deviation = -turnAngle;
   _mode = TURN;
 }
 
@@ -305,11 +305,41 @@ void Truck::tick() {
       return;
     }
 
+    // int course = _gyro->getDeltaCourse();
+    // long residual = _deviation - course;
     _deviation += _gyro->getDeltaCourse();
-    int turn = -_deviation / 1800;
-    goAndTurn(0, turn, Motor::SMOOTH_OFF);
+    // int turn = -_deviation / 1800;
+    // int turn = -residual / 1800;
+    int turn = 0;
+    // if (residual > 0) {
+    //   turn = _maxTurn;
+    // }
+    // else if (residual < 0) {
+    //   turn = -_maxTurn;
+    // }
 
-    if (abs(_deviation) < 100) {
+    if (_deviation > 0) {
+      turn = -_maxTurn / 2;
+    }
+    else if (_deviation < 0) {
+      turn = _maxTurn / 2;
+    }
+
+    // Serial.print(course);
+    // Serial.print("\t");
+    // Serial.print(residual);
+    // Serial.print("\t");
+    // Serial.print(_deviation);
+    // Serial.print("\t");
+    // Serial.print(turn);
+    // Serial.print("\t");
+    // Serial.print("0\t500\t-500");  // линии для масштаба на графике
+    // Serial.println();
+
+    goAndTurn(0, turn, Motor::SMOOTH_HARD);
+
+    // if (abs(residual) < 5000) {
+    if (abs(_deviation) < 2000) {
       stop(Motor::SMOOTH_OFF);
       return;
     }
