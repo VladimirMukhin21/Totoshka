@@ -305,19 +305,8 @@ void Truck::tick() {
       return;
     }
 
-    // int course = _gyro->getDeltaCourse();
-    // long residual = _deviation - course;
     _deviation += _gyro->getDeltaCourse();
-    // int turn = -_deviation / 1800;
-    // int turn = -residual / 1800;
     int turn = 0;
-    // if (residual > 0) {
-    //   turn = _maxTurn;
-    // }
-    // else if (residual < 0) {
-    //   turn = -_maxTurn;
-    // }
-
     if (_deviation > 0) {
       turn = -_maxTurn / 2;
     }
@@ -325,10 +314,6 @@ void Truck::tick() {
       turn = _maxTurn / 2;
     }
 
-    // Serial.print(course);
-    // Serial.print("\t");
-    // Serial.print(residual);
-    // Serial.print("\t");
     // Serial.print(_deviation);
     // Serial.print("\t");
     // Serial.print(turn);
@@ -338,8 +323,7 @@ void Truck::tick() {
 
     goAndTurn(0, turn, Motor::SMOOTH_HARD);
 
-    // if (abs(residual) < 5000) {
-    if (abs(_deviation) < 2000) {
+    if (abs(_deviation) < 5000) {
       stop(Motor::SMOOTH_OFF);
       return;
     }
