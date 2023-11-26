@@ -106,7 +106,7 @@ void ProgHillWithPipes::tick() {
     if (!_truck->isRunning()) {
       // повернули => на маленькой скорости съезжаем прямо
       _truck->goWhilePitchInRange(_slowDriveSpeed, -6000, 2000, false, 2000);
-      _phase = TAIL_UP;
+      _phase = DRIVE_DOWN;
     }
   }
   else if (_phase == DRIVE_DOWN) {
