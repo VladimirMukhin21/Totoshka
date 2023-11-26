@@ -17,16 +17,19 @@ private:
     STARTING,
     INIT_TAIL_UP,
     DRIVING_BOW_UP,
+    DRIVE_TO_FIX,
     TAIL_DOWN,
     DRIVING_STERN_UP,
     TAIL_HORIZ,
     TURN,
     DRIVE_DOWN,
     TAIL_UP,
-    FINISH_DRIVING
+    FINISH_DRIVING,
+    STOP
   };
 
-  const byte _tailUpDeg = 125;
+  const byte _tailInitialDeg = 125;
+  const byte _tailUpDeg = 145;
   const byte _tailHorizDeg = 80;
   const byte _tailDownDeg = 15;
   const int _driveSpeed = 180;
@@ -64,7 +67,7 @@ void ProgHillWithPipes::tick() {
   }
   else if (_phase == STARTING) {
     // программа стартует => поднимаем хвост в нач. положение
-    _tail->moveTo(_tailUpDeg);
+    _tail->moveTo(_tailInitialDeg);
     _phase = INIT_TAIL_UP;
   }
   else if (_phase == INIT_TAIL_UP) {
@@ -76,7 +79,14 @@ void ProgHillWithPipes::tick() {
   }
   else if (_phase == DRIVING_BOW_UP) {
     if (!_truck->isRunning()) {
-      // встали на дыбы => опускаем хвост
+      // встали на дыбы => еще чуть-чуть подъезжаем, чтобы закрепиться
+      _truck->autoGo(_driveSpeed, 100);
+      _phase = DRIVE_TO_FIX;
+    }
+  }
+  else if (_phase == DRIVE_TO_FIX) {
+    if (!_truck->isRunning()) {
+      // закрепились => опускаем хвост
       _tail->moveTo(_tailDownDeg);
       _phase = TAIL_DOWN;
     }
@@ -105,7 +115,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == TURN) {
     if (!_truck->isRunning()) {
       // повернули => на маленькой скорости съезжаем прямо
-      _truck->goWhilePitchInRange(_slowDriveSpeed, -6000, 2000, false, 2000);
+      _truck->goWhilePitchInRange(_slowDriveSpeed, -6000, 2000, false, 3000);
       _phase = DRIVE_DOWN;
     }
   }
@@ -119,11 +129,18 @@ void ProgHillWithPipes::tick() {
   else if (_phase == TAIL_UP) {
     if (!_tail->isRunning()) {
       // хвост поднялся => включаем скорость и едем до горизонтали
-      _truck->goWhilePitchInRange(_slowDriveSpeed, -10000, 1000, false, 2000);
+      _truck->goWhilePitchInRange(_driveSpeed, -20000, -1000, false, 3000);
       _phase = FINISH_DRIVING;
     }
   }
   else if (_phase == FINISH_DRIVING) {
+    if (!_tail->isRunning()) {
+      // доехали до горизонтали => еще немного отъезжаем
+      _truck->autoGo(_driveSpeed, 500);
+      _phase = STOP;
+    }
+  }
+  else if (_phase == STOP) {
     if (!_truck->isRunning()) {
       // отъехали => стоп
       stop();
