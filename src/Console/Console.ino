@@ -67,7 +67,7 @@ void loop() {
   payload.upBlueButton = !digitalRead(PIN_UP_BLUE_BUTTON);
   payload.upGreenButton = !digitalRead(PIN_UP_GREEN_BUTTON);
 
-  if (payload.upBlueButton) {
+  if (payload.upBlueButton || payload.frontWhiteButton) {
     payload.key = keyboard.getKey();
   }
 
