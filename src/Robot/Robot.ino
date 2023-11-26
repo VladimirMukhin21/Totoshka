@@ -3,16 +3,17 @@
 #include "Hand.h"
 #include "Tail.h"
 #include "Video.h"
+#include "Average.h"
+#include "Color.h"
+#include "Gyro.h"
+#include "DistMeter.h"
 #include "ProgStairsUp.h"
 #include "ProgStairsDown.h"
 #include "ProgAutoLine.h"
 #include "ProgTakeTin.h"
 #include "ProgRotatePipe.h"
 #include "ProgHillWithPipes.h"
-#include "Average.h"
-#include "Color.h"
-#include "Gyro.h"
-#include "DistMeter.h"
+#include "ProgTruncatedPyramid.h"
 
 #define L_EN_PIN 39
 #define L_INA_PIN 41
@@ -52,6 +53,7 @@ ProgAutoLine progAutoLine;
 ProgTakeTin progTakeTin;
 ProgRotatePipe progRotatePipe;
 ProgHillWithPipes progHillWithPipes;
+ProgTruncatedPyramid progTruncatedPyramid;
 
 unsigned long lastRadioTime = millis();
 
@@ -84,6 +86,7 @@ void setup() {
   progTakeTin.init(truck, hand, distMeter);
   progRotatePipe.init(hand);
   progHillWithPipes.init(truck, tail);
+  progTruncatedPyramid.init(truck);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -238,6 +241,49 @@ void loop() {
     }
   }
 
+  if (payload.frontWhiteButton) {
+    if (payload.key == 0xA1) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xB1) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xC1) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xD1) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xA2) {  // СВОБОДНО
+      hand.handToRideTheLine();
+    }
+    else if (payload.key == 0xB2) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xC2) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xD2) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xA3) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xB3) {  // Провалы налево
+      progTruncatedPyramid.start(-90);
+      return;
+    }
+    else if (payload.key == 0xC3) {  // Провалы прямо
+      progTruncatedPyramid.start(0);
+      return;
+    }
+    else if (payload.key == 0xD3) {  // Провалы направо
+      progTruncatedPyramid.start(90);
+      return;
+    }
+    else if (payload.key == 0xA4) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xB4) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xC4) {  // СВОБОДНО
+    }
+    else if (payload.key == 0xD4) {  // Калибровка гироскопа
+      // не занимать! тут калибровка гироскопа на син + бел + D4
+    }
+  }
+
   truck.operate(payload.rightStick.vert, payload.rightStick.horiz);
 }
 
@@ -247,7 +293,8 @@ bool isAnyProgRunning() {
          || progAutoLine.isRunning()
          || progTakeTin.isRunning()
          || progRotatePipe.isRunning()
-         || progHillWithPipes.isRunning();
+         || progHillWithPipes.isRunning()
+         || progTruncatedPyramid.isRunning();
 }
 
 void stopAll() {
@@ -261,6 +308,7 @@ void stopAll() {
   progTakeTin.stop();
   progRotatePipe.stop();
   progHillWithPipes.stop();
+  progTruncatedPyramid.stop();
 }
 
 void tickAll() {
@@ -275,4 +323,5 @@ void tickAll() {
   progTakeTin.tick();
   progRotatePipe.tick();
   progHillWithPipes.tick();
+  progTruncatedPyramid.tick();
 }
