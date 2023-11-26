@@ -193,7 +193,7 @@ void Truck::turn(int turnAngleDeg, int msec = -1) {
     _targetTime = millis() + msec;
   }
 
-  _deviation = -turnAngleDeg * 47200;  // пересчет градусов в коэффициент для гироскопа
+  _deviation = -turnAngleDeg * Gyro::DEG_MULTIPLIER;  // пересчет градусов в коэффициент для гироскопа
   _mode = TURN;
 }
 

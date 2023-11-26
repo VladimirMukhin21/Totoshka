@@ -6,7 +6,7 @@
 class ProgHillWithPipes {
 public:
   void init(Truck &truck, Tail &tail);
-  void start();
+  void start(int turnOnTopAngleDeg);
   void stop();
   void tick();
   bool isRunning();
@@ -20,6 +20,7 @@ private:
     TAIL_DOWN,
     DRIVING_STERN_UP,
     TAIL_HORIZ,
+    TURN,
     DRIVE_DOWN,
     TAIL_UP,
     FINISH_DRIVING
@@ -34,6 +35,7 @@ private:
   Truck *_truck;
   Tail *_tail;
   Phase _phase = NONE;
+  int _turnOnTopAngleDeg = 0;
 };
 
 void ProgHillWithPipes::init(Truck &truck, Tail &tail) {
@@ -41,11 +43,12 @@ void ProgHillWithPipes::init(Truck &truck, Tail &tail) {
   _tail = &tail;
 }
 
-void ProgHillWithPipes::start() {
+void ProgHillWithPipes::start(int turnOnTopAngleDeg) {
   if (isRunning()) {
     return;
   }
 
+  _turnOnTopAngleDeg = turnOnTopAngleDeg;
   _phase = STARTING;
 }
 
@@ -94,9 +97,16 @@ void ProgHillWithPipes::tick() {
   }
   else if (_phase == TAIL_HORIZ) {
     if (!_tail->isRunning()) {
-      // хвост в горизонтали => на маленькой скорости съезжаем прямо
+      // хвост в горизонтали => поворачиваем
+      _truck->turn(_turnOnTopAngleDeg);
+      _phase = TURN;
+    }
+  }
+  else if (_phase == TURN) {
+    if (!_truck->isRunning()) {
+      // повернули => на маленькой скорости съезжаем прямо
       _truck->goWhilePitchInRange(_slowDriveSpeed, -6000, 2000, false, 2000);
-      _phase = DRIVE_DOWN;
+      _phase = TAIL_UP;
     }
   }
   else if (_phase == DRIVE_DOWN) {

@@ -7,6 +7,8 @@
 
 class Gyro {
 public:
+  static const long DEG_MULTIPLIER = 47200;
+
   void init();
   void enable();
   void disable();

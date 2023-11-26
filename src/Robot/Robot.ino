@@ -192,13 +192,17 @@ void loop() {
       progRotatePipe.start();
       return;
     }
-    else if (payload.key == 0xB3) {  // Горка с трубами
-      progHillWithPipes.start();
+    else if (payload.key == 0xB3) {  // Горка с трубами налево
+      progHillWithPipes.start(-90);
       return;
     }
-    else if (payload.key == 0xC3) {  // СВОБОДНО
+    else if (payload.key == 0xC3) {  // Горка с трубами прямо
+      progHillWithPipes.start(0);
+      return;
     }
-    else if (payload.key == 0xD3) {  // СВОБОДНО
+    else if (payload.key == 0xD3) {  // Горка с трубами направо
+      progHillWithPipes.start(90);
+      return;
     }
     else if (payload.key == 0xA4) {  // Подъем по лестнице
       progStairsUp.start();
