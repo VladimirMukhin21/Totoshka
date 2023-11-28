@@ -256,7 +256,7 @@ void Truck::tick() {
 
     if (_targetSpeed > 0) {
       int pitch = _gyro->getPitch();
-      if (pitch > 10000) {
+      if (pitch > 12000) {
         _tail->downTail(true);
       }
     }
