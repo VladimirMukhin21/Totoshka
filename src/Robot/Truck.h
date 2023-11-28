@@ -299,7 +299,8 @@ void Truck::tick() {
 
       if (millis() - _timeOfStartFixing > _fixTimeMsec) {
         _timeOfStartFixing = 0;
-        stop();
+        //stop();
+        autoGo(_targetSpeed, 100);
         return;
       }
     }
@@ -347,7 +348,8 @@ void Truck::tick() {
 
       if (millis() - _timeOfStartFixing > _fixTimeMsec) {
         _timeOfStartFixing = 0;
-        stop();
+        // stop();
+        autoGo(_targetSpeed, 200);
         return;
       }
     }
