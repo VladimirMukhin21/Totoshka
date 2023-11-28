@@ -14,7 +14,7 @@ public:
 
 private:
   const int _driveSpeed = 65;                     // 70
-  GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);  //   4.5, 0.1, 0.3, 100      3.1, 0.15, 0.25, 100     // 2.0, 0, 0.2, 100  //   2.7, 0.2, 0.15, 100   4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
+  GyverPID _pid = GyverPID(2.5, 0.1, 0, 100);  //   4.5, 0.1, 0.3, 100      3.1, 0.15, 0.25, 100     // 2.0, 0, 0.2, 100  //   2.7, 0.2, 0.15, 100   4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
 
   Truck *_truck;
   Hand *_hand;
@@ -61,7 +61,7 @@ void ProgAutoLine::tick() {
   int turn = _pid.getResult();  // ПИД-регулятор
   //int turn = (int)((double)(l - r) * 3); // П-регулятор
 
-  _truck->goAndTurn(_driveSpeed, turn);
+  _truck->goAndTurn(_driveSpeed, turn, Motor::SMOOTH_OFF);
 
   /*Serial.print(l);
     Serial.print("\t");
