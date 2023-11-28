@@ -16,7 +16,8 @@ private:
     STARTING,
     DRIVE_TOP,
     TURN,
-    DRIVE_DOWN
+    DRIVE_DOWN,
+    FINISH_DRIVING
   };
 
   const int _driveSpeed = 100;
@@ -69,6 +70,13 @@ void ProgTruncatedPyramid::tick() {
     }
   }
   else if (_phase == DRIVE_DOWN) {
+    if (!_truck->isRunning()) {
+      // съехали => еще немного отъезжаем
+      _truck->autoGo(_driveSpeed, 1000);
+      _phase = FINISH_DRIVING;
+    }
+  }
+  else if (_phase == FINISH_DRIVING) {
     if (!_truck->isRunning()) {
       // отъехали => стоп
       stop();
