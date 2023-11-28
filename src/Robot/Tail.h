@@ -7,8 +7,9 @@ class Tail {
 public:
   void init(byte coccyxPin);
   void operate(byte stickVert);
-  void moveTo(int deg);
-  void upTail();
+  void moveTo(int deg, bool returnAfter = false);
+  void upTail(bool returnAfter = false);
+  void downTail(bool returnAfter = false);
   void stop();
   void tick();
   bool isRunning();
@@ -17,10 +18,12 @@ private:
   const byte _minStick = 0;
   const byte _maxStick = 255;
   const byte _maxSpeed = 5;
+  static const int UP_ANGLE = 145;
+  static const int DOWN_ANGLE = 15;
 
   Servo _coccyx;
 
-  Angle _coccyxAngle = Angle(145, 15, 145, 60); // вниз-вверх; макс вверх для больших колес - 140, для маленьких - 145
+  Angle _coccyxAngle = Angle(145, DOWN_ANGLE, UP_ANGLE, 60);  // вниз-вверх; макс вверх для больших колес - 140, для маленьких - 145
 
   //#define DEBUG
 #ifdef DEBUG
@@ -29,6 +32,8 @@ private:
 
   unsigned long _tickTime = millis();
   int _targetDeg;
+  int _returnAngle = 0;
+  bool _returnAfter = false;
   bool _isRunning = false;
 
   byte filterStickDeadZone(byte value);
@@ -62,13 +67,22 @@ void Tail::operate(byte stickVert) {
 #endif*/
 }
 
-void Tail::moveTo(int deg) {
+void Tail::moveTo(int deg, bool returnAfter = false) {
   _targetDeg = deg;
   _isRunning = true;
+
+  _returnAfter = returnAfter;
+  if (_returnAfter) {
+    _returnAngle = _coccyxAngle.toDeg();
+  }
 }
 
-void Tail::upTail() {
-  moveTo(150);
+void Tail::upTail(bool returnAfter = false) {
+  moveTo(UP_ANGLE, returnAfter);
+}
+
+void Tail::downTail(bool returnAfter = false) {
+  moveTo(DOWN_ANGLE, returnAfter);
 }
 
 void Tail::stop() {
@@ -93,7 +107,13 @@ void Tail::tick() {
       _coccyx.write(_coccyxAngle.toDeg());
     }
     else {
-      _isRunning = false;
+      if (_returnAfter) {
+        moveTo(UP_ANGLE);  //_returnAngle);
+        _returnAfter = false;
+      }
+      else {
+        _isRunning = false;
+      }
     }
   }
 }

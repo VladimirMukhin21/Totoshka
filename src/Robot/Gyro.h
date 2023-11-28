@@ -154,6 +154,9 @@ void Gyro::tick() {
   // Serial.print(dc);
   // Serial.print("\t");
 
+  // Serial.print(getPitch());
+  // Serial.print("\t");
+
   // Serial.print("0\t50\t-50");  // линии для масштаба на графике
   // Serial.println();
 }

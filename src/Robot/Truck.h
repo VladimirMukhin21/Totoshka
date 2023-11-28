@@ -2,10 +2,11 @@
 
 #include "Motor.h"
 #include "Gyro.h"
+#include "Tail.h"
 
 class Truck {
 public:
-  void init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro);
+  void init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro, Tail &tail);
   void operate(byte stickVert, byte stickHoriz);
   void goAndTurn(int speed, int turn, byte smoothStep = Motor::SMOOTH_SOFT);
   void speedGo(int speedLeft, int speedRight, byte smoothStep = Motor::SMOOTH_SOFT);
@@ -37,6 +38,7 @@ private:
   Motor _left;
   Motor _right;
   Gyro *_gyro;
+  Tail *_tail;
   long _deviation = 0;
 
   /*#ifdef DEBUG
@@ -59,10 +61,11 @@ private:
   byte filterStickDeadZone(byte value);
 };
 
-void Truck::init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro) {
+void Truck::init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro, Tail &tail) {
   _left.init(lEnPin, lInaPin, lInbPin, lPwmPin);
-  _right.init(rEnPin, rInaPin, rInbPin, rPwmPin, 90, 60);
+  _right.init(rEnPin, rInaPin, rInbPin, rPwmPin, 72, 42);  // 90, 60
   _gyro = &gyro;
+  _tail = &tail;
 }
 
 void Truck::operate(byte stickVert, byte stickHoriz) {
@@ -232,6 +235,13 @@ void Truck::tick() {
     _deviation += _gyro->getDeltaCourse();
     int turn = -_deviation / 1800;
     goAndTurn(_targetSpeed, turn, Motor::SMOOTH_OFF);
+
+    if (_targetSpeed > 0) {
+      int pitch = _gyro->getPitch();
+      if (pitch > 10000) {
+        _tail->downTail(true);
+      }
+    }
   }
   else if (_mode == GO_TO_HILL) {
     if (_targetTime > 0 && millis() > _targetTime) {
