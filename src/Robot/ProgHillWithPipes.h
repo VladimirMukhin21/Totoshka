@@ -73,14 +73,14 @@ void ProgHillWithPipes::tick() {
   else if (_phase == INIT_TAIL_UP) {
     if (!_tail->isRunning()) {
       // хвост поднялся => подъезжаем пока не встанем на дыбы
-      _truck->goWhilePitchInRange(_driveSpeed, -8000, 8000, false, 2000);
+      _truck->goWhilePitchInRange(_driveSpeed, -8000, 10000, false, 2000);
       _phase = DRIVING_BOW_UP;
     }
   }
   else if (_phase == DRIVING_BOW_UP) {
     if (!_truck->isRunning()) {
       // встали на дыбы => еще чуть-чуть подъезжаем, чтобы закрепиться
-      _truck->autoGo(_driveSpeed, 100);
+      _truck->autoGo(_driveSpeed, 500);
       _phase = DRIVE_TO_FIX;
     }
   }
@@ -94,7 +94,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == TAIL_DOWN) {
     if (!_tail->isRunning()) {
       // опустили хвост => даем газ, забрасываем корму
-      _truck->goWhilePitchInRange(_driveSpeed, -4000, 8000, false, 2000);
+      _truck->goWhilePitchInRange(255, -4000, 8000, false, 2000);
       _phase = DRIVING_STERN_UP;
     }
   }
@@ -136,7 +136,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == FINISH_DRIVING) {
     if (!_tail->isRunning()) {
       // доехали до горизонтали => еще немного отъезжаем
-      _truck->autoGo(_driveSpeed, 500);
+      _truck->autoGo(_driveSpeed, 1000);
       _phase = STOP;
     }
   }
