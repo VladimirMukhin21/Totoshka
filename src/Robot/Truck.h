@@ -12,7 +12,8 @@ public:
   void speedGo(int speedLeft, int speedRight, byte smoothStep = Motor::SMOOTH_SOFT);
   void autoGo(int speed, int msec = -1);
   void goStraight(int speed, bool resetDeviation = true, int msec = -1);
-  void goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
+  void goHillUp(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
+  void goHillDown(int speed, int thresholdHillPitch = -4000, int thresholdHorizPitch = -1000, int fixTimeMsec = 50, int maxTimeMsec = -1);
   void goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool absolutePitch = true, int msec = -1);
   void turn(int turnAngleDeg, int msec = -1);
   void stop(byte smoothStep = Motor::SMOOTH_HARD);
@@ -24,8 +25,10 @@ private:
     NONE,
     AUTO_GO,
     GO_STRAIGHT,
-    GO_TO_HILL,
-    GO_TO_HORIZ,
+    GO_TO_HILL_UP,
+    GO_TO_HORIZ_FROM_UP,
+    GO_TO_HILL_DOWN,
+    GO_TO_HORIZ_FROM_DOWN,
     GO_WHILE_PITCH_IN_RANGE,
     TURN
   };
@@ -161,7 +164,7 @@ void Truck::goStraight(int speed, bool resetDeviation = true, int msec = -1) {
   _mode = GO_STRAIGHT;
 }
 
-void Truck::goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1) {
+void Truck::goHillUp(int speed, int thresholdHillPitch = 4000, int thresholdHorizPitch = 1000, int fixTimeMsec = 50, int maxTimeMsec = -1) {
   _targetSpeed = speed;
   _thresholdHillPitch = thresholdHillPitch;
   _thresholdHorizPitch = thresholdHorizPitch;
@@ -173,7 +176,22 @@ void Truck::goHill(int speed, int thresholdHillPitch = 4000, int thresholdHorizP
 
   _timeOfStartFixing = 0;
   _deviation = 0;
-  _mode = GO_TO_HILL;
+  _mode = GO_TO_HILL_UP;
+}
+
+void Truck::goHillDown(int speed, int thresholdHillPitch = -4000, int thresholdHorizPitch = -1000, int fixTimeMsec = 50, int maxTimeMsec = -1) {
+  _targetSpeed = speed;
+  _thresholdHillPitch = thresholdHillPitch;
+  _thresholdHorizPitch = thresholdHorizPitch;
+  _fixTimeMsec = fixTimeMsec;
+  _targetTime = -1;
+  if (maxTimeMsec > 0) {
+    _targetTime = millis() + maxTimeMsec;
+  }
+
+  _timeOfStartFixing = 0;
+  _deviation = 0;
+  _mode = GO_TO_HILL_DOWN;
 }
 
 void Truck::goWhilePitchInRange(int speed, int minPitch, int maxPitch, bool absolutePitch = true, int msec = -1) {
@@ -243,21 +261,21 @@ void Truck::tick() {
       }
     }
   }
-  else if (_mode == GO_TO_HILL) {
+  else if (_mode == GO_TO_HILL_UP) {
     if (_targetTime > 0 && millis() > _targetTime) {
       stop();
       return;
     }
 
     // Serial.print(0); Serial.print("\t"); Serial.println(_gyro->getPitch());
-    if (abs(_gyro->getPitch()) >= _thresholdHillPitch) {
+    if (_gyro->getPitch() >= _thresholdHillPitch) {
       if (_timeOfStartFixing <= 0) {
         _timeOfStartFixing = millis();
       }
 
       if (millis() - _timeOfStartFixing > _fixTimeMsec) {
         _timeOfStartFixing = 0;
-        _mode = GO_TO_HORIZ;
+        _mode = GO_TO_HORIZ_FROM_UP;
         return;
       }
     }
@@ -267,14 +285,62 @@ void Truck::tick() {
 
     goAndTurn(_targetSpeed, 0);
   }
-  else if (_mode == GO_TO_HORIZ) {
+  else if (_mode == GO_TO_HORIZ_FROM_UP) {
     if (_targetTime > 0 && millis() > _targetTime) {
       stop();
       return;
     }
 
     int pitch = _gyro->getPitch();
-    if (abs(pitch) <= _thresholdHorizPitch) {
+    if (pitch <= _thresholdHorizPitch) {
+      if (_timeOfStartFixing <= 0) {
+        _timeOfStartFixing = millis();
+      }
+
+      if (millis() - _timeOfStartFixing > _fixTimeMsec) {
+        _timeOfStartFixing = 0;
+        stop();
+        return;
+      }
+    }
+    else {
+      _timeOfStartFixing = 0;
+    }
+
+    goAndTurn(_targetSpeed, 0);
+  }
+  else if (_mode == GO_TO_HILL_DOWN) {
+    if (_targetTime > 0 && millis() > _targetTime) {
+      stop();
+      return;
+    }
+
+    // Serial.print(0); Serial.print("\t"); Serial.println(_gyro->getPitch());
+    if (_gyro->getPitch() <= _thresholdHillPitch) {
+      if (_timeOfStartFixing <= 0) {
+        _timeOfStartFixing = millis();
+      }
+
+      if (millis() - _timeOfStartFixing > _fixTimeMsec) {
+        _timeOfStartFixing = 0;
+        _mode = GO_TO_HORIZ_FROM_DOWN;
+        return;
+      }
+    }
+    else {
+      _timeOfStartFixing = 0;
+    }
+
+    goAndTurn(_targetSpeed, 0);
+  }
+  else if (_mode == GO_TO_HORIZ_FROM_DOWN) {
+    if (_targetTime > 0 && millis() > _targetTime) {
+      stop();
+      return;
+    }
+
+    int pitch = _gyro->getPitch();
+    if (pitch >= _thresholdHorizPitch) {
       if (_timeOfStartFixing <= 0) {
         _timeOfStartFixing = millis();
       }

@@ -51,7 +51,7 @@ void ProgHoof::tick() {
   }
   else if (_phase == STARTING) {
     // программа стартует => заезжаем на вершину
-    _truck->goHill(_driveSpeed);
+    _truck->goHillUp(_driveSpeed);
     _phase = DRIVE_TOP;
   }
   else if (_phase == DRIVE_TOP) {
@@ -64,7 +64,7 @@ void ProgHoof::tick() {
   else if (_phase == TURN) {
     if (!_truck->isRunning()) {
       // повернули => на маленькой скорости съезжаем прямо
-      _truck->goHill(_slowDriveSpeed);
+      _truck->goHillDown(_slowDriveSpeed);
       _phase = DRIVE_DOWN;
     }
   }

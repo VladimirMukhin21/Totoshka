@@ -187,11 +187,11 @@ void loop() {
       return;
     }
     else if (payload.key == 0xC2) {  // Подъем по наклонной
-      truck.goHill(200);             // едем быстро
+      truck.goHillUp(200);           // едем быстро
       return;
     }
     else if (payload.key == 0xD2) {  // Спуск по наклонной
-      truck.goHill(100);             // едем медленно
+      truck.goHillDown(100);         // едем медленно
       return;
     }
     else if (payload.key == 0xA3) {  // Поворот трубки
