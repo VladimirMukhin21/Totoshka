@@ -22,6 +22,7 @@ private:
     DRIVING_STERN_UP,
     DRIVE_TO_CENTER,
     TAIL_HORIZ,
+    DRIVE_TO_CENTER2,
     TURN,
     DRIVE_DOWN,
     TAIL_UP,
@@ -34,7 +35,7 @@ private:
   const byte _tailHorizDeg = 80;
   const byte _tailDownDeg = 15;
   const int _driveSpeed = 180;
-  const int _slowDriveSpeed = 40;
+  const int _slowDriveSpeed = 50;
 
   Truck *_truck;
   Tail *_tail;
@@ -95,35 +96,47 @@ void ProgHillWithPipes::tick() {
   else if (_phase == TAIL_DOWN) {
     if (!_tail->isRunning()) {
       // опустили хвост => даем газ, забрасываем корму
-      _truck->goWhilePitchInRange(255, -4000, 8000, false, 5000);
+      _truck->goWhilePitchInRange(255, -4000, 12000, false, 5000);
       _phase = DRIVING_STERN_UP;
     }
   }
   else if (_phase == DRIVING_STERN_UP) {
     if (!_truck->isRunning()) {
       // забросили корму => еще немного подъезжаем до центра
-      _truck->autoGo(_driveSpeed, 50);
+      _truck->autoGo(_driveSpeed, 300);
+      _tail->moveTo(_tailHorizDeg);//
       _phase = DRIVE_TO_CENTER;
     }
   }
   else if (_phase == DRIVE_TO_CENTER) {
     if (!_truck->isRunning()) {
       // подъехали до центра => ставим хвост горизонтально для смещения ЦМ назад
-      _tail->moveTo(_tailHorizDeg);
-      _phase = TAIL_HORIZ;
+      // _tail->moveTo(_tailHorizDeg);
+      _truck->autoGo(_driveSpeed, 150);
+      // _phase = TAIL_HORIZ;
+      _phase = DRIVE_TO_CENTER2;
     }
   }
-  else if (_phase == TAIL_HORIZ) {
+  // else if (_phase == TAIL_HORIZ) {
+  //   if (!_tail->isRunning()) {
+  //     // хвост в горизонтали => //поворачиваем
+  //     _truck->autoGo(_driveSpeed, 150);
+  //     _phase = DRIVE_TO_CENTER2;
+  //   }
+  // }
+
+  else if (_phase == DRIVE_TO_CENTER2) {
+    // подъехали до центра => ставим хвост горизонтально для смещения ЦМ назад
     if (!_tail->isRunning()) {
-      // хвост в горизонтали => поворачиваем
       _truck->turn(_turnOnTopAngleDeg);
       _phase = TURN;
     }
   }
+
   else if (_phase == TURN) {
     if (!_truck->isRunning()) {
       // повернули => на маленькой скорости съезжаем прямо
-      _truck->goWhilePitchInRange(_slowDriveSpeed, -6000, 2000, false, 5000);
+      _truck->goWhilePitchInRange(_slowDriveSpeed, -8000, 5000, false, 5000);
       _phase = DRIVE_DOWN;
     }
   }
@@ -131,16 +144,18 @@ void ProgHillWithPipes::tick() {
     if (!_truck->isRunning()) {
       // съехали носом => поднимаем хвост
       _tail->moveTo(_tailUpDeg);
-      _phase = TAIL_UP;
-    }
-  }
-  else if (_phase == TAIL_UP) {
-    if (!_tail->isRunning()) {
-      // хвост поднялся => включаем скорость и едем до горизонтали
       _truck->goWhilePitchInRange(_driveSpeed, -20000, -1000, false, 5000);
+      // _phase = TAIL_UP;
       _phase = FINISH_DRIVING;
     }
   }
+  // else if (_phase == TAIL_UP) {
+  //   if (!_tail->isRunning()) {
+  //     // хвост поднялся => включаем скорость и едем до горизонтали
+  //     _truck->goWhilePitchInRange(_driveSpeed, -20000, -1000, false, 5000);
+  //     _phase = FINISH_DRIVING;
+  //   }
+  // }
   else if (_phase == FINISH_DRIVING) {
     if (!_tail->isRunning()) {
       // доехали до горизонтали => еще немного отъезжаем
