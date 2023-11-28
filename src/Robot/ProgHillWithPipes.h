@@ -20,6 +20,7 @@ private:
     DRIVE_TO_FIX,
     TAIL_DOWN,
     DRIVING_STERN_UP,
+    DRIVE_TO_CENTER,
     TAIL_HORIZ,
     TURN,
     DRIVE_DOWN,
@@ -73,7 +74,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == INIT_TAIL_UP) {
     if (!_tail->isRunning()) {
       // хвост поднялся => подъезжаем пока не встанем на дыбы
-      _truck->goWhilePitchInRange(_driveSpeed, -8000, 10000, false, 2000);
+      _truck->goWhilePitchInRange(_driveSpeed, -8000, 10000, false, 5000);
       _phase = DRIVING_BOW_UP;
     }
   }
@@ -94,13 +95,20 @@ void ProgHillWithPipes::tick() {
   else if (_phase == TAIL_DOWN) {
     if (!_tail->isRunning()) {
       // опустили хвост => даем газ, забрасываем корму
-      _truck->goWhilePitchInRange(255, -4000, 8000, false, 2000);
+      _truck->goWhilePitchInRange(255, -4000, 8000, false, 5000);
       _phase = DRIVING_STERN_UP;
     }
   }
   else if (_phase == DRIVING_STERN_UP) {
     if (!_truck->isRunning()) {
-      // забросили корму => ставим хвост горизонтально для смещения ЦМ назад
+      // забросили корму => еще немного подъезжаем до центра
+      _truck->autoGo(_driveSpeed, 50);
+      _phase = DRIVE_TO_CENTER;
+    }
+  }
+  else if (_phase == DRIVE_TO_CENTER) {
+    if (!_truck->isRunning()) {
+      // подъехали до центра => ставим хвост горизонтально для смещения ЦМ назад
       _tail->moveTo(_tailHorizDeg);
       _phase = TAIL_HORIZ;
     }
@@ -115,7 +123,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == TURN) {
     if (!_truck->isRunning()) {
       // повернули => на маленькой скорости съезжаем прямо
-      _truck->goWhilePitchInRange(_slowDriveSpeed, -6000, 2000, false, 3000);
+      _truck->goWhilePitchInRange(_slowDriveSpeed, -6000, 2000, false, 5000);
       _phase = DRIVE_DOWN;
     }
   }
@@ -129,7 +137,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == TAIL_UP) {
     if (!_tail->isRunning()) {
       // хвост поднялся => включаем скорость и едем до горизонтали
-      _truck->goWhilePitchInRange(_driveSpeed, -20000, -1000, false, 3000);
+      _truck->goWhilePitchInRange(_driveSpeed, -20000, -1000, false, 5000);
       _phase = FINISH_DRIVING;
     }
   }
