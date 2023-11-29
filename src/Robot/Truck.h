@@ -58,8 +58,9 @@ private:
   int _minPitch = 0;
   int _maxPitch = 0;
   bool _absolutePitch = false;
-  int _fixTimeMsec = 0;                  // показывает сколько мсек надо для четкой фиксации показаний (защита от плавающих показаний)
-  unsigned long _timeOfStartFixing = 0;  // время начала фиксации требуемых показаний
+  int _fixTimeMsec = 0;                    // показывает сколько мсек надо для четкой фиксации показаний (защита от плавающих показаний)
+  unsigned long _timeOfStartFixing = 0;    // время начала фиксации требуемых показаний
+  unsigned long _timeOfStartGoStraight = 0;  // время старта программы Езда прямо
 
   byte filterStickDeadZone(byte value);
 };
@@ -161,6 +162,7 @@ void Truck::goStraight(int speed, bool resetDeviation = true, int msec = -1) {
     _deviation = 0;
   }
 
+  _timeOfStartGoStraight = millis();
   _mode = GO_STRAIGHT;
 }
 
@@ -254,7 +256,7 @@ void Truck::tick() {
     int turn = -_deviation / 1800;
     goAndTurn(_targetSpeed, turn, Motor::SMOOTH_OFF);
 
-    if (_targetSpeed > 0) {
+    if (_targetSpeed > 0 && (millis() - _timeOfStartGoStraight > 1000)) {
       int pitch = _gyro->getPitch();
       if (pitch > 12000) {
         _tail->downTail(true);
