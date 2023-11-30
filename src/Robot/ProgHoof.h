@@ -16,11 +16,12 @@ private:
     STARTING,
     DRIVE_TOP,
     TURN,
-    DRIVE_DOWN
+    DRIVE_DOWN,
+    STOP
   };
 
   const int _driveSpeed = 100;
-  const int _slowDriveSpeed = 40;
+  const int _slowDriveSpeed = 50;
 
   Truck *_truck;
   Phase _phase = NONE;
@@ -51,7 +52,7 @@ void ProgHoof::tick() {
   }
   else if (_phase == STARTING) {
     // программа стартует => заезжаем на вершину
-    _truck->goHillUp(_driveSpeed, 4000, 800, 30);
+    _truck->goHillUp(_driveSpeed, 6000, 1200, 30);
     _phase = DRIVE_TOP;
   }
   else if (_phase == DRIVE_TOP) {
@@ -64,11 +65,18 @@ void ProgHoof::tick() {
   else if (_phase == TURN) {
     if (!_truck->isRunning()) {
       // повернули => на маленькой скорости съезжаем прямо
-      _truck->goHillDown(_slowDriveSpeed);
+      _truck->goHillDown(_slowDriveSpeed, -4000, -1000, 50);
       _phase = DRIVE_DOWN;
     }
   }
   else if (_phase == DRIVE_DOWN) {
+    if (!_truck->isRunning()) {
+      // доехали до горизонтали => еще немного отъезжаем
+      _truck->autoGo(_driveSpeed, 500);
+      _phase = STOP;
+    }
+  }
+  else if (_phase == STOP) {
     if (!_truck->isRunning()) {
       // отъехали => стоп
       stop();
