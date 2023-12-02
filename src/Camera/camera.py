@@ -142,7 +142,7 @@ def switch_record():
         codec = cv2.VideoWriter_fourcc(*'DIVX')
         # codec = cv2.VideoWriter_fourcc(*'XVID')
         # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
-        file = cv2.VideoWriter(name, codec, 20, (width, height))
+        file = cv2.VideoWriter(name, codec, 25, (width, height))
     else:
         file.release()
 
