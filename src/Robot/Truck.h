@@ -256,12 +256,12 @@ void Truck::tick() {
     int turn = -_deviation / 1800;
     goAndTurn(_targetSpeed, turn, Motor::SMOOTH_OFF);
 
-    if (_targetSpeed > 0 && (millis() - _timeOfStartGoStraight > 1000)) {
+    /*if (_targetSpeed > 0 && (millis() - _timeOfStartGoStraight > 1000)) { // Автономное опускание хвоста при езде прямо
       int pitch = _gyro->getPitch();
       if (pitch > 12000) {
         _tail->downTail(true);
       }
-    }
+    }*/
   }
   else if (_mode == GO_TO_HILL_UP) {
     if (_targetTime > 0 && millis() > _targetTime) {
