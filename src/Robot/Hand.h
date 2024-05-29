@@ -58,7 +58,7 @@ private:
   Angle _shoulderAngle = Angle(30, 30, 154, 70);             // вверх-вниз
   Angle _elbowAngle = Angle(0, 0, 120, 70);                  // вниз-вверх
   Angle _rotateAngle = Angle(_rotateCenterPos, 3, 180, 30);  // против-по часовой (смотреть по ходу движения робота)
-  Angle _clawAngle = Angle(105, 65, 130, 40);                // сжатие-разжатие
+  Angle _clawAngle = Angle(105, 62, 130, 40);                // сжатие-разжатие
 
   /*#ifdef DEBUG
           unsigned long _printTime = millis();
