@@ -187,7 +187,7 @@ void loop() {
       return;
     }
     else if (payload.key == 0xC2) {  // Подъем по наклонной
-      truck.goHillUp(200);           // едем быстро
+      truck.goHillUp(200, 4000, 1000, 100);           // едем быстро
       return;
     }
     else if (payload.key == 0xD2) {  // Спуск по наклонной

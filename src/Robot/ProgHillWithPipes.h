@@ -34,7 +34,7 @@ private:
   const byte _tailUpDeg = 145;
   const byte _tailHorizDeg = 80;
   const byte _tailDownDeg = 15;
-  const int _driveSpeed = 180;
+  const int _driveSpeed = 230; //180;
   const int _slowDriveSpeed = 50;
 
   Truck *_truck;
