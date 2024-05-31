@@ -276,11 +276,11 @@ void loop() {
       return;
     }
     else if (payload.key == 0xA4) {  // Копыто налево
-      progHoof.start(-100);
+      progHoof.start(-60);
       return;
     }
     else if (payload.key == 0xB4) {  // Копыто направо
-      progHoof.start(100);
+      progHoof.start(60);
       return;
     }
     else if (payload.key == 0xC4) {  // СВОБОДНО

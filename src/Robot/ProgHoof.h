@@ -15,7 +15,9 @@ private:
     NONE,
     STARTING,
     DRIVE_TOP,
-    TURN,
+    TURN1,
+    LITTLE_DRIVE,
+    TURN2,
     DRIVE_DOWN,
     STOP
   };
@@ -52,17 +54,31 @@ void ProgHoof::tick() {
   }
   else if (_phase == STARTING) {
     // программа стартует => заезжаем на вершину
-    _truck->goHillUp(_driveSpeed, 6000, 1200, 30);
+    _truck->goHillUp(_driveSpeed, 6000, 1400, 30);
     _phase = DRIVE_TOP;
   }
   else if (_phase == DRIVE_TOP) {
     if (!_truck->isRunning()) {
-      // на вершину заехали => поворачиваем
+      // на вершину заехали => поворачиваем на 45 градусов
       _truck->turn(_turnOnTopAngleDeg);
-      _phase = TURN;
+      _phase = TURN1;
     }
   }
-  else if (_phase == TURN) {
+  else if (_phase == TURN1) {
+    if (!_truck->isRunning()) {
+      // повернули => еще чуть-чуть подъезжаем
+      _truck->autoGo(_slowDriveSpeed, 800);
+      _phase = LITTLE_DRIVE;
+    }
+  }
+  else if (_phase == LITTLE_DRIVE) {
+    if (!_truck->isRunning()) {
+      // на вершину заехали => еще доворачиваем на 45 градусов
+      _truck->turn(_turnOnTopAngleDeg);
+      _phase = TURN2;
+    }
+  }
+  else if (_phase == TURN2) {
     if (!_truck->isRunning()) {
       // повернули => на маленькой скорости съезжаем прямо
       _truck->goHillDown(_slowDriveSpeed, -4000, -1000, 50);
