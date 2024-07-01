@@ -26,6 +26,11 @@ struct Payload {
   byte key;
 };
 
+struct Telemetry {
+  int data1;  //: 2;
+  int data2;  //: 2;
+};
+
 class Radio {
 public:
   Radio();
@@ -97,6 +102,10 @@ bool Radio::available() {
 Payload Radio::read() {
   Payload payload;
   _nrf.read(&payload, sizeof(payload));
+  Telemetry telemetry;
+  telemetry.data1 = 1234;
+  telemetry.data2 = 5678;
+  _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
 #ifdef DEBUG
   debugPrint(payload);
 #endif
@@ -105,6 +114,16 @@ Payload Radio::read() {
 
 void Radio::write(Payload payload) {
   _nrf.write(&payload, sizeof(payload));
+
+
+  if (_nrf.available()) {
+    Telemetry telemetry;
+    _nrf.read(&telemetry, sizeof(telemetry));
+    Serial.print(telemetry.data1);
+    Serial.print("\t");
+    Serial.println(telemetry.data2);
+  }
+
 #ifdef DEBUG
   debugPrint(payload);
 #endif
