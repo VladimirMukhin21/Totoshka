@@ -19,17 +19,18 @@ void DistMeter::init() {
   Wire.begin();
   sensor.setTimeout(500);
   sensor.init();
-  disable();
+  sensor.startContinuous();
+  //disable();
 }
 
 int DistMeter::getDist() {
   return sensor.readRangeContinuousMillimeters();
 }
 
-void DistMeter::enable() {
+/*void DistMeter::enable() {
   sensor.startContinuous();
 }
 
 void DistMeter::disable() {
   sensor.stopContinuous();
-}
+}*/

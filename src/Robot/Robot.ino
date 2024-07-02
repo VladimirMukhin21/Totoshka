@@ -73,7 +73,7 @@ void setup() {
   // https://www.i2cdevlib.com/forums/topic/414-freezing-problem/
   Wire.setWireTimeout(3000, true);
 
-  radio.initReceiver();
+  radio.initReceiver(distMeter);
   color.init();
   gyro.init();
   distMeter.init();

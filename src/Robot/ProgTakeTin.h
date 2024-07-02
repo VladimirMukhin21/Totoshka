@@ -58,7 +58,7 @@ void ProgTakeTin::start() {
 void ProgTakeTin::stop() {
   _truck->stop();
   _hand->stop();
-  _distMeter->disable();
+  //_distMeter->disable();
   _phase = NONE;
   //Serial.println("stop");
 }
@@ -79,7 +79,7 @@ void ProgTakeTin::tick() {
     //Serial.println("init hand");
     if (!_hand->isRunning()) {
       // рука опустилась => подъезжаем к маяку
-      _distMeter->enable();
+      //_distMeter->enable();
       int dist = _distMeter->getDist();
       if (dist > _distToSlowDrive) {
         _truck->goStraight(_driveSpeed);
@@ -106,7 +106,7 @@ void ProgTakeTin::tick() {
     if (dist <= _distToTake) {
       // доехали до маяка
       _truck->stop(Motor::SMOOTH_OFF);
-      _distMeter->disable();
+      //_distMeter->disable();
       _hand->takeTin();
       _phase = TAKE;
     }

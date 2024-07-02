@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
+#include "DistMeter.h"
 
 struct Stick {
   byte vert;
@@ -27,14 +28,14 @@ struct Payload {
 };
 
 struct Telemetry {
-  int data1;  //: 2;
+  int dist;  //: 2;
   int data2;  //: 2;
 };
 
 class Radio {
 public:
   Radio();
-  void initReceiver();
+  void initReceiver(DistMeter &distMeter);
   void initTransmitter();
   bool available();
   Payload read();
@@ -46,6 +47,7 @@ private:
   const byte _payloadSize = 32;
 
   RF24 _nrf;
+  DistMeter *_distMeter;
 
 //#define DEBUG
 #ifdef DEBUG
@@ -60,8 +62,10 @@ Radio::Radio()
   : _nrf(48, 49) {
 }
 
-void Radio::initReceiver() {
+void Radio::initReceiver(DistMeter &distMeter) {
   initCommon();
+
+  _distMeter = &distMeter;
 
   byte address[][6] = { "1Toto", "2Toto", "3Toto", "4Toto", "5Toto", "6Toto" };  // возможные номера труб
   _nrf.openReadingPipe(_pipeNo, address[0]);                                     // выбираем трубу
@@ -103,9 +107,10 @@ Payload Radio::read() {
   Payload payload;
   _nrf.read(&payload, sizeof(payload));
   Telemetry telemetry;
-  telemetry.data1 = 1234;
+  telemetry.dist = _distMeter->getDist();
   telemetry.data2 = 5678;
   _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
+  
 #ifdef DEBUG
   debugPrint(payload);
 #endif
@@ -115,11 +120,10 @@ Payload Radio::read() {
 void Radio::write(Payload payload) {
   _nrf.write(&payload, sizeof(payload));
 
-
   if (_nrf.available()) {
     Telemetry telemetry;
     _nrf.read(&telemetry, sizeof(telemetry));
-    Serial.print(telemetry.data1);
+    Serial.print(telemetry.dist);
     Serial.print("\t");
     Serial.println(telemetry.data2);
   }
