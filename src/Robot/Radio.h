@@ -28,7 +28,7 @@ struct Payload {
 };
 
 struct Telemetry {
-  int dist;  //: 2;
+  int dist;   //: 2;
   int data2;  //: 2;
 };
 
@@ -45,6 +45,8 @@ private:
   const byte _channel = 0x60;
   const byte _pipeNo = 1;
   const byte _payloadSize = 32;
+
+  unsigned long _lastReloadDataTime = millis();
 
   RF24 _nrf;
   DistMeter *_distMeter;
@@ -106,11 +108,19 @@ bool Radio::available() {
 Payload Radio::read() {
   Payload payload;
   _nrf.read(&payload, sizeof(payload));
-  Telemetry telemetry;
-  telemetry.dist = _distMeter->getDist();
-  telemetry.data2 = 5678;
-  _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
-  
+
+  if (millis() - _lastReloadDataTime >= 500) {
+    _lastReloadDataTime = millis();
+
+    Telemetry telemetry;
+    //_distMeter->enable();
+    telemetry.dist = _distMeter->getDist();
+    //_distMeter->disable();
+    telemetry.data2 = 5678;
+
+    _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
+  }
+
 #ifdef DEBUG
   debugPrint(payload);
 #endif
