@@ -27,17 +27,15 @@ struct Payload {
 };
 
 struct Telemetry {
-  int data1;  //: 2;
+  int dist;  //: 2;
   int data2;  //: 2;
 };
 
 class Radio {
 public:
   Radio();
-  void initReceiver();
   void initTransmitter();
   bool available();
-  Payload read();
   void write(Payload payload);
 
 private:
@@ -47,25 +45,11 @@ private:
 
   RF24 _nrf;
 
-//#define DEBUG
-#ifdef DEBUG
-  unsigned long _printTime = millis();
-#endif
-
   void initCommon();
-  void debugPrint(Payload payload);
 };
 
 Radio::Radio()
   : _nrf(48, 49) {
-}
-
-void Radio::initReceiver() {
-  initCommon();
-
-  byte address[][6] = { "1Toto", "2Toto", "3Toto", "4Toto", "5Toto", "6Toto" };  // возможные номера труб
-  _nrf.openReadingPipe(_pipeNo, address[0]);                                     // выбираем трубу
-  _nrf.startListening();                                                         // начинаем слушать эфир, мы приёмный модуль
 }
 
 void Radio::initTransmitter() {
@@ -99,54 +83,14 @@ bool Radio::available() {
   return _nrf.available(&pipeNo);
 }
 
-Payload Radio::read() {
-  Payload payload;
-  _nrf.read(&payload, sizeof(payload));
-  Telemetry telemetry;
-  telemetry.data1 = 1234;
-  telemetry.data2 = 5678;
-  _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
-#ifdef DEBUG
-  debugPrint(payload);
-#endif
-  return payload;
-}
-
 void Radio::write(Payload payload) {
   _nrf.write(&payload, sizeof(payload));
-
 
   if (_nrf.available()) {
     Telemetry telemetry;
     _nrf.read(&telemetry, sizeof(telemetry));
-    Serial.print(telemetry.data1);
+    Serial.print(telemetry.dist);
     Serial.print("\t");
     Serial.println(telemetry.data2);
   }
-
-#ifdef DEBUG
-  debugPrint(payload);
-#endif
 }
-
-#ifdef DEBUG
-void Radio::debugPrint(Payload payload) {
-  if (millis() - _printTime >= 10) {
-    _printTime = millis();
-
-    /*Serial.print("\tfrontSwitch = ");
-    Serial.print(payload.frontSwitch);
-
-    Serial.print("\tredB = ");
-    Serial.print(payload.frontRedButton);
-    Serial.print("\tyellowB = ");
-    Serial.print(payload.frontYellowButton);
-    Serial.print("\twhiteB = ");
-    Serial.print(payload.frontWhiteButton);
-    Serial.print("\tblackB = ");
-    Serial.print(payload.frontBlackButtonSwitch);
-
-    Serial.println();*/
-  }
-}
-#endif
