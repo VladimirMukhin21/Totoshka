@@ -6,8 +6,11 @@ from datetime import datetime
 import time
 from threading import Thread
 import winsound
+import serial
 
-CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
+CAMERA_NUM = 1 #1 + cv2.CAP_FFMPEG # номер камеры
+PORT = "COM5"
+BAUDRATE = 9600
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
 RED = (0,0,255)
 GREEN = (0,255,0)
@@ -133,6 +136,30 @@ def draw_captured_qrs(image):
         text = str.format("{0}. {1}", index, qr)
         cv2.putText(image, text, (x(5), y((index+1)*step)), FONT, size, GREEN)
 
+def read_telemetry():
+    if not readTelemetry:
+        return
+    
+    global dist
+    global data2
+    serialAvailable = ser.inWaiting()
+    if (serialAvailable):
+        data= ser.readline().decode().strip()
+        dist, data2 = data.split(',')
+
+def print_telemetry(image):
+    if not printTelemetry:
+        return
+
+    size = 0.6
+    firstStr = 100
+    step = 15
+    cv2.putText(image, "Датчики:", (x(333), y(firstStr)), FONT, size, GREEN)
+    cv2.putText(image, "dist", (x(330), y(firstStr+step)), FONT, size, GREEN)
+    cv2.putText(image, dist, (x(365), y(firstStr+step)), FONT, size, GREEN)
+    cv2.putText(image, "data2", (x(330), y(firstStr+2*step)), FONT, size, GREEN)
+    cv2.putText(image, data2, (x(365), y(firstStr+2*step)), FONT, size, GREEN)
+
 def switch_record():
     global file
     global recording
@@ -196,10 +223,12 @@ def change_scale(delta):
     print("scale:", scale, "%,  image size:", size[0], "x", size[1])
 
 capturedQrs = set()
-guideMode = 0
+guideMode = 1  # 0
 showCapturedQrs = True
 scaleChangedTime = datetime.now()
 recording = False
+readTelemetry = False
+printTelemetry = False
 showHelp = False
 cv2Decoder = cv2.QRCodeDetector()
 qrMode = QR_OFF
@@ -212,6 +241,7 @@ if __name__ == "__main__":
     print("Connecting...")
     cap = cv2.VideoCapture()
     cap.open(CAMERA_NUM)
+    ser = serial.Serial(PORT, BAUDRATE)
     print("Connected")
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -232,6 +262,8 @@ if __name__ == "__main__":
             draw_captured_qrs(frame)
             record(frame)
 
+            read_telemetry()
+            print_telemetry(frame)
             draw_help(frame)
             draw_scale(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
@@ -260,6 +292,17 @@ if __name__ == "__main__":
         if key == ord("r"):
             qrMode = QR_OFF
             qr = EMPTY_STR
+        if key == ord("l"):
+            if (not readTelemetry):
+                ser.write(b'telemetry ON')
+                time.sleep(0.1)
+                readTelemetry = not readTelemetry
+                time.sleep(0.1)
+                printTelemetry = not printTelemetry
+            else:
+                ser.write(b'telemetry OFF')
+                readTelemetry = not readTelemetry
+                printTelemetry = not printTelemetry
         if key == 41: # shift-0
             switch_record()
         if key == ord("h"):
@@ -274,5 +317,8 @@ if __name__ == "__main__":
 
     if recording:
         file.release()
+    if ser.is_open:
+        ser.close()
+        print("Serial connection closed")
     cap.release()
     cv2.destroyAllWindows()

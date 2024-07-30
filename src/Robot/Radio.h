@@ -97,10 +97,13 @@ Payload Radio::read() {
     _lastReloadDataTime = millis();
 
     Telemetry telemetry;
-    //_distMeter->enable();
     telemetry.dist = _distMeter->getDist();
-    //_distMeter->disable();
     telemetry.data2 = 5678;
+
+    if (telemetry.dist == -1) {
+      _distMeter->disable();
+      _distMeter->enable();
+    }
 
     _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
   }

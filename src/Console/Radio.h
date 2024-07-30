@@ -89,8 +89,7 @@ void Radio::write(Payload payload) {
   if (_nrf.available()) {
     Telemetry telemetry;
     _nrf.read(&telemetry, sizeof(telemetry));
-    Serial.print(telemetry.dist);
-    Serial.print("\t");
-    Serial.println(telemetry.data2);
+    
+    Serial.println(String(telemetry.dist) + "," + String(telemetry.data2));
   }
 }

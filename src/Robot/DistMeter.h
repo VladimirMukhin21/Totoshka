@@ -17,7 +17,7 @@ private:
 
 void DistMeter::init() {
   Wire.begin();
-  sensor.setTimeout(500);
+  sensor.setTimeout(50);
   sensor.init();
   enable();
   //disable();
