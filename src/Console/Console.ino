@@ -71,6 +71,16 @@ void loop() {
     payload.key = keyboard.getKey();
   }
 
+  if(Serial.available()) {
+    String telemetryMode = Serial.readString();
+    if(telemetryMode == "telemetry_start") {
+      payload.switchTelemetry = true;
+    }
+    else {
+      payload.switchTelemetry = false;
+    }
+  }
+
   radio.write(payload);
 }
 

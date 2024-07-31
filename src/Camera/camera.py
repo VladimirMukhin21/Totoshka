@@ -8,7 +8,7 @@ from threading import Thread
 import winsound
 import serial
 
-CAMERA_NUM = 1 #1 + cv2.CAP_FFMPEG # номер камеры
+CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 PORT = "COM5"
 BAUDRATE = 9600
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
@@ -20,6 +20,9 @@ QR_OFF = ""
 QR_CV2 = "C"
 QR_PYZBAR = "P"
 EMPTY_STR = ""
+
+dist = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
+data2 = str(10)   # начальное значение датчика расстояния (нужно только для старта вывода телеметрии) 
 
 def beep():
     frequency = 2500
@@ -136,20 +139,16 @@ def draw_captured_qrs(image):
         text = str.format("{0}. {1}", index, qr)
         cv2.putText(image, text, (x(5), y((index+1)*step)), FONT, size, GREEN)
 
-def read_telemetry():
+def read_telemetry(image):
     if not readTelemetry:
         return
-    
     global dist
     global data2
+
     serialAvailable = ser.inWaiting()
     if (serialAvailable):
-        data= ser.readline().decode().strip()
+        data = ser.readline().decode().strip()
         dist, data2 = data.split(',')
-
-def print_telemetry(image):
-    if not printTelemetry:
-        return
 
     size = 0.6
     firstStr = 100
@@ -246,9 +245,9 @@ if __name__ == "__main__":
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    scale = 100
+    scale = 130
     size = (width, height)
-    # change_scale(0)
+    change_scale(0)
     # print(width, "x", height)
 
     while True:
@@ -262,8 +261,7 @@ if __name__ == "__main__":
             draw_captured_qrs(frame)
             record(frame)
 
-            read_telemetry()
-            print_telemetry(frame)
+            read_telemetry(frame)
             draw_help(frame)
             draw_scale(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
@@ -293,16 +291,11 @@ if __name__ == "__main__":
             qrMode = QR_OFF
             qr = EMPTY_STR
         if key == ord("l"):
-            if (not readTelemetry):
-                ser.write(b'telemetry ON')
-                time.sleep(0.1)
-                readTelemetry = not readTelemetry
-                time.sleep(0.1)
-                printTelemetry = not printTelemetry
+            readTelemetry = not readTelemetry
+            if (readTelemetry):
+                ser.write(b'telemetry_start')
             else:
-                ser.write(b'telemetry OFF')
-                readTelemetry = not readTelemetry
-                printTelemetry = not printTelemetry
+                ser.write(b'telemetry_stop')
         if key == 41: # shift-0
             switch_record()
         if key == ord("h"):

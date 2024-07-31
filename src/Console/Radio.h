@@ -24,6 +24,7 @@ struct Payload {
   bool upGreenButton;  //: 1;
   bool upBlueButton;   //: 1;
   byte key;
+  bool switchTelemetry;
 };
 
 struct Telemetry {

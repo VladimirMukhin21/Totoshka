@@ -25,6 +25,7 @@ struct Payload {
   bool upGreenButton;  //: 1;
   bool upBlueButton;   //: 1;
   byte key;
+  bool switchTelemetry;
 };
 
 struct Telemetry {
@@ -45,6 +46,8 @@ private:
   const byte _payloadSize = 32;
 
   unsigned long _lastReloadDataTime = millis();
+
+  bool _isTelemetryOn = false;
 
   RF24 _nrf;
   DistMeter *_distMeter;
@@ -93,19 +96,34 @@ Payload Radio::read() {
   Payload payload;
   _nrf.read(&payload, sizeof(payload));
 
-  if (millis() - _lastReloadDataTime >= 500) {
-    _lastReloadDataTime = millis();
-
-    Telemetry telemetry;
-    telemetry.dist = _distMeter->getDist();
-    telemetry.data2 = 5678;
-
-    if (telemetry.dist == -1) {
-      _distMeter->disable();
+  if (payload.switchTelemetry == true) {
+    if (!_isTelemetryOn) {
       _distMeter->enable();
+      Serial.println("On");
+      _isTelemetryOn = true;
     }
 
-    _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
+    if (millis() - _lastReloadDataTime >= 500) {
+      _lastReloadDataTime = millis();
+
+      Telemetry telemetry;
+      telemetry.dist = _distMeter->getDist();
+      telemetry.data2 = 5678;
+      
+      if (telemetry.dist == -1) {
+        _distMeter->disable();
+        _distMeter->enable();
+      }
+
+      _nrf.writeAckPayload(_pipeNo, &telemetry, sizeof(telemetry));
+    }
+  }
+  else {
+    if (_isTelemetryOn) {
+      _distMeter->disable();
+      Serial.println("Off");
+      _isTelemetryOn = false;
+    }
   }
   return payload;
 }
