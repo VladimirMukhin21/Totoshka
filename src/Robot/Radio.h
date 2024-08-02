@@ -54,8 +54,6 @@ private:
   RF24 _nrf;
   DistMeter *_distMeter;
   Color *_color;
-
-  void initCommon();
 };
 
 Radio::Radio()
@@ -63,17 +61,6 @@ Radio::Radio()
 }
 
 void Radio::initReceiver(DistMeter &distMeter, Color &color) {
-  initCommon();
-
-  _distMeter = &distMeter;
-  _color = &color;
-
-  byte address[][6] = { "1Toto", "2Toto", "3Toto", "4Toto", "5Toto", "6Toto" };  // возможные номера труб
-  _nrf.openReadingPipe(_pipeNo, address[0]);                                     // выбираем трубу
-  _nrf.startListening();                                                         // начинаем слушать эфир, мы приёмный модуль
-}
-
-void Radio::initCommon() {
   _nrf.begin();                       // активировать модуль
   _nrf.setAutoAck(1);                 // режим подтверждения приёма, 1 вкл 0 выкл
   _nrf.setRetries(0, 15);             // (время между попыткой достучаться, число попыток)
@@ -89,6 +76,13 @@ void Radio::initCommon() {
   _nrf.setDataRate(RF24_1MBPS);  // скорость обмена (ниже скорость - выше чувствительность и дальность)
 
   _nrf.powerUp();  // начать работу
+
+  _distMeter = &distMeter;
+  _color = &color;
+
+  byte address[][6] = { "1Toto", "2Toto", "3Toto", "4Toto", "5Toto", "6Toto" };  // возможные номера труб
+  _nrf.openReadingPipe(_pipeNo, address[0]);                                     // выбираем трубу
+  _nrf.startListening();                                                         // начинаем слушать эфир, мы приёмный модуль
 }
 
 bool Radio::available() {

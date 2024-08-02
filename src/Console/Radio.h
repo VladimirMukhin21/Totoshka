@@ -46,8 +46,6 @@ private:
   const byte _payloadSize = 32;
 
   RF24 _nrf;
-
-  void initCommon();
 };
 
 Radio::Radio()
@@ -55,14 +53,6 @@ Radio::Radio()
 }
 
 void Radio::initTransmitter() {
-  initCommon();
-
-  byte address[][6] = { "1Toto", "2Toto", "3Toto", "4Toto", "5Toto", "6Toto" };  // возможные номера труб
-  _nrf.openWritingPipe(address[0]);                                              // !!! мы - труба 0, открываем канал для передачи данных
-  _nrf.stopListening();                                                          // не слушаем радиоэфир, мы передатчик
-}
-
-void Radio::initCommon() {
   _nrf.begin();                       // активировать модуль
   _nrf.setAutoAck(1);                 // режим подтверждения приёма, 1 вкл 0 выкл
   _nrf.setRetries(0, 15);             // (время между попыткой достучаться, число попыток)
@@ -78,6 +68,10 @@ void Radio::initCommon() {
   _nrf.setDataRate(RF24_1MBPS);  // скорость обмена (ниже скорость - выше чувствительность и дальность)
 
   _nrf.powerUp();  // начать работу
+
+  byte address[][6] = { "1Toto", "2Toto", "3Toto", "4Toto", "5Toto", "6Toto" };  // возможные номера труб
+  _nrf.openWritingPipe(address[0]);                                              // !!! мы - труба 0, открываем канал для передачи данных
+  _nrf.stopListening();                                                          // не слушаем радиоэфир, мы передатчик
 }
 
 bool Radio::available() {
@@ -91,7 +85,7 @@ void Radio::write(Payload payload) {
   if (_nrf.available()) {
     Telemetry telemetry;
     _nrf.read(&telemetry, sizeof(telemetry));
-    
+
     Serial.println(String(telemetry.dist) + "," + String(telemetry.clrl) + "," + String(telemetry.clrr));
   }
 }
