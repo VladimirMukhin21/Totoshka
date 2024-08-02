@@ -8,7 +8,7 @@ from threading import Thread
 import winsound
 import serial
 
-CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
+CAMERA_NUM = 1 #1 + cv2.CAP_FFMPEG # номер камеры
 PORT = "COM5"
 BAUDRATE = 9600
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
@@ -22,7 +22,8 @@ QR_PYZBAR = "P"
 EMPTY_STR = ""
 
 dist = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
-data2 = str(10)   # начальное значение датчика расстояния (нужно только для старта вывода телеметрии) 
+clrl = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
+clrr = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии) 
 
 def beep():
     frequency = 2500
@@ -143,12 +144,13 @@ def read_telemetry(image):
     if not readTelemetry:
         return
     global dist
-    global data2
+    global clrl
+    global clrr
 
     serialAvailable = ser.inWaiting()
     if (serialAvailable):
         data = ser.readline().decode().strip()
-        dist, data2 = data.split(',')
+        dist, clrl, clrr = data.split(',')
 
     size = 0.6
     firstStr = 100
@@ -156,8 +158,10 @@ def read_telemetry(image):
     cv2.putText(image, "Датчики:", (x(333), y(firstStr)), FONT, size, GREEN)
     cv2.putText(image, "dist", (x(330), y(firstStr+step)), FONT, size, GREEN)
     cv2.putText(image, dist, (x(365), y(firstStr+step)), FONT, size, GREEN)
-    cv2.putText(image, "data2", (x(330), y(firstStr+2*step)), FONT, size, GREEN)
-    cv2.putText(image, data2, (x(365), y(firstStr+2*step)), FONT, size, GREEN)
+    cv2.putText(image, "clrl", (x(330), y(firstStr+2*step)), FONT, size, GREEN)
+    cv2.putText(image, clrl, (x(365), y(firstStr+2*step)), FONT, size, GREEN)
+    cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), FONT, size, GREEN)
+    cv2.putText(image, clrr, (x(365), y(firstStr+3*step)), FONT, size, GREEN)
 
 def switch_record():
     global file
@@ -242,6 +246,7 @@ if __name__ == "__main__":
     cap.open(CAMERA_NUM)
     ser = serial.Serial(PORT, BAUDRATE)
     print("Connected")
+    ser.write(b'telemetry_stop')
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -310,6 +315,7 @@ if __name__ == "__main__":
 
     if recording:
         file.release()
+    ser.write(b'telemetry_stop')
     if ser.is_open:
         ser.close()
         print("Serial connection closed")

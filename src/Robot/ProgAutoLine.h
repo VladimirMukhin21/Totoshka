@@ -57,7 +57,7 @@ void ProgAutoLine::tick() {
   int l = _color->getLeft();
   int r = _color->getRight();
 
-  _pid.input = r - l;
+  _pid.input = l - r;
   int turn = _pid.getResult();  // ПИД-регулятор
   //int turn = (int)((double)(l - r) * 3); // П-регулятор
 

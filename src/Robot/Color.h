@@ -2,10 +2,10 @@
 
 #include <Adafruit_TCS34725softi2c.h>
 
-#define COLOR_L_SDA_PIN 28
-#define COLOR_L_SCL_PIN 29
-#define COLOR_R_SDA_PIN 30
-#define COLOR_R_SCL_PIN 31
+#define COLOR_L_SDA_PIN 30
+#define COLOR_L_SCL_PIN 31
+#define COLOR_R_SDA_PIN 28
+#define COLOR_R_SCL_PIN 29
 #define COLOR_LED_PIN 53
 
 class Color {

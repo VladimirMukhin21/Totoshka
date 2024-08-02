@@ -73,7 +73,7 @@ void setup() {
   // https://www.i2cdevlib.com/forums/topic/414-freezing-problem/
   Wire.setWireTimeout(3000, true);
 
-  radio.initReceiver(distMeter);
+  radio.initReceiver(distMeter, color);
   color.init();
   gyro.init();
   distMeter.init();
@@ -186,8 +186,8 @@ void loop() {
       progAutoLine.start();
       return;
     }
-    else if (payload.key == 0xC2) {  // Подъем по наклонной
-      truck.goHillUp(200, 4000, 1000, 100);           // едем быстро
+    else if (payload.key == 0xC2) {          // Подъем по наклонной
+      truck.goHillUp(200, 4000, 1000, 100);  // едем быстро
       return;
     }
     else if (payload.key == 0xD2) {  // Спуск по наклонной

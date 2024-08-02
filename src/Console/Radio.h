@@ -28,8 +28,9 @@ struct Payload {
 };
 
 struct Telemetry {
-  int dist;  //: 2;
-  int data2;  //: 2;
+  int dist;
+  byte clrl;
+  byte clrr;
 };
 
 class Radio {
@@ -91,6 +92,6 @@ void Radio::write(Payload payload) {
     Telemetry telemetry;
     _nrf.read(&telemetry, sizeof(telemetry));
     
-    Serial.println(String(telemetry.dist) + "," + String(telemetry.data2));
+    Serial.println(String(telemetry.dist) + "," + String(telemetry.clrl) + "," + String(telemetry.clrr));
   }
 }

@@ -4,6 +4,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "DistMeter.h"
+#include "Color.h"
 
 struct Stick {
   byte vert;
@@ -29,14 +30,15 @@ struct Payload {
 };
 
 struct Telemetry {
-  int dist;   //: 2;
-  int data2;  //: 2;
+  int dist;
+  byte clrl;
+  byte clrr;
 };
 
 class Radio {
 public:
   Radio();
-  void initReceiver(DistMeter &distMeter);
+  void initReceiver(DistMeter &distMeter, Color &color);
   bool available();
   Payload read();
 
@@ -51,6 +53,7 @@ private:
 
   RF24 _nrf;
   DistMeter *_distMeter;
+  Color *_color;
 
   void initCommon();
 };
@@ -59,10 +62,11 @@ Radio::Radio()
   : _nrf(48, 49) {
 }
 
-void Radio::initReceiver(DistMeter &distMeter) {
+void Radio::initReceiver(DistMeter &distMeter, Color &color) {
   initCommon();
 
   _distMeter = &distMeter;
+  _color = &color;
 
   byte address[][6] = { "1Toto", "2Toto", "3Toto", "4Toto", "5Toto", "6Toto" };  // возможные номера труб
   _nrf.openReadingPipe(_pipeNo, address[0]);                                     // выбираем трубу
@@ -99,6 +103,7 @@ Payload Radio::read() {
   if (payload.switchTelemetry == true) {
     if (!_isTelemetryOn) {
       _distMeter->enable();
+      _color->enable();
       Serial.println("On");
       _isTelemetryOn = true;
     }
@@ -108,8 +113,12 @@ Payload Radio::read() {
 
       Telemetry telemetry;
       telemetry.dist = _distMeter->getDist();
-      telemetry.data2 = 5678;
-      
+      telemetry.clrl = _color->getLeft();
+      telemetry.clrr = _color->getRight();
+      /*Serial.print(telemetry.clrl);
+      Serial.print("\t");
+      Serial.println(telemetry.clrr);*/
+
       if (telemetry.dist == -1) {
         _distMeter->disable();
         _distMeter->enable();
@@ -121,6 +130,7 @@ Payload Radio::read() {
   else {
     if (_isTelemetryOn) {
       _distMeter->disable();
+      _color->disable();
       Serial.println("Off");
       _isTelemetryOn = false;
     }
