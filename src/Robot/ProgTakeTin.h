@@ -18,16 +18,19 @@ private:
     NONE,
     START,
     INIT_HAND,
+    ERROR_STOP_PROG,
     DRIVE,
     SLOW_DRIVE,
     TAKE,
     TIN_UP
   };
 
-  const int _driveSpeed = 70;        // скорость подъезда к маяку
-  const int _driveSlowSpeed = 60;    // скорость медленного подъезда к маяку когда маяк близко
-  const int _distToSlowDrive = 150;  // расстояние до маяка, на котором снижаем скорость
-  const int _distToTake = 75;        // расстояние до маяка, на котором останавливаемся и хватаем маяк
+  const int _driveSpeed = 70;            // скорость подъезда к маяку
+  const int _driveSlowSpeed = 60;        // скорость медленного подъезда к маяку когда маяк близко
+  const int _maxDistToStartProg = 1000;  // порог максимального расстояния до маяка для запуска программы
+  const int _distToSlowDrive = 150;      // расстояние до маяка, на котором снижаем скорость
+  const int _distToTake = 75;            // расстояние до маяка, на котором останавливаемся и хватаем маяк
+  const int _rotateErrorPos = 120;       // угол, на который поворачивается клешня при стопе программы из-за большого расстояния до банки
   //GyverPID _pid = GyverPID(3.6, 0.15, 0.2, 100);
 
   Truck *_truck;
@@ -58,7 +61,6 @@ void ProgTakeTin::start() {
 void ProgTakeTin::stop() {
   _truck->stop();
   _hand->stop();
-  //_distMeter->disable();
   _phase = NONE;
   //Serial.println("stop");
 }
@@ -79,9 +81,14 @@ void ProgTakeTin::tick() {
     //Serial.println("init hand");
     if (!_hand->isRunning()) {
       // рука опустилась => подъезжаем к маяку
-      //_distMeter->enable();
+      _distMeter->enable();
       int dist = _distMeter->getDist();
-      if (dist > _distToSlowDrive) {
+      if (dist > _maxDistToStartProg) {
+        _distMeter->disable();
+        _hand->rotate(_rotateErrorPos);
+        _phase = ERROR_STOP_PROG;
+      }
+      else if (dist > _distToSlowDrive) {
         _truck->goStraight(_driveSpeed);
         _phase = DRIVE;
       }
@@ -89,6 +96,12 @@ void ProgTakeTin::tick() {
         _truck->goStraight(_driveSlowSpeed);
         _phase = SLOW_DRIVE;
       }
+    }
+  }
+  else if (_phase == ERROR_STOP_PROG) {
+    if (!_hand->isRunning()) {
+      _hand->rotateToCenter();
+      _phase = TIN_UP;
     }
   }
   else if (_phase == DRIVE) {
@@ -106,7 +119,7 @@ void ProgTakeTin::tick() {
     if (dist <= _distToTake) {
       // доехали до маяка
       _truck->stop(Motor::SMOOTH_OFF);
-      //_distMeter->disable();
+      _distMeter->disable();
       _hand->takeTin();
       _phase = TAKE;
     }
