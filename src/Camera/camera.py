@@ -7,8 +7,9 @@ import time
 from threading import Thread
 import winsound
 import serial
+import keyboard
 
-CAMERA_NUM = 1 #1 + cv2.CAP_FFMPEG # номер камеры
+CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 PORT = "COM5"
 BAUDRATE = 9600
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
@@ -16,6 +17,7 @@ RED = (0,0,255)
 GREEN = (0,255,0)
 BLUE = (255,0,0)
 BLACK = (0,0,0)
+YELLOW = (0,255,255)
 QR_OFF = ""
 QR_CV2 = "C"
 QR_PYZBAR = "P"
@@ -23,7 +25,8 @@ EMPTY_STR = ""
 
 dist = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
 clrl = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
-clrr = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии) 
+clrr = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
+now = int(datetime.now().strftime("%M%S"))
 
 def beep():
     frequency = 2500
@@ -148,7 +151,7 @@ def read_telemetry(image):
     global clrr
 
     serialAvailable = ser.inWaiting()
-    if (serialAvailable):
+    if serialAvailable:
         data = ser.readline().decode().strip()
         dist, clrl, clrr = data.split(',')
 
@@ -225,14 +228,44 @@ def change_scale(delta):
     scaleChangedTime = datetime.now()
     print("scale:", scale, "%,  image size:", size[0], "x", size[1])
 
+def clock(image):
+    if not showClock:
+        return
+    
+    global now
+    global timeLeft
+    pre = int(datetime.now().strftime("%M%S"))
+    if timeLeft > 0:
+        if pre != now:
+            timeLeft -= 1
+            now = pre
+    min = timeLeft // 60
+    sec = timeLeft % 60
+
+    if min < 1:
+        color = RED
+    elif min < 5:
+        color = YELLOW
+    else:
+        color = GREEN
+    if min <= 9:
+        min = str(0) + str(min)
+    if sec <= 9:
+        sec = str(0) + str(sec)
+
+    timerMinSec = str(min) + ":" + str(sec)
+    cv2.putText(image, timerMinSec, (x(367), y(35)), FONT, 0.5, color)
+
 capturedQrs = set()
 guideMode = 1  # 0
 showCapturedQrs = True
 scaleChangedTime = datetime.now()
 recording = False
 readTelemetry = False
-printTelemetry = False
 showHelp = False
+showClock = False
+#buttonPressedTimeIsNoted = False
+#buttonHoldTime = 2
 cv2Decoder = cv2.QRCodeDetector()
 qrMode = QR_OFF
 qrDecodeTime = datetime.now()
@@ -265,15 +298,28 @@ if __name__ == "__main__":
             draw_guides(frame)
             draw_captured_qrs(frame)
             record(frame)
-
             read_telemetry(frame)
             draw_help(frame)
             draw_scale(frame)
+            clock(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
             cv2.imshow("TOTOSHKA", frame)
         else:
             cap.release()
             cap.open(CAMERA_NUM)
+        
+        #if keyboard.is_pressed("p"):
+        #    if not buttonPressedTimeIsNoted:
+        #        buttonPressedTime = int(datetime.now().strftime("%S"))
+        #        buttonPressedTimeIsNoted = True
+        #        print("pressed")
+
+        #    nowTime = int(datetime.now().strftime("%S"))
+        #    if abs(nowTime - buttonPressedTime) >= buttonHoldTime:
+        #        showClock = not showClock
+        #        buttonPressedTimeIsNoted = False
+        #else:
+        #    buttonPressedTimeIsNoted = False
         
         key = cv2.waitKey(1)
         # print(key)
@@ -301,6 +347,12 @@ if __name__ == "__main__":
                 ser.write(b'telemetry_start')
             else:
                 ser.write(b'telemetry_stop')
+        #if key == ord("p"):
+        #    buttonIsPressed = True
+        #    buttonPressedTime = datetime.now()
+        if key == ord("p"):
+            showClock = not showClock
+            timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
         if key == 41: # shift-0
             switch_record()
         if key == ord("h"):
