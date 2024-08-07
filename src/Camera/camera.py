@@ -23,11 +23,6 @@ QR_CV2 = "C"
 QR_PYZBAR = "P"
 EMPTY_STR = ""
 
-dist = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
-clrl = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
-clrr = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
-now = int(datetime.now().strftime("%M%S"))
-
 def beep():
     frequency = 2500
     duration = 500
@@ -175,7 +170,7 @@ def switch_record():
         codec = cv2.VideoWriter_fourcc(*'DIVX')
         # codec = cv2.VideoWriter_fourcc(*'XVID')
         # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
-        file = cv2.VideoWriter(name, codec, 25, (width, height))
+        file = cv2.VideoWriter(name, codec, 30, (width, height))
     else:
         file.release()
 
@@ -235,7 +230,8 @@ def clock(image):
     global now
     global timeLeft
     pre = int(datetime.now().strftime("%M%S"))
-    if timeLeft > 0:
+    
+    if timeLeft > 0 and pause == False:
         if pre != now:
             timeLeft -= 1
             now = pre
@@ -264,14 +260,18 @@ recording = False
 readTelemetry = False
 showHelp = False
 showClock = False
-#buttonPressedTimeIsNoted = False
-#buttonHoldTime = 2
+pause = False
 cv2Decoder = cv2.QRCodeDetector()
 qrMode = QR_OFF
 qrDecodeTime = datetime.now()
 cv2_box = []
 pyzbar_box = []
 qr = EMPTY_STR
+dist = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
+clrl = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
+clrr = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
+now = int(datetime.now().strftime("%M%S"))
+
 
 if __name__ == "__main__":
     print("Connecting...")
@@ -297,30 +297,17 @@ if __name__ == "__main__":
             # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
             draw_captured_qrs(frame)
-            record(frame)
             read_telemetry(frame)
             draw_help(frame)
             draw_scale(frame)
             clock(frame)
+            record(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
             cv2.imshow("TOTOSHKA", frame)
         else:
             cap.release()
             cap.open(CAMERA_NUM)
-        
-        #if keyboard.is_pressed("p"):
-        #    if not buttonPressedTimeIsNoted:
-        #        buttonPressedTime = int(datetime.now().strftime("%S"))
-        #        buttonPressedTimeIsNoted = True
-        #        print("pressed")
-
-        #    nowTime = int(datetime.now().strftime("%S"))
-        #    if abs(nowTime - buttonPressedTime) >= buttonHoldTime:
-        #        showClock = not showClock
-        #        buttonPressedTimeIsNoted = False
-        #else:
-        #    buttonPressedTimeIsNoted = False
-        
+             
         key = cv2.waitKey(1)
         # print(key)
         if key >= ord("0") and key <= ord("9"):
@@ -347,14 +334,15 @@ if __name__ == "__main__":
                 ser.write(b'telemetry_start')
             else:
                 ser.write(b'telemetry_stop')
-        #if key == ord("p"):
-        #    buttonIsPressed = True
-        #    buttonPressedTime = datetime.now()
-        if key == ord("p"):
+        if key == 42: # shift-8
             showClock = not showClock
             timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
+        if key == ord("p"):
+            pause = not pause
         if key == 41: # shift-0
             switch_record()
+            showClock = not showClock
+            timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
         if key == ord("h"):
             showHelp = not showHelp
         if key == 40: # shift-9
