@@ -38,8 +38,8 @@ private:
   const byte _maxSpeed = 5;
 
   const byte _shoulderThr = 50;
-  const byte _elbowUpHandPos = 108;
-  const byte _rotateCenterPos = 107;
+  const byte _elbowUpHandPos = 109;
+  const byte _rotateCenterPos = 110;
   const byte _clawOpenPos = 110;    // разжатие руки при захвате маяка и вращении трубок
   const byte _clawTakeTinPos = 77;  // сжатие руки при захвате маяка
   const byte _clenchPipePos = 77;   // сжатие руки при вращении трубок

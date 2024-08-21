@@ -9,7 +9,7 @@ import winsound
 import serial
 import keyboard
 
-CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
+CAMERA_NUM = 1 #1 + cv2.CAP_FFMPEG # номер камеры
 PORT = "COM5"
 BAUDRATE = 9600
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы

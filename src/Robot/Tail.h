@@ -18,12 +18,12 @@ private:
   const byte _minStick = 0;
   const byte _maxStick = 255;
   const byte _maxSpeed = 5;
-  static const int UP_ANGLE = 145;
+  static const int UP_ANGLE = 140;
   static const int DOWN_ANGLE = 15;
 
   Servo _coccyx;
 
-  Angle _coccyxAngle = Angle(145, DOWN_ANGLE, UP_ANGLE, 60);  // вниз-вверх; макс вверх для больших колес - 140, для маленьких - 145
+  Angle _coccyxAngle = Angle(UP_ANGLE, DOWN_ANGLE, UP_ANGLE, 60);  // вниз-вверх; макс вверх для больших колес - 140, для маленьких - 145
 
   //#define DEBUG
 #ifdef DEBUG
