@@ -31,7 +31,7 @@ private:
   };
 
   const byte _tailInitialDeg = 125;
-  const byte _tailUpDeg = 145;
+  const byte _tailUpDeg = 139;
   const byte _tailHorizDeg = 80;
   const byte _tailDownDeg = 15;
   const int _driveSpeed = 230; //180;
@@ -159,7 +159,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == FINISH_DRIVING) {
     if (!_tail->isRunning()) {
       // доехали до горизонтали => еще немного отъезжаем
-      _truck->autoGo(_driveSpeed, 1000);
+      _truck->autoGo(_driveSpeed, 400);
       _phase = STOP;
     }
   }

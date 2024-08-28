@@ -5,7 +5,7 @@
 class ProgRotatePipe {
 public:
   void init(Hand &hand);
-  void start(byte rotateCount = 4);
+  void start(byte rotateCount = 3);
   void stop();
   void tick();
   bool isRunning();
@@ -30,7 +30,7 @@ void ProgRotatePipe::init(Hand &hand) {
   _hand = &hand;
 }
 
-void ProgRotatePipe::start(byte rotateCount = 4) {
+void ProgRotatePipe::start(byte rotateCount = 3) {
   if (!isRunning()) {
     _rotateCount = rotateCount;
     _phase = START;

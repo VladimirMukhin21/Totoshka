@@ -1,4 +1,4 @@
-# pip3 install opencv-python qrcode pyzbar numpy
+5# pip3 install opencv-python qrcode pyzbar numpy
 
 import cv2
 from pyzbar import pyzbar
@@ -170,7 +170,7 @@ def switch_record():
         codec = cv2.VideoWriter_fourcc(*'DIVX')
         # codec = cv2.VideoWriter_fourcc(*'XVID')
         # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
-        file = cv2.VideoWriter(name, codec, 30, (width, height))
+        file = cv2.VideoWriter(name, codec, 25, (width, height))
     else:
         file.release()
 

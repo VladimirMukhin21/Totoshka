@@ -261,7 +261,8 @@ void loop() {
     }
     else if (payload.key == 0xD2) {  // СВОБОДНО
     }
-    else if (payload.key == 0xA3) {  // СВОБОДНО
+    else if (payload.key == 0xA3) {  // Рука на вращение трубок
+      hand.handToRotatePipe();
     }
     else if (payload.key == 0xB3) {  // Провалы налево
       progTruncatedPyramid.start(-90);

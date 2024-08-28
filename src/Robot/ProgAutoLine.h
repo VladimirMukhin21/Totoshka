@@ -13,7 +13,7 @@ public:
   bool isRunning();
 
 private:
-  const int _driveSpeed = 65;                     // 70
+  const int _driveSpeed = 70;                     // 65
   GyverPID _pid = GyverPID(1.8, 0, 0.1, 100);  //   4.5, 0.1, 0.3, 100      3.1, 0.15, 0.25, 100     // 2.0, 0, 0.2, 100  //   2.7, 0.2, 0.15, 100   4, 0.25, 0.2, 100   3.5, 0.2, 0.35, 100
 
   Truck *_truck;

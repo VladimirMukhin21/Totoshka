@@ -54,7 +54,7 @@ void ProgHoof::tick() {
   }
   else if (_phase == STARTING) {
     // программа стартует => заезжаем на вершину
-    _truck->goHillUp(_driveSpeed, 6000, 1400, 30);
+    _truck->goHillUp(_driveSpeed, 6000, 1800, 30);
     _phase = DRIVE_TOP;
   }
   else if (_phase == DRIVE_TOP) {

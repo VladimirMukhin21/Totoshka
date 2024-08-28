@@ -18,7 +18,7 @@ private:
   const byte _minStick = 0;
   const byte _maxStick = 255;
   const byte _maxSpeed = 5;
-  static const int UP_ANGLE = 140;
+  static const int UP_ANGLE = 139;
   static const int DOWN_ANGLE = 15;
 
   Servo _coccyx;
