@@ -43,7 +43,7 @@ private:
   const byte _elbowUpHandPos = 109;
   const byte _rotateCenterPos = 110;
   const byte _clawOpenPos = 110;              // разжатие руки при захвате маяка
-  const byte _clawOpenRotatePipePos = 100;    // разжатие руки при вращении трубок
+  const byte _clawOpenRotatePipePos = 105;    // разжатие руки при вращении трубок
   const byte _clawTakeTinPos = 77;            // сжатие руки при захвате маяка
   const byte _clenchPipePos = 77;             // сжатие руки при вращении трубок
 
@@ -52,8 +52,8 @@ private:
   const byte _rotateRideTheLinePos = 3;
   const byte _clawRideTheLinePos = 58;
 
-  const byte _shoulderRotatePipePos = 80;
-  const byte _elbowRotatePipePos = 54;
+  const byte _shoulderRotatePipePos = 100;
+  const byte _elbowRotatePipePos = 76;
 
   byte _shoulderAngleTakeTin = 154;
 

@@ -14,6 +14,7 @@ private:
   enum Phase {
     NONE,
     STARTING,
+    DRIVE_TO_FIX,
     DRIVE_TOP,
     TURN,
     DRIVE_DOWN,
@@ -53,11 +54,18 @@ void ProgTruncatedPyramid::tick() {
   else if (_phase == STARTING) {
     // программа стартует => заезжаем на вершину
     _truck->goHillUp(_driveSpeed);
-    _phase = DRIVE_TOP;
+    _phase = DRIVE_TO_FIX;
+  }
+  else if (_phase == DRIVE_TO_FIX) {
+    if (!_truck->isRunning()) {
+      // заехали на вершину => еще чуть-чуть подъезжаем, чтобы закрепиться
+      _truck->autoGo(_driveSpeed, 100);
+      _phase = DRIVE_TOP;
+    }
   }
   else if (_phase == DRIVE_TOP) {
-    if (!_truck->isRunning()) {
-      // на вершину заехали => поворачиваем
+    if (!_truck->isRunning()) { 
+      // закрепились => поворачиваем
       _truck->turn(_turnOnTopAngleDeg);
       _phase = TURN;
     }
