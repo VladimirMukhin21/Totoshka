@@ -18,7 +18,7 @@ public:
   void rotateToCenter();
   void rotate(int pos);
   void claw(int pos);
-  void handToPos(int shoulderPos, int elbowPos, int rotatePos, int clawPos,
+  void handToPos(int _shoulderPos = -1, int _elbowPos = -1, int _rotatePos = -1, int _clawPos = -1,
                  byte _shoulderSpeed = 6, byte _elbowSpeed = 6, byte _rotateSpeed = 5, byte _clawSpeed = 4);
   void stop();
   void tick();
@@ -42,9 +42,12 @@ private:
   const byte _maxStick = 255;
   const byte _maxSpeed = 5;
 
-  const byte _shoulderThr = 50;
+  //const byte _shoulderThr = 50;
+  const byte _shoulderUpHandPos = 30;
   const byte _elbowUpHandPos = 109;
+
   const byte _rotateCenterPos = 110;
+
   const byte _clawOpenPos = 110;            // разжатие руки при захвате маяка
   const byte _clawOpenRotatePipePos = 105;  // разжатие руки при вращении трубок
   const byte _clawTakeTinPos = 77;          // сжатие руки при захвате маяка
@@ -58,8 +61,11 @@ private:
   const byte _shoulderRotatePipePos = 100;
   const byte _elbowRotatePipePos = 76;
 
-  byte _shoulderAngleTakeTin = 154;
+  const byte _shoulderAngleTakeTinFromHighPos = 60;
+  const byte _elbowAngleTakeTinFromHighPos = 90;
 
+  // const byte _shoulderToTakeTinPos = 154; опускание руки пока убрали, т.к. пока не надо
+  // const byte _elbowToTakeTinPos = 120;
 
   Servo _shoulder;
   Servo _elbow;
@@ -160,16 +166,20 @@ void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
 }
 
 void Hand::handToBack() {
-  _mode = HAND_TO_BACK;
+  handToPos(_shoulderUpHandPos, _elbowUpHandPos, _rotateCenterPos);
+  // HAND_TO_BACK
 }
 
 void Hand::tinUp() {
   if (_shoulderAngle.toDeg() > 100) {
-    _mode = TIN_UP_FROM_LOW_POS;
-    _shoulderAngleTakeTin = _shoulderAngle.toDeg() - 35;
+    byte _shoulderAngleTakeTin = _shoulderAngle.toDeg() - 35;
+    byte _elbowAngleTakeTin = _shoulderAngleTakeTin - 24;
+    handToPos(_shoulderAngleTakeTin, _elbowAngleTakeTin, _rotateCenterPos);
+    // TIN_UP_FROM_LOW_POS
   }
   else {
-    _mode = TIN_UP_FROM_HIGH_POS;
+    handToPos(_shoulderAngleTakeTinFromHighPos, _elbowAngleTakeTinFromHighPos, _rotateCenterPos);
+    // TIN_UP_FROM_HIGH_POS
   }
 }
 
@@ -184,7 +194,9 @@ void Hand::handToRotatePipe() {
 }
 
 void Hand::handToTakeTin() {
-  _mode = TO_TAKE_TIN;
+  handToPos(-1, -1, _rotateCenterPos, _clawOpenPos);
+  // handToPos(_shoulderToTakeTinPos, _elbowToTakeTinPos, _rotateCenterPos, _clawOpenPos); опускание руки пока убрали,
+  // TO_TAKE_TIN                                                                           т.к. пока не надо (но оно работает)
 }
 
 void Hand::takeTin() {
@@ -213,12 +225,12 @@ void Hand::claw(int pos) {
   _mode = CLAW;
 }
 
-void Hand::handToPos(int shoulderPos, int elbowPos, int rotatePos, int clawPos,
+void Hand::handToPos(int _shoulderPos = -1, int _elbowPos = -1, int _rotatePos = -1, int _clawPos = -1,
                      byte _shoulderSpeed = 6, byte _elbowSpeed = 6, byte _rotateSpeed = 5, byte _clawSpeed = 4) {
-  _targetShoulderPos = shoulderPos;
-  _targetElbowPos = elbowPos;
-  _targetRotatePos = rotatePos;
-  _targetClawPos = clawPos;
+  _targetShoulderPos = _shoulderPos;
+  _targetElbowPos = _elbowPos;
+  _targetRotatePos = _rotatePos;
+  _targetClawPos = _clawPos;
 
   _shoulderSpeedInPoints = _shoulderSpeed;
   _elbowSpeedInPoints = _elbowSpeed;
@@ -246,77 +258,7 @@ void Hand::tick() {
   int rotatePointsPre = _rotateAngle.toPoints();
   int clawPointsPre = _clawAngle.toPoints();
 
-  if (_mode == HAND_TO_BACK) {
-    _shoulderAngle.addPoints(-6);
-    _shoulder.write(_shoulderAngle.toDeg());
-
-    _elbowAngle.addPoints(constrain(_elbowUpHandPos - _elbowAngle.toDeg(), -6, 6));
-    _elbow.write(_elbowAngle.toDeg());
-
-    _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
-    _rotate.write(_rotateAngle.toDeg());
-  }
-  else if (_mode == TIN_UP_FROM_LOW_POS) {
-    _shoulderAngle.addPoints(constrain(_shoulderAngleTakeTin - _shoulderAngle.toDeg(), -6, 6));
-    _shoulder.write(_shoulderAngle.toDeg());
-
-    _elbowAngle.addPoints(constrain(_shoulderAngleTakeTin - 24 - _elbowAngle.toDeg(), -6, 6));
-    _elbow.write(_elbowAngle.toDeg());
-
-    _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
-    _rotate.write(_rotateAngle.toDeg());
-  }
-  else if (_mode == TIN_UP_FROM_HIGH_POS) {
-    _shoulderAngle.addPoints(constrain(60 - _shoulderAngle.toDeg(), -6, 6));
-    _shoulder.write(_shoulderAngle.toDeg());
-
-    _elbowAngle.addPoints(constrain(90 - _elbowAngle.toDeg(), -6, 6));
-    _elbow.write(_elbowAngle.toDeg());
-
-    _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
-    _rotate.write(_rotateAngle.toDeg());
-  }
-  /*else if (_mode == TO_RIDE_LINE) {
-    _shoulderAngle.addPoints(constrain(_shoulderRideTheLinePos - _shoulderAngle.toDeg(), -5, 5));
-    _shoulder.write(_shoulderAngle.toDeg());
-
-    _elbowAngle.addPoints(-7);
-    _elbow.write(_elbowAngle.toDeg());
-
-    _rotateAngle.addPoints(constrain(_rotateRideTheLinePos - _rotateAngle.toDeg(), -5, 5));
-    _rotate.write(_rotateAngle.toDeg());
-
-    _clawAngle.addPoints(-3);
-    _claw.write(_clawAngle.toDeg());
-  }*/
-  /*else if (_mode == TO_ROTATE_PIPE) {
-    _shoulderAngle.addPoints(constrain(_shoulderRotatePipePos - _shoulderAngle.toDeg(), -6, 6));
-    _shoulder.write(_shoulderAngle.toDeg());
-
-    _elbowAngle.addPoints(constrain(_elbowRotatePipePos - _elbowAngle.toDeg(), -6, 6));
-    _elbow.write(_elbowAngle.toDeg());
-
-    _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
-    _rotate.write(_rotateAngle.toDeg());
-
-    _clawAngle.addPoints(constrain(_clawOpenPos - _clawAngle.toDeg(), -4, 4));
-    _claw.write(_clawAngle.toDeg());
-  }*/
-  else if (_mode == TO_TAKE_TIN) {
-    // опускание руки пока убрали, т.к. пока не надо (но оно работает)
-    // _shoulderAngle.addPoints(6);
-    // _shoulder.write(_shoulderAngle.toDeg());
-
-    // _elbowAngle.addPoints(6);
-    // _elbow.write(_elbowAngle.toDeg());
-
-    _rotateAngle.addPoints(constrain(_rotateCenterPos - _rotateAngle.toDeg(), -5, 5));
-    _rotate.write(_rotateAngle.toDeg());
-
-    _clawAngle.addPoints(constrain(_clawOpenPos - _clawAngle.toDeg(), -4, 4));
-    _claw.write(_clawAngle.toDeg());
-  }
-  else if (_mode == ROTATE) {
+  if (_mode == ROTATE) {
     _rotateAngle.addPoints(constrain(_targetRotatePos - _rotateAngle.toDeg(), -5, 5));
     _rotate.write(_rotateAngle.toDeg());
   }
@@ -325,17 +267,22 @@ void Hand::tick() {
     _claw.write(_clawAngle.toDeg());
   }
   else if (_mode == HAND_TO_POS) {
-    _shoulderAngle.addPoints(constrain(_targetShoulderPos - _shoulderAngle.toDeg(), -_shoulderSpeedInPoints, _shoulderSpeedInPoints));
-    _shoulder.write(_shoulderAngle.toDeg());
-
-    _elbowAngle.addPoints(constrain(_targetElbowPos - _elbowAngle.toDeg(), -_elbowSpeedInPoints, _elbowSpeedInPoints));
-    _elbow.write(_elbowAngle.toDeg());
-
-    _rotateAngle.addPoints(constrain(_targetRotatePos - _rotateAngle.toDeg(), -_rotateSpeedInPoints, _rotateSpeedInPoints));
-    _rotate.write(_rotateAngle.toDeg());
-
-    _clawAngle.addPoints(constrain(_targetClawPos - _clawAngle.toDeg(), -_clawSpeedInPoints, _clawSpeedInPoints));
-    _claw.write(_clawAngle.toDeg());
+    if (_targetShoulderPos >= 0) {
+      _shoulderAngle.addPoints(constrain(_targetShoulderPos - _shoulderAngle.toDeg(), -_shoulderSpeedInPoints, _shoulderSpeedInPoints));
+      _shoulder.write(_shoulderAngle.toDeg());
+    }
+    if (_targetElbowPos >= 0) {
+      _elbowAngle.addPoints(constrain(_targetElbowPos - _elbowAngle.toDeg(), -_elbowSpeedInPoints, _elbowSpeedInPoints));
+      _elbow.write(_elbowAngle.toDeg());
+    }
+    if (_targetRotatePos >= 0) {
+      _rotateAngle.addPoints(constrain(_targetRotatePos - _rotateAngle.toDeg(), -_rotateSpeedInPoints, _rotateSpeedInPoints));
+      _rotate.write(_rotateAngle.toDeg());
+    }
+    if (_targetClawPos >= 0) {
+      _clawAngle.addPoints(constrain(_targetClawPos - _clawAngle.toDeg(), -_clawSpeedInPoints, _clawSpeedInPoints));
+      _claw.write(_clawAngle.toDeg());
+    }
   }
 
   if (shoulderPointsPre == _shoulderAngle.toPoints()
