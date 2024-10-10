@@ -8,6 +8,7 @@ public:
   void init(byte shoulderPin, byte elbowPin, byte rotatePin, byte clawPin);
   void operate(byte stickVert, byte stickHoriz, bool altMode);
   void handToBack();
+  void handToUp();
   void tinUp();
   void handToRideTheLine();
   void handToRotatePipe();
@@ -43,8 +44,11 @@ private:
   const byte _maxSpeed = 5;
 
   //const byte _shoulderThr = 50;
-  const byte _shoulderUpHandPos = 30;
-  const byte _elbowUpHandPos = 109;
+  const byte _shoulderHandToBackPos = 30;
+  const byte _elbowHandToBackPos = 109;
+
+  const byte _shoulderHandToUpPos = 30;
+  const byte _elbowHandToUpPos = 0;
 
   const byte _rotateCenterPos = 110;
 
@@ -166,8 +170,12 @@ void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
 }
 
 void Hand::handToBack() {
-  handToPos(_shoulderUpHandPos, _elbowUpHandPos, _rotateCenterPos);
+  handToPos(_shoulderHandToBackPos, _elbowHandToBackPos, _rotateCenterPos);
   // HAND_TO_BACK
+}
+
+void Hand::handToUp() {
+  handToPos(_shoulderHandToUpPos, _elbowHandToUpPos, _rotateCenterPos);
 }
 
 void Hand::tinUp() {
@@ -245,7 +253,7 @@ void Hand::stop() {
 }
 
 void Hand::tick() {
-  _elbowAngle.setMinMax(0, constrain(0.75 * _shoulderAngle.toDeg() + 82.5, _elbowUpHandPos, 120));
+  _elbowAngle.setMinMax(0, constrain(0.75 * _shoulderAngle.toDeg() + 82.5, _elbowHandToBackPos, 120));
 
   if ((_mode == NONE) || (millis() - _tickTime < 1)) {
     return;

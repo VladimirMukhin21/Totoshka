@@ -158,6 +158,10 @@ void loop() {
   if (payload.upBlueButton) {
     video.moveCamera(payload.leftStick.vert);  // Поворот камеры
 
+    if (payload.upGreenButton) {  // Рука наверх
+      hand.handToUp();
+    }
+
     if (payload.frontYellowButton) {  // Захват маяка
       progTakeTin.start();
       return;
