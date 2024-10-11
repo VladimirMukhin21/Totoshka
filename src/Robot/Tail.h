@@ -97,13 +97,9 @@ void Tail::tick() {
   if (millis() - _tickTime >= 1) {
     _tickTime = millis();
 
-    int delta = _coccyxAngle.toDeg() - _targetDeg;
-    if (delta > 1) {
-      _coccyxAngle.addPoints(-5);
-      _coccyx.write(_coccyxAngle.toDeg());
-    }
-    else if (delta < -1) {
-      _coccyxAngle.addPoints(5);
+    int delta = _targetDeg - _coccyxAngle.toDeg();
+    if (delta != 0) {
+      _coccyxAngle.addPoints(constrain(delta, -5, 5));
       _coccyx.write(_coccyxAngle.toDeg());
     }
     else {
