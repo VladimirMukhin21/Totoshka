@@ -113,7 +113,7 @@ Payload Radio::read() {
       Serial.print("\t");
       Serial.println(telemetry.clrr);*/
 
-      if (telemetry.dist == -1) {
+      if (telemetry.dist == -1) {        // нужен для автоматического включения датчика расстояния после взятия банки
         _distMeter->disable();
         _distMeter->enable();
       }

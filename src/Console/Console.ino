@@ -25,6 +25,7 @@ Radio radio;
 EncButton<EB_TICK, PIN_FRONT_BLACK_BUTTON> blackButton;
 byte blackButtonPos = 0;
 Keyboard keyboard;
+bool switchTelemetry = false;
 
 void setup() {
   Serial.begin(9600);
@@ -71,15 +72,17 @@ void loop() {
     payload.key = keyboard.getKey();
   }
 
-  if(Serial.available()) {
+  if (Serial.available()) {
     String telemetryMode = Serial.readString();
-    if(telemetryMode == "telemetry_start") {
-      payload.switchTelemetry = true;
+    if (telemetryMode == "telemetry_start") {
+      switchTelemetry = true;
     }
-    else {
-      payload.switchTelemetry = false;
+    else if (telemetryMode == "telemetry_stop") {
+      switchTelemetry = false;
     }
   }
+
+  payload.switchTelemetry = switchTelemetry;
 
   radio.write(payload);
 }
