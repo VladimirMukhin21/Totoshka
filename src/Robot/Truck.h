@@ -67,7 +67,7 @@ private:
 
 void Truck::init(byte lEnPin, byte lInaPin, byte lInbPin, byte lPwmPin, byte rEnPin, byte rInaPin, byte rInbPin, byte rPwmPin, Gyro &gyro, Tail &tail) {
   _left.init(lEnPin, lInaPin, lInbPin, lPwmPin);
-  _right.init(rEnPin, rInaPin, rInbPin, rPwmPin, 40, 12);
+  _right.init(rEnPin, rInaPin, rInbPin, rPwmPin, 25, 12);
   _gyro = &gyro;
   _tail = &tail;
 }
