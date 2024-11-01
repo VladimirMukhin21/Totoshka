@@ -1,4 +1,4 @@
-5# pip3 install opencv-python qrcode pyzbar numpy
+# pip3 install opencv-python qrcode pyzbar numpy
 
 import cv2
 from pyzbar import pyzbar
@@ -9,8 +9,8 @@ import winsound
 import serial
 import keyboard
 
-CAMERA_NUM = 1 #1 + cv2.CAP_FFMPEG # номер камеры
-PORT = "COM5"
+CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
+PORT = "COM3" # 5 - левый, 3 - правый ближний, 6 - правый дальний
 BAUDRATE = 9600
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
 RED = (0,0,255)
@@ -161,6 +161,13 @@ def read_telemetry(image):
     cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), FONT, size, GREEN)
     cv2.putText(image, clrr, (x(365), y(firstStr+3*step)), FONT, size, GREEN)
 
+def connect_camera(num):
+    print("Connecting to camera " + str(num) + "...")
+    cap.release()
+    CAMERA_NUM = num - 1
+    cap.open(CAMERA_NUM)
+    print("Connected to camera " + str(num))
+
 def switch_record():
     global file
     global recording
@@ -180,7 +187,8 @@ def record(image):
         cv2.circle(image, (x(390), y(10)), radius=3, color=RED, thickness=-1)
 
 HELP = []
-HELP.append("shift-9: переподключить камеру")
+HELP.append("shift-1/2/3: выбор камеры")
+HELP.append("shift-8: таймер")
 HELP.append("shift-0: запись в файл")
 HELP.append("q: захваченные QR-коды")
 HELP.append("w: захват cv2")
@@ -198,7 +206,7 @@ def draw_help(image):
     cv2.rectangle(
         image,
         (x(0), y(40)),
-        (x(270), y(270)),
+        (x(270), y(290)),
         color = GREEN,
         thickness = -1)
     for i in range(len(HELP)):
@@ -345,11 +353,12 @@ if __name__ == "__main__":
             timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
         if key == ord("h"):
             showHelp = not showHelp
-        if key == 40: # shift-9
-            print("Reconnecting...")
-            cap.release()
-            cap.open(CAMERA_NUM)
-            print("Reconnected")
+        if key == ord("!"): # shift-1
+            connect_camera(1)
+        if key == ord("@"): # shift-2
+            connect_camera(2)
+        if key == ord("#"): # shift-3
+            connect_camera(3)
         if key == 27: # Esc => exit
             break
 
