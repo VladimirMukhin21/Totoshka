@@ -1,4 +1,7 @@
 # pip3 install opencv-python qrcode pyzbar numpy
+# Выбор пути установки интерпретатора (например, если перестала находится установленная cv2):
+# https://code.visualstudio.com/docs/python/environments#_working-with-python-interpreters
+# Ctrl+Shift+P -> Python: Select Interpreter -> "C:\Users\<USER>\AppData\Local\Programs\Python\Python310\python.exe"
 
 import cv2
 from pyzbar import pyzbar
