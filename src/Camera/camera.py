@@ -9,12 +9,9 @@ from datetime import datetime
 import time
 from threading import Thread
 import winsound
-import serial
-import keyboard
+import control
 
 CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
-PORT = "COM3" # 5 - левый, 3 - правый ближний, 6 - правый дальний
-BAUDRATE = 9600
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
 RED = (0,0,255)
 GREEN = (0,255,0)
@@ -141,35 +138,26 @@ def draw_captured_qrs(image):
         text = str.format("{0}. {1}", index, qr)
         cv2.putText(image, text, (x(5), y((index+1)*step)), FONT, size, GREEN)
 
-def read_telemetry(image):
-    if not readTelemetry:
-        return
-    global dist
-    global clrl
-    global clrr
-
-    serialAvailable = ser.inWaiting()
-    if serialAvailable:
-        data = ser.readline().decode().strip()
-        dist, clrl, clrr = data.split(',')
-
-    size = 0.6
-    firstStr = 100
-    step = 15
-    cv2.putText(image, "Датчики:", (x(333), y(firstStr)), FONT, size, GREEN)
-    cv2.putText(image, "dist", (x(330), y(firstStr+step)), FONT, size, GREEN)
-    cv2.putText(image, dist, (x(365), y(firstStr+step)), FONT, size, GREEN)
-    cv2.putText(image, "clrl", (x(330), y(firstStr+2*step)), FONT, size, GREEN)
-    cv2.putText(image, clrl, (x(365), y(firstStr+2*step)), FONT, size, GREEN)
-    cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), FONT, size, GREEN)
-    cv2.putText(image, clrr, (x(365), y(firstStr+3*step)), FONT, size, GREEN)
+def draw_telemetry(image):
+    readed, dist, clrl, clrr = control.readTelemetry()
+    if readed:
+        size = 0.6
+        firstStr = 100
+        step = 15
+        cv2.putText(image, "Датчики:", (x(333), y(firstStr)), FONT, size, GREEN)
+        cv2.putText(image, "dist", (x(330), y(firstStr+step)), FONT, size, GREEN)
+        cv2.putText(image, dist, (x(365), y(firstStr+step)), FONT, size, GREEN)
+        cv2.putText(image, "clrl", (x(330), y(firstStr+2*step)), FONT, size, GREEN)
+        cv2.putText(image, clrl, (x(365), y(firstStr+2*step)), FONT, size, GREEN)
+        cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), FONT, size, GREEN)
+        cv2.putText(image, clrr, (x(365), y(firstStr+3*step)), FONT, size, GREEN)
 
 def connect_camera(num):
-    print("Connecting to camera " + str(num) + "...")
+    print("Подключение камеры " + str(num) + "...")
     cap.release()
     CAMERA_NUM = num - 1
     cap.open(CAMERA_NUM)
-    print("Connected to camera " + str(num))
+    print("Камера " + str(num) + " подключена")
 
 def switch_record():
     global file
@@ -268,7 +256,6 @@ guideMode = 1  # 0
 showCapturedQrs = True
 scaleChangedTime = datetime.now()
 recording = False
-readTelemetry = False
 showHelp = False
 showClock = False
 pause = False
@@ -278,19 +265,16 @@ qrDecodeTime = datetime.now()
 cv2_box = []
 pyzbar_box = []
 qr = EMPTY_STR
-dist = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
-clrl = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
-clrr = str(10)    # начальное значение датчика расстояния (нужно только для старта вывода телеметрии)
 now = int(datetime.now().strftime("%M%S"))
 
 
 if __name__ == "__main__":
-    print("Connecting...")
+    print("Подключение камеры...")
     cap = cv2.VideoCapture()
     cap.open(CAMERA_NUM)
-    ser = serial.Serial(PORT, BAUDRATE)
-    print("Connected")
-    ser.write(b'telemetry_stop')
+    print("Камера подключена")
+
+    control.connect()
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -308,7 +292,7 @@ if __name__ == "__main__":
             # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
             draw_captured_qrs(frame)
-            read_telemetry(frame)
+            draw_telemetry(frame)
             draw_help(frame)
             draw_scale(frame)
             clock(frame)
@@ -320,56 +304,50 @@ if __name__ == "__main__":
             cap.open(CAMERA_NUM)
              
         key = cv2.waitKey(1)
-        # print(key)
         if key >= ord("0") and key <= ord("9"):
             guideMode = key - ord("0")
             # print("guideMode:", guideMode)
-        if key == ord("+"):
+        elif key == ord("+"):
             change_scale(10)
-        if key == ord("-"):
+        elif key == ord("-"):
             change_scale(-10)
-        if key == ord("q"):
+        elif key == ord("q"):
             showCapturedQrs = not showCapturedQrs
-        if key == ord("w"):
+        elif key == ord("w"):
             qrMode = QR_CV2
             qr = EMPTY_STR
-        if key == ord("e"):
+        elif key == ord("e"):
             qrMode = QR_PYZBAR
             qr = EMPTY_STR
-        if key == ord("r"):
+        elif key == ord("r"):
             qrMode = QR_OFF
             qr = EMPTY_STR
-        if key == ord("l"):
-            readTelemetry = not readTelemetry
-            if (readTelemetry):
-                ser.write(b'telemetry_start')
-            else:
-                ser.write(b'telemetry_stop')
-        if key == 42: # shift-8
+        elif key == ord("l"):
+            control.telemetrySwitch()
+        elif key == 42: # shift-8
             showClock = not showClock
             timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
-        if key == ord("p"):
+        elif key == ord("p"):
             pause = not pause
-        if key == 41: # shift-0
+        elif key == 41: # shift-0
             switch_record()
             showClock = not showClock
             timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
-        if key == ord("h"):
+        elif key == ord("h"):
             showHelp = not showHelp
-        if key == ord("!"): # shift-1
+        elif key == ord("!"): # shift-1
             connect_camera(1)
-        if key == ord("@"): # shift-2
+        elif key == ord("@"): # shift-2
             connect_camera(2)
-        if key == ord("#"): # shift-3
+        elif key == ord("#"): # shift-3
             connect_camera(3)
-        if key == 27: # Esc => exit
+        elif key == 27: # Esc => exit
             break
+        elif key != -1:
+            print("Нажата клавиша с кодом " + str(key) + ", действие не задано")
 
     if recording:
         file.release()
-    ser.write(b'telemetry_stop')
-    if ser.is_open:
-        ser.close()
-        print("Serial connection closed")
+    control.disconnect()
     cap.release()
     cv2.destroyAllWindows()
