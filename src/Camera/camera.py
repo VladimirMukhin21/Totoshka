@@ -9,7 +9,7 @@ from datetime import datetime
 import time
 from threading import Thread
 import winsound
-import control
+from control import RemoteControl
 
 CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
@@ -22,6 +22,8 @@ QR_OFF = ""
 QR_CV2 = "C"
 QR_PYZBAR = "P"
 EMPTY_STR = ""
+
+remCtrl = RemoteControl()
 
 def beep():
     frequency = 2500
@@ -139,18 +141,18 @@ def draw_captured_qrs(image):
         cv2.putText(image, text, (x(5), y((index+1)*step)), FONT, size, GREEN)
 
 def draw_telemetry(image):
-    readed, dist, clrl, clrr = control.readTelemetry()
+    readed, dist, clrl, clrr = remCtrl.readTelemetry()
     if readed:
         size = 0.6
         firstStr = 100
         step = 15
         cv2.putText(image, "Датчики:", (x(333), y(firstStr)), FONT, size, GREEN)
         cv2.putText(image, "dist", (x(330), y(firstStr+step)), FONT, size, GREEN)
-        cv2.putText(image, dist, (x(365), y(firstStr+step)), FONT, size, GREEN)
+        cv2.putText(image, str(dist), (x(365), y(firstStr+step)), FONT, size, GREEN)
         cv2.putText(image, "clrl", (x(330), y(firstStr+2*step)), FONT, size, GREEN)
-        cv2.putText(image, clrl, (x(365), y(firstStr+2*step)), FONT, size, GREEN)
+        cv2.putText(image, str(clrl), (x(365), y(firstStr+2*step)), FONT, size, GREEN)
         cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), FONT, size, GREEN)
-        cv2.putText(image, clrr, (x(365), y(firstStr+3*step)), FONT, size, GREEN)
+        cv2.putText(image, str(clrr), (x(365), y(firstStr+3*step)), FONT, size, GREEN)
 
 def connect_camera(num):
     print("Подключение камеры " + str(num) + "...")
@@ -274,7 +276,7 @@ if __name__ == "__main__":
     cap.open(CAMERA_NUM)
     print("Камера подключена")
 
-    control.connect()
+    remCtrl.connect()
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -323,7 +325,7 @@ if __name__ == "__main__":
             qrMode = QR_OFF
             qr = EMPTY_STR
         elif key == ord("l"):
-            control.telemetrySwitch()
+            remCtrl.telemetrySwitch()
         elif key == 42: # shift-8
             showClock = not showClock
             timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
@@ -348,6 +350,6 @@ if __name__ == "__main__":
 
     if recording:
         file.release()
-    control.disconnect()
+    remCtrl.disconnect()
     cap.release()
     cv2.destroyAllWindows()
