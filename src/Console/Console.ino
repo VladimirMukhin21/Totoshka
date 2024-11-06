@@ -1,6 +1,7 @@
 #include <EncButton.h>
 #include "Radio.h"
 #include "Keyboard.h"
+#include "Command.h"
 
 #define PIN_LEFT_STICK_VERT A13
 #define PIN_LEFT_STICK_HORIZ A15
@@ -25,10 +26,15 @@ Radio radio;
 EncButton<EB_TICK, PIN_FRONT_BLACK_BUTTON> blackButton;
 byte blackButtonPos = 0;
 Keyboard keyboard;
+Command command;
 bool switchTelemetry = false;
 
+byte speed = 127;
+byte turn = 127;
+unsigned long timeOfReadDrive = millis();
+
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   radio.initTransmitter();
   pinMode(PIN_LEFT_STICK_BUTTON, INPUT_PULLUP);
   pinMode(PIN_RIGHT_STICK_BUTTON, INPUT_PULLUP);
@@ -73,13 +79,29 @@ void loop() {
   }
 
   if (Serial.available()) {
-    String telemetryMode = Serial.readString();
-    if (telemetryMode == "telemetry_start") {
-      switchTelemetry = true;
+    command.readPart();
+    if (command.isCompleted()) {
+      if (command.command == command.TELEMETRY_START) {
+        switchTelemetry = true;
+      }
+      else if (command.command == command.TELEMETRY_STOP) {
+        switchTelemetry = false;
+      }
+      else if (command.command == command.DRIVE) {
+        speed = command.args[0];
+        turn = command.args[1];
+        timeOfReadDrive = millis();
+      }
+
+      command.clear(); // команду исполнили, очищаем
     }
-    else if (telemetryMode == "telemetry_stop") {
-      switchTelemetry = false;
-    }
+  }
+
+  if (millis() - timeOfReadDrive < 200) {
+    // первые 200мс после загрузки пульта робот не будет ехать из-за условия выше
+    payload.rightStick.vert = speed;
+    payload.rightStick.horiz = turn;
+    payload.rightStick.pressed = false;
   }
 
   payload.switchTelemetry = switchTelemetry;

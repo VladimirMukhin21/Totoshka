@@ -345,6 +345,8 @@ if __name__ == "__main__":
             connect_camera(3)
         elif key == 27: # Esc => exit
             break
+        elif key == ord("x"):
+            remCtrl.sendDriveCommand(157, 127)
         elif key != -1:
             print("Нажата клавиша с кодом " + str(key) + ", действие не задано")
 
