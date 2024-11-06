@@ -10,6 +10,7 @@ import time
 from threading import Thread
 import winsound
 from control import RemoteControl
+from autoLine import AutoLine
 
 CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
@@ -24,6 +25,7 @@ QR_PYZBAR = "P"
 EMPTY_STR = ""
 
 remCtrl = RemoteControl()
+autoLine = AutoLine()
 
 def beep():
     frequency = 2500
@@ -31,7 +33,7 @@ def beep():
     t = Thread(target=winsound.Beep, args=(frequency, duration))
     t.start()
 
-def decode(image):
+def qrDecode(image):
     if qrMode == QR_CV2:
         cv2Decode(image)
     elif qrMode == QR_PYZBAR:
@@ -289,7 +291,8 @@ if __name__ == "__main__":
         readed, frame = cap.read()
 
         if readed:
-            decode(frame)
+            autoLine.feed(frame, remCtrl)
+            qrDecode(frame)
             
             # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
@@ -346,7 +349,7 @@ if __name__ == "__main__":
         elif key == 27: # Esc => exit
             break
         elif key == ord("x"):
-            remCtrl.sendDriveCommand(157, 127)
+            autoLine.switch()
         elif key != -1:
             print("Нажата клавиша с кодом " + str(key) + ", действие не задано")
 
