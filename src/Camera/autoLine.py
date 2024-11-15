@@ -36,7 +36,7 @@ class AutoLine(object):
         
         now = datetime.now()
         delta = now - self.lastDetectTime
-        if (delta.microseconds > 200000): # 200ms
+        if (delta.microseconds > 150000): # 150ms
             self.lastDetectTime = now
 
             h, w, _ = img.shape
@@ -44,7 +44,7 @@ class AutoLine(object):
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # cv2.imshow('gray', img)
 
-            img = cv2.GaussianBlur(img, (9, 9), 0)
+            img = cv2.GaussianBlur(img, (19, 19), 0)
             # cv2.imshow('blur', img)
 
             persp = 200
@@ -55,13 +55,15 @@ class AutoLine(object):
             # img = cv2.circle(img, points[3], 10, (0,0,0), cv2.FILLED)
             # cv2.imshow('blur', img)
 
-            img = self.warpImg(img, points, w, h)
+            #img = self.warpImg(img, points, w, h)
             # cv2.imshow('warp', img)
 
-            _, img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY_INV)
+            _, img = cv2.threshold(img, 117, 255, cv2.THRESH_BINARY_INV)
             # cv2.imshow('tresh1', img)
 
-            img = img[200:450, 0:w]  # [y1:y2, x1:x2]
+            # сужаем область поиска линии - обрезаем изображение
+            #img = img[200:440, 0:w]  # [y1:y2, x1:x2]
+            img = img[200:365, 10:w-10]  # [y1:y2, x1:x2]
 
             basePoint = self.getHist(img)
             img = cv2.rectangle(img, (0,0), (w,10), (0,0,0), cv2.FILLED)
@@ -70,4 +72,4 @@ class AutoLine(object):
             print(basePoint)
             turn = int(np.interp(basePoint, [0,w], [0,255]))
             # print(turn)
-            remCtrl.sendDriveCommand(197, turn)
+            remCtrl.sendDriveCommand(157, turn)
