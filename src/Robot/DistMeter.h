@@ -13,6 +13,8 @@ public:
 
 private:
   VL53L0X sensor;
+  unsigned long _lastReadTime = millis();
+  int _lastValue = 0;
 };
 
 void DistMeter::init() {
@@ -24,7 +26,13 @@ void DistMeter::init() {
 }
 
 int DistMeter::getDist() {
-  return sensor.readRangeContinuousMillimeters();
+  unsigned long now = millis();
+  if (now - _lastReadTime >= 50) {
+    _lastReadTime = now;
+    _lastValue = sensor.readRangeContinuousMillimeters();
+  }
+
+  return _lastValue;
 }
 
 void DistMeter::enable() {

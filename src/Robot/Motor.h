@@ -76,7 +76,7 @@ void Motor::tick() {
 }
 
 int Motor::smooth(int speed) {
-  if (_smoothStep <= 0 || speed == _currentSpeed) {
+  if ((_smoothStep <= 0) || (speed == _currentSpeed)) {
     return speed;
   }
 
