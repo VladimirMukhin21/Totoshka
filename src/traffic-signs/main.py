@@ -5,6 +5,9 @@ BLUE_NUM = 1
 RED_NUM = 2
 PURPLE_NUM = 3
 
+FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
+GREEN = (0,255,0)
+
 def bin(img, color: int):
     if color == BLUE_NUM:
         # hsv=(103,193,208) # bgr=(206,145,52)
@@ -28,7 +31,7 @@ def bin(img, color: int):
     return img
 
 def readSample(fileName, color: int):
-    img = cv2.imread('samples/' + fileName)
+    img = cv2.imread('samples/' + fileName + '.png')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img = bin(img, color)
 
@@ -85,10 +88,10 @@ def process(img, color, samples):
             res.append([sample[1], sum, cont, (x,y,w,h)])
     return res
 
-sampleLeft = readSample('left.png', BLUE_NUM)
-sampleRight = readSample('right.png', BLUE_NUM)
-sampleStop = readSample('stop.png', RED_NUM)
-sampleAmox = readSample('amox.png', PURPLE_NUM)
+sampleLeft = readSample('left', BLUE_NUM)
+sampleRight = readSample('right', BLUE_NUM)
+sampleStop = readSample('stop', RED_NUM)
+sampleAmox = readSample('amox', PURPLE_NUM)
 
 cap = cv2.VideoCapture(0)
 while (True):
@@ -108,7 +111,8 @@ while (True):
         if item[1] > 3000:
             cv2.drawContours(imgOrig, item[2], -1, (255,0,255), 2)
             (x,y,w,h) = item[3]
-            cv2.rectangle(imgOrig, (x,y), (x+w,y+h), (0,255,0), 2)
+            cv2.rectangle(imgOrig, (x,y), (x+w,y+h), GREEN, 2)
+            cv2.putText(imgOrig, item[0], (x,y-10), FONT, fontScale=1, color=GREEN)
             print(item[0])
     # print(weights)
     cv2.imshow('original', imgOrig)
