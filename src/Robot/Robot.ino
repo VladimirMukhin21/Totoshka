@@ -15,6 +15,7 @@
 #include "ProgHillWithPipes.h"
 #include "ProgTruncatedPyramid.h"
 #include "ProgHoof.h"
+#include "ProgCorridor.h"
 
 #define L_EN_PIN 38
 #define L_INA_PIN 40 // 41
@@ -56,6 +57,7 @@ ProgRotatePipe progRotatePipe;
 ProgHillWithPipes progHillWithPipes;
 ProgTruncatedPyramid progTruncatedPyramid;
 ProgHoof progHoof;
+ProgCorridor progCorridor;
 
 unsigned long lastRadioTime = millis();
 
@@ -90,6 +92,7 @@ void setup() {
   progHillWithPipes.init(truck, tail);
   progTruncatedPyramid.init(truck);
   progHoof.init(truck);
+  progCorridor.init(truck, distMeter);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -257,9 +260,13 @@ void loop() {
     }
     else if (payload.key == 0xD1) {  // СВОБОДНО
     }
-    else if (payload.key == 0xA2) {  // СВОБОДНО
+    else if (payload.key == 0xA2) {  // Коридор налево
+      progCorridor.start(ProgCorridor::TURN_LEFT);
+      return;
     }
-    else if (payload.key == 0xB2) {  // СВОБОДНО
+    else if (payload.key == 0xB2) {  // Коридор направо
+      progCorridor.start(ProgCorridor::TURN_RIGHT);
+      return;
     }
     else if (payload.key == 0xC2) {  // СВОБОДНО
     }
@@ -306,7 +313,8 @@ bool isAnyProgRunning() {
          || progRotatePipe.isRunning()
          || progHillWithPipes.isRunning()
          || progTruncatedPyramid.isRunning()
-         || progHoof.isRunning();
+         || progHoof.isRunning()
+         || progCorridor.isRunning();
 }
 
 void stopAll() {
@@ -322,6 +330,7 @@ void stopAll() {
   progHillWithPipes.stop();
   progTruncatedPyramid.stop();
   progHoof.stop();
+  progCorridor.stop();
 }
 
 void tickAll() {
@@ -338,4 +347,5 @@ void tickAll() {
   progHillWithPipes.tick();
   progTruncatedPyramid.tick();
   progHoof.tick();
+  progCorridor.tick();
 }
