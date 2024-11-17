@@ -1,1 +1,1 @@
-python camera.py
+python main.py
