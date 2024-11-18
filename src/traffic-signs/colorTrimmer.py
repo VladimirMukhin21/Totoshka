@@ -3,7 +3,7 @@ import cv2
 def nothing(void):
     pass
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 cv2.namedWindow('result')
 
@@ -17,9 +17,9 @@ cv2.createTrackbar('minV', 'result', 0, 255, nothing)
 cv2.createTrackbar('maxV', 'result', 255, 255, nothing)
 
 while(True):
-    # ret, frame = cap.read()
+    ret, img = cap.read()
     # img = cv2.imread("all.png")
-    img = cv2.imread('samples/amox.png')
+    # img = cv2.imread('samples/amox.png')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # img = cv2.GaussianBlur(img, (19, 19), 0)
