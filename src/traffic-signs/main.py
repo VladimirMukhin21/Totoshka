@@ -27,6 +27,9 @@ class Recognized(object):
         self.rect = rect
 
 class SignDetector(object):
+    MIN_CONTOUR_AREA = 5000
+    MIN_ACCURACY = 60
+
     BLUE_COLOR = 'blue'
     RED_COLOR = 'red'
     PURPLE_COLOR = 'purple'
@@ -101,7 +104,7 @@ class SignDetector(object):
 
             area = cv2.contourArea(cont)
             print(area)
-            if area > 5000:
+            if area > self.MIN_CONTOUR_AREA:
                 (x,y,w,h) = cv2.boundingRect(cont) # рамка с найденным знаком
 
                 sign = mask[y:y+h, x:x+w]
@@ -115,8 +118,10 @@ class SignDetector(object):
                             if sample.img[i][j] == sign[i][j]:
                                 sum += 1
                     accuracy = sum*100//4096
-                    res.append(Recognized(sample.name, accuracy, cont, (x,y,w,h)))
-                finalRes.append(max(res, key=lambda x: x.accuracy))
+                    if accuracy >= self.MIN_ACCURACY:
+                        res.append(Recognized(sample.name, accuracy, cont, (x,y,w,h)))
+                if res:
+                    finalRes.append(max(res, key=lambda x: x.accuracy))
         return finalRes
 
     def detectAll(self, img):
@@ -130,14 +135,13 @@ class SignDetector(object):
         # detected.extend(detect(imgForAnalyze, PURPLE_COLOR, [sampleAmox]))
 
         for item in detected:
-            if item.accuracy > 60:
-                cv2.drawContours(img, item.contour, -1, (255,0,255), 2)
-                (x,y,w,h) = item.rect
-                cv2.rectangle(img, (x,y), (x+w,y+h), BLUE, 2)
-                title = item.name + ' ' + str(item.accuracy) + '%'
-                cv2.putText(img, title, (x,y-10), FONT, fontScale=1, color=BLUE)
-                # print(title)
-        return img
+            cv2.drawContours(img, item.contour, -1, (255,0,255), 2)
+            (x,y,w,h) = item.rect
+            cv2.rectangle(img, (x,y), (x+w,y+h), BLUE, 2)
+            title = item.name + ' ' + str(item.accuracy) + '%'
+            cv2.putText(img, title, (x,y-10), FONT, fontScale=1, color=BLUE)
+            # print(title)
+        return (img, detected)
 
 cap = cv2.VideoCapture(0)
 while (True):
@@ -147,7 +151,7 @@ while (True):
     # cv2.imshow('original', img)
 
     detector = SignDetector()
-    img = detector.detectAll(img)
+    img, detected = detector.detectAll(img)
     cv2.imshow('original', img)
 
     if cv2.waitKey(1)==ord('q'):
