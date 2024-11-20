@@ -9,16 +9,12 @@ from datetime import datetime
 import time
 from threading import Thread
 import winsound
+import const
 from control import RemoteControl
 from autoLine import AutoLine
+from signDetector import SignDetector
 
 CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
-FONT = cv2.FONT_HERSHEY_COMPLEX # только этот шрифт содержит русские буквы
-RED = (0,0,255)
-GREEN = (0,255,0)
-BLUE = (255,0,0)
-BLACK = (0,0,0)
-YELLOW = (0,255,255)
 QR_OFF = ""
 QR_CV2 = "C"
 QR_PYZBAR = "P"
@@ -26,6 +22,7 @@ EMPTY_STR = ""
 
 remCtrl = RemoteControl()
 autoLine = AutoLine()
+signDetector = SignDetector()
 
 def beep():
     frequency = 2500
@@ -40,7 +37,7 @@ def qrDecode(image):
         pyzbarDecode(image)
     else:
         return
-    cv2.putText(image, qrMode, (x(375), y(12)), FONT, 0.5, color=RED)
+    cv2.putText(image, qrMode, (x(375), y(12)), const.FONT, 0.5, color=const.RED)
 
 def pyzbarDecode(image):
     global qrDecodeTime
@@ -69,8 +66,8 @@ def pyzbarDecode(image):
         return
     n_points = len(pyzbar_box.polygon)
     for i in range(n_points):
-        image = cv2.line(image, pyzbar_box.polygon[i], pyzbar_box.polygon[(i+1) % n_points], RED, thickness=3)
-    cv2.putText(image, qr, (pyzbar_box.rect.left, pyzbar_box.rect.top-10), FONT, 1, RED)
+        image = cv2.line(image, pyzbar_box.polygon[i], pyzbar_box.polygon[(i+1) % n_points], const.RED, thickness=3)
+    cv2.putText(image, qr, (pyzbar_box.rect.left, pyzbar_box.rect.top-10), const.FONT, 1, const.RED)
 
 def cv2Decode(image):
     global qrDecodeTime
@@ -97,13 +94,13 @@ def cv2Decode(image):
     if qr == EMPTY_STR:
         return
     thickness=3
-    cv2.line(image, (int(cv2_box[0][0]), int(cv2_box[0][1])), (int(cv2_box[1][0]), int(cv2_box[1][1])), RED, thickness)
-    cv2.line(image, (int(cv2_box[1][0]), int(cv2_box[1][1])), (int(cv2_box[2][0]), int(cv2_box[2][1])), RED, thickness)
-    cv2.line(image, (int(cv2_box[2][0]), int(cv2_box[2][1])), (int(cv2_box[3][0]), int(cv2_box[3][1])), RED, thickness)
-    cv2.line(image, (int(cv2_box[3][0]), int(cv2_box[3][1])), (int(cv2_box[0][0]), int(cv2_box[0][1])), RED, thickness)
+    cv2.line(image, (int(cv2_box[0][0]), int(cv2_box[0][1])), (int(cv2_box[1][0]), int(cv2_box[1][1])), const.RED, thickness)
+    cv2.line(image, (int(cv2_box[1][0]), int(cv2_box[1][1])), (int(cv2_box[2][0]), int(cv2_box[2][1])), const.RED, thickness)
+    cv2.line(image, (int(cv2_box[2][0]), int(cv2_box[2][1])), (int(cv2_box[3][0]), int(cv2_box[3][1])), const.RED, thickness)
+    cv2.line(image, (int(cv2_box[3][0]), int(cv2_box[3][1])), (int(cv2_box[0][0]), int(cv2_box[0][1])), const.RED, thickness)
     x = int(min(cv2_box[0][0], cv2_box[1][0], cv2_box[2][0], cv2_box[3][0]))
     y = int(min(cv2_box[0][1], cv2_box[1][1], cv2_box[2][1], cv2_box[3][1]))
-    cv2.putText(image, qr, (x, y-10), FONT, 1, RED)
+    cv2.putText(image, qr, (x, y-10), const.FONT, 1, const.RED)
 
 def x(x):
     return int(width*x/400)
@@ -113,20 +110,20 @@ def y(y):
 def draw_guides(image):
     thickness=1
     if guideMode == 1:
-        cv2.line(image, (x(190), y(280)), (x(190), y(20)), BLUE, thickness) # центр
-        cv2.line(image, (x(131), y(170)), (x(154), y(120)), GREEN, thickness) # лев
-        cv2.line(image, (x(249), y(170)), (x(227), y(120)), GREEN, thickness) # прав
-        cv2.line(image, (x(100), y(170)), (x(280), y(170)), GREEN, thickness) # горизонт
+        cv2.line(image, (x(190), y(280)), (x(190), y(20)), const.BLUE, thickness) # центр
+        cv2.line(image, (x(131), y(170)), (x(154), y(120)), const.GREEN, thickness) # лев
+        cv2.line(image, (x(249), y(170)), (x(227), y(120)), const.GREEN, thickness) # прав
+        cv2.line(image, (x(100), y(170)), (x(280), y(170)), const.GREEN, thickness) # горизонт
     elif guideMode == 2:
-        cv2.line(image, (x(247), y(300)), (x(227), y(240)), GREEN, thickness) # центр
-        cv2.line(image, (x(112), y(300)), (x(150), y(230)), GREEN, thickness) # лев
-        cv2.line(image, (x(386), y(300)), (x(300), y(230)), GREEN, thickness) # прав
-        cv2.line(image, (x(142), y(297)), (x(351), y(264)), BLUE, thickness) # горизонт
+        cv2.line(image, (x(247), y(300)), (x(227), y(240)), const.GREEN, thickness) # центр
+        cv2.line(image, (x(112), y(300)), (x(150), y(230)), const.GREEN, thickness) # лев
+        cv2.line(image, (x(386), y(300)), (x(300), y(230)), const.GREEN, thickness) # прав
+        cv2.line(image, (x(142), y(297)), (x(351), y(264)), const.BLUE, thickness) # горизонт
     elif guideMode == 5:
         for i in range(0, 400, 100):
-            cv2.line(image, (x(i), y(0)), (x(i), y(300)), GREEN, thickness)
+            cv2.line(image, (x(i), y(0)), (x(i), y(300)), const.GREEN, thickness)
         for i in range(0, 300, 100):
-            cv2.line(image, (x(0), y(i)), (x(400), y(i)), GREEN, thickness)
+            cv2.line(image, (x(0), y(i)), (x(400), y(i)), const.GREEN, thickness)
 
 def draw_captured_qrs(image):
     if not showCapturedQrs:
@@ -136,11 +133,11 @@ def draw_captured_qrs(image):
     size = 0.7
     index = 0
     step = 15
-    cv2.putText(image, "QR-коды:", (x(5), y((index+1)*step)), FONT, size, GREEN)
+    cv2.putText(image, "QR-коды:", (x(5), y((index+1)*step)), const.FONT, size, const.GREEN)
     for qr in capturedQrs:
         index += 1
         text = str.format("{0}. {1}", index, qr)
-        cv2.putText(image, text, (x(5), y((index+1)*step)), FONT, size, GREEN)
+        cv2.putText(image, text, (x(5), y((index+1)*step)), const.FONT, size, const.GREEN)
 
 def draw_telemetry(image):
     readed, dist, clrl, clrr = remCtrl.readTelemetry()
@@ -148,13 +145,13 @@ def draw_telemetry(image):
         size = 0.6
         firstStr = 100
         step = 15
-        cv2.putText(image, "Датчики:", (x(333), y(firstStr)), FONT, size, GREEN)
-        cv2.putText(image, "dist", (x(330), y(firstStr+step)), FONT, size, GREEN)
-        cv2.putText(image, str(dist), (x(365), y(firstStr+step)), FONT, size, GREEN)
-        cv2.putText(image, "clrl", (x(330), y(firstStr+2*step)), FONT, size, GREEN)
-        cv2.putText(image, str(clrl), (x(365), y(firstStr+2*step)), FONT, size, GREEN)
-        cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), FONT, size, GREEN)
-        cv2.putText(image, str(clrr), (x(365), y(firstStr+3*step)), FONT, size, GREEN)
+        cv2.putText(image, "Датчики:", (x(333), y(firstStr)), const.FONT, size, const.GREEN)
+        cv2.putText(image, "dist", (x(330), y(firstStr+step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, str(dist), (x(365), y(firstStr+step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, "clrl", (x(330), y(firstStr+2*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, str(clrl), (x(365), y(firstStr+2*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, str(clrr), (x(365), y(firstStr+3*step)), const.FONT, size, const.GREEN)
 
 def connect_camera(num):
     print("Подключение камеры " + str(num) + "...")
@@ -179,7 +176,7 @@ def switch_record():
 def record(image):
     if recording:
         file.write(image)
-        cv2.circle(image, (x(390), y(10)), radius=3, color=RED, thickness=-1)
+        cv2.circle(image, (x(390), y(10)), radius=3, color=const.RED, thickness=-1)
 
 HELP = []
 HELP.append("shift-1/2/3: выбор камеры")
@@ -202,10 +199,10 @@ def draw_help(image):
         image,
         (x(0), y(40)),
         (x(270), y(290)),
-        color = GREEN,
+        color = const.GREEN,
         thickness = -1)
     for i in range(len(HELP)):
-        cv2.putText(image, HELP[i], (x(5), y(40+(i+1)*20)), FONT, 0.7, BLACK)
+        cv2.putText(image, HELP[i], (x(5), y(40+(i+1)*20)), const.FONT, 0.7, const.BLACK)
 
 def draw_scale(image):
     now = datetime.now()
@@ -213,7 +210,7 @@ def draw_scale(image):
     if (delta.total_seconds() > 1):
         return
     msg = str(scale) + "%"
-    cv2.putText(image, msg, (x(180), y(140)), FONT, 1, GREEN)
+    cv2.putText(image, msg, (x(180), y(140)), const.FONT, 1, const.GREEN)
 
 def change_scale(delta):
     global scale
@@ -242,18 +239,18 @@ def clock(image):
     sec = timeLeft % 60
 
     if min < 1:
-        color = RED
+        color = const.RED
     elif min < 5:
-        color = YELLOW
+        color = const.YELLOW
     else:
-        color = GREEN
+        color = const.GREEN
     if min <= 9:
         min = str(0) + str(min)
     if sec <= 9:
         sec = str(0) + str(sec)
 
     timerMinSec = str(min) + ":" + str(sec)
-    cv2.putText(image, timerMinSec, (x(367), y(35)), FONT, 0.5, color)
+    cv2.putText(image, timerMinSec, (x(367), y(35)), const.FONT, 0.5, color)
 
 capturedQrs = set()
 guideMode = 1  # 0
