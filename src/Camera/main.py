@@ -288,8 +288,9 @@ if __name__ == "__main__":
         readed, frame = cap.read()
 
         if readed:
-            autoLine.feed(frame, remCtrl)
             qrDecode(frame)
+            autoLine.feed(frame, remCtrl)
+            frame = signDetector.feed(frame)
             
             # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
@@ -347,6 +348,8 @@ if __name__ == "__main__":
             break
         elif key == ord("x"):
             autoLine.switch()
+        elif key == ord("c"):
+            signDetector.switch()
         elif key != -1:
             print("Нажата клавиша с кодом " + str(key) + ", действие не задано")
 

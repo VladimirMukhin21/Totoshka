@@ -9,7 +9,7 @@ class AutoLine(object):
     def switch(self):
         self.enabled = not self.enabled
         if self.enabled:
-             print("Езда по линии включена")
+            print("Езда по линии включена")
         else:
             print("Езда по линии выключена")
 
@@ -47,8 +47,8 @@ class AutoLine(object):
             img = cv2.GaussianBlur(img, (19, 19), 0)
             # cv2.imshow('blur', img)
 
-            persp = 200
-            points = [[0+persp,0], [w-persp,0], [0,h], [w,h]]
+            # persp = 200
+            # points = [[0+persp,0], [w-persp,0], [0,h], [w,h]]
             # img = cv2.circle(img, points[0], 10, (0,0,0), cv2.FILLED)
             # img = cv2.circle(img, points[1], 10, (0,0,0), cv2.FILLED)
             # img = cv2.circle(img, points[2], 10, (0,0,0), cv2.FILLED)

@@ -36,11 +36,20 @@ class SignDetector(object):
     sampleStop = None
     # sampleAmox = None
 
+    enabled = False
+
     def __init__(self):
         self.sampleLeft = self.readSample('left', self.BLUE_COLOR)
         self.sampleRight = self.readSample('right', self.BLUE_COLOR)
         self.sampleStop = self.readSample('stop', self.RED_COLOR)
         # self.sampleAmox = self.readSample('amox', self.PURPLE_COLOR)
+
+    def switch(self):
+        self.enabled = not self.enabled
+        if self.enabled:
+            print("Распознавание знаков включено")
+        else:
+            print("Распознавание знаков выключено")
 
     def bin(self, img, color, isSample: bool):
         if color == self.BLUE_COLOR:
@@ -100,7 +109,7 @@ class SignDetector(object):
             # cont = conts[0] # 0-й контур - самый длинный и интересный
 
             area = cv2.contourArea(cont)
-            print(area)
+            # print(area)
             if area > self.MIN_CONTOUR_AREA:
                 (x,y,w,h) = cv2.boundingRect(cont) # рамка с найденным знаком
 
@@ -121,7 +130,10 @@ class SignDetector(object):
                     finalRes.append(max(res, key=lambda x: x.accuracy))
         return finalRes
 
-    def detectAll(self, img):
+    def feed(self, img):
+        if not self.enabled:
+            return img
+        
         imgForAnalyze = img.copy()
         imgForAnalyze = cv2.cvtColor(imgForAnalyze, cv2.COLOR_BGR2HSV)
         imgForAnalyze = cv2.GaussianBlur(imgForAnalyze, (19, 19), 0)
@@ -138,4 +150,4 @@ class SignDetector(object):
             title = item.name + ' ' + str(item.accuracy) + '%'
             cv2.putText(img, title, (x,y-10), const.FONT, fontScale=1, color=const.BLUE)
             # print(title)
-        return (img, detected)
+        return img
