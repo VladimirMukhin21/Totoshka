@@ -183,12 +183,11 @@ HELP.append("shift-1/2/3: выбор камеры")
 HELP.append("shift-8: таймер")
 HELP.append("shift-0: запись в файл")
 HELP.append("q: захваченные QR-коды")
-HELP.append("w: захват cv2")
-HELP.append("e: захват pyzbar")
-HELP.append("r: выкл захват")
-HELP.append("1: гайдлайны верхней камеры")
-HELP.append("2: гайдлайны нижней камеры")
-HELP.append("3: выкл гайдлайны")
+HELP.append("w/e/r: захват QR cv2/pyzbar/выкл")
+HELP.append("1/2/3: гайдлайны верх/нижн/выкл")
+HELP.append("l: датчики")
+HELP.append("x: автолиния")
+HELP.append("c: дорожные знаки")
 HELP.append("h: справка")
 HELP.append("esc: завершить работу")
 
@@ -197,12 +196,12 @@ def draw_help(image):
         return
     cv2.rectangle(
         image,
-        (x(0), y(40)),
-        (x(270), y(290)),
+        (x(0), y(10)),
+        (x(310), y(290)),
         color = const.GREEN,
         thickness = -1)
     for i in range(len(HELP)):
-        cv2.putText(image, HELP[i], (x(5), y(40+(i+1)*20)), const.FONT, 0.7, const.BLACK)
+        cv2.putText(image, HELP[i], (x(5), y(10+(i+1)*20)), const.FONT, 0.7, const.BLACK)
 
 def draw_scale(image):
     now = datetime.now()
