@@ -11,6 +11,14 @@ class AutoLine(object):
         if self.enabled:
             print("Езда по линии включена")
         else:
+            try:
+                cv2.destroyWindow('tresh')
+                # cv2.destroyWindow('gray')
+                # cv2.destroyWindow('blur')
+                # cv2.destroyWindow('warp')
+                # cv2.destroyWindow('tresh1')
+            except:
+                pass
             print("Езда по линии выключена")
 
     def warpImg(self, img, points, w, h):

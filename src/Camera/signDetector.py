@@ -44,8 +44,11 @@ class SignDetector(object):
         self.sampleStop = self.readSample('stop', self.RED_COLOR)
         # self.sampleAmox = self.readSample('amox', self.PURPLE_COLOR)
 
-    def switch(self):
-        self.enabled = not self.enabled
+    def switch(self, enabled = None):
+        if enabled == None:
+            self.enabled = not self.enabled
+        else:
+            self.enabled = enabled
         if self.enabled:
             print("Распознавание знаков включено")
         else:
@@ -57,7 +60,8 @@ class SignDetector(object):
             if isSample:
                 img = cv2.inRange(img, (103-20,50,50), (103+20,255,255))
             else:
-                img = cv2.inRange(img, (105,50,50), (116,240,240))
+                # img = cv2.inRange(img, (105,50,50), (116,240,240)) # робот
+                img = cv2.inRange(img, (63,182,116), (143,255,196)) # ноут Г
         elif color == self.RED_COLOR:
             # hsv=(3,218,188) # bgr=(28,42,188)
             if isSample:
@@ -102,7 +106,7 @@ class SignDetector(object):
 
         conts = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         conts = conts[0] # контуры хранятся под индексом 0
-        finalRes = []
+        result = []
         if conts:
             cont = max(conts, key=cv2.contourArea) # самый длинный и интересный
             # conts = sorted(conts, key=cv2.contourArea, reverse=True)
@@ -116,7 +120,7 @@ class SignDetector(object):
                 sign = mask[y:y+h, x:x+w]
                 sign = cv2.resize(sign, (64,64))
 
-                res = []
+                detectedItems = []
                 for sample in samples:
                     sum = 0
                     for i in range(64):
@@ -125,20 +129,20 @@ class SignDetector(object):
                                 sum += 1
                     accuracy = sum*100//4096
                     if accuracy >= self.MIN_ACCURACY:
-                        res.append(Recognized(sample.name, accuracy, cont, (x,y,w,h)))
-                if res:
-                    finalRes.append(max(res, key=lambda x: x.accuracy))
-        return finalRes
+                        detectedItems.append(Recognized(sample.name, accuracy, cont, (x,y,w,h)))
+                if detectedItems:
+                    result.append(max(detectedItems, key=lambda x: x.accuracy))
+        return result
 
     def feed(self, img):
+        detected = []
         if not self.enabled:
-            return img
+            return img, detected
         
         imgForAnalyze = img.copy()
         imgForAnalyze = cv2.cvtColor(imgForAnalyze, cv2.COLOR_BGR2HSV)
         imgForAnalyze = cv2.GaussianBlur(imgForAnalyze, (19, 19), 0)
 
-        detected = []
         detected.extend(self.detect(imgForAnalyze, self.BLUE_COLOR, [self.sampleLeft, self.sampleRight]))
         detected.extend(self.detect(imgForAnalyze, self.RED_COLOR, [self.sampleStop]))
         # detected.extend(detect(imgForAnalyze, PURPLE_COLOR, [sampleAmox]))
@@ -150,4 +154,4 @@ class SignDetector(object):
             title = item.name + ' ' + str(item.accuracy) + '%'
             cv2.putText(img, title, (x,y-10), const.FONT, fontScale=1, color=const.BLUE)
             # print(title)
-        return img
+        return img, detected

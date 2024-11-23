@@ -13,6 +13,7 @@ import const
 from control import RemoteControl
 from autoLine import AutoLine
 from signDetector import SignDetector
+from roadTraffic import RoadTraffic
 
 CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 QR_OFF = ""
@@ -23,6 +24,7 @@ EMPTY_STR = ""
 remCtrl = RemoteControl()
 autoLine = AutoLine()
 signDetector = SignDetector()
+roadTraffic = RoadTraffic(signDetector, remCtrl)
 
 def beep():
     frequency = 2500
@@ -288,8 +290,12 @@ if __name__ == "__main__":
 
         if readed:
             qrDecode(frame)
-            autoLine.feed(frame, remCtrl)
-            frame = signDetector.feed(frame)
+            if roadTraffic.enabled:
+                frame, _ = roadTraffic.feed(frame)
+            elif signDetector.enabled:
+                frame, _ = signDetector.feed(frame)
+            elif autoLine.enabled:
+                autoLine.feed(frame, remCtrl)
             
             # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
@@ -349,6 +355,8 @@ if __name__ == "__main__":
             autoLine.switch()
         elif key == ord("c"):
             signDetector.switch()
+        elif key == ord("v"):
+            roadTraffic.switch()
         elif key != -1:
             print("Нажата клавиша с кодом " + str(key) + ", действие не задано")
 
