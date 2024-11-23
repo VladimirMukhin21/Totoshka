@@ -13,19 +13,20 @@
 #include "ProgTakeTin.h"
 #include "ProgRotatePipe.h"
 #include "ProgHillWithPipes.h"
+#include "ProgHillWithPipesAutoTin.h"
 #include "ProgTruncatedPyramid.h"
 #include "ProgHoof.h"
 #include "ProgCorridor.h"
 
 #define L_EN_PIN 38
-#define L_INA_PIN 40 // 41
-#define L_INB_PIN 42 // 43
-#define L_PWM_PIN 5  // ШИМ
+#define L_INA_PIN 40  // 41
+#define L_INB_PIN 42  // 43
+#define L_PWM_PIN 5   // ШИМ
 
 #define R_EN_PIN 39
-#define R_INA_PIN 41 // 40
-#define R_INB_PIN 43 // 42
-#define R_PWM_PIN 4  // ШИМ
+#define R_INA_PIN 41  // 40
+#define R_INB_PIN 43  // 42
+#define R_PWM_PIN 4   // ШИМ
 
 // shoulder - elbow - rotate - claw
 #define HAND_SHOULDER_PIN 11
@@ -55,9 +56,15 @@ ProgAutoLine progAutoLine;
 ProgTakeTin progTakeTin;
 ProgRotatePipe progRotatePipe;
 ProgHillWithPipes progHillWithPipes;
+ProgHillWithPipesAutoTin progHillWithPipesAutoTin;
 ProgTruncatedPyramid progTruncatedPyramid;
 ProgHoof progHoof;
 ProgCorridor progCorridor;
+
+const byte _shoulderRotatePipeMiddlePlastPos = 100;
+const byte _elbowRotatePipeMiddlePlastPos = 76;
+const byte _shoulderRotatePipeNeftPos = 120;
+const byte _elbowRotatePipeNeftPos = 96;
 
 unsigned long lastRadioTime = millis();
 
@@ -90,6 +97,7 @@ void setup() {
   progTakeTin.init(truck, hand, distMeter);
   progRotatePipe.init(hand);
   progHillWithPipes.init(truck, tail);
+  progHillWithPipesAutoTin.init(truck, tail, hand, distMeter);
   progTruncatedPyramid.init(truck);
   progHoof.init(truck);
   progCorridor.init(truck, distMeter);
@@ -252,39 +260,46 @@ void loop() {
   }
 
   if (payload.frontWhiteButton) {
-    if (payload.key == 0xA1) {  // СВОБОДНО
+    if (payload.key == 0xA1) {  // Коридор налево
+      progCorridor.start(ProgCorridor::TURN_LEFT);
+      return;
     }
-    else if (payload.key == 0xB1) {  // СВОБОДНО
+    else if (payload.key == 0xB1) {  // Коридор направо
+      progCorridor.start(ProgCorridor::TURN_RIGHT);
+      return;
     }
     else if (payload.key == 0xC1) {  // СВОБОДНО
     }
     else if (payload.key == 0xD1) {  // СВОБОДНО
     }
-    else if (payload.key == 0xA2) {  // Коридор налево
-      progCorridor.start(ProgCorridor::TURN_LEFT);
-      return;
+    else if (payload.key == 0xA2) {  // Рука на вращение вентилей нефти
+      hand.handToPos(_shoulderRotatePipeNeftPos, _elbowRotatePipeNeftPos);
     }
-    else if (payload.key == 0xB2) {  // Коридор направо
-      progCorridor.start(ProgCorridor::TURN_RIGHT);
-      return;
-    }
-    else if (payload.key == 0xC2) {  // СВОБОДНО
-    }
-    else if (payload.key == 0xD2) {  // СВОБОДНО
-    }
-    else if (payload.key == 0xA3) {  // Рука на вращение трубок
-      hand.handToRotatePipe();
-    }
-    else if (payload.key == 0xB3) {  // Провалы налево
+    else if (payload.key == 0xB2) {  // Провалы налево
       progTruncatedPyramid.start(-90);
       return;
     }
-    else if (payload.key == 0xC3) {  // Провалы прямо
+    else if (payload.key == 0xC2) {  // Провалы прямо
       progTruncatedPyramid.start(0);
       return;
     }
-    else if (payload.key == 0xD3) {  // Провалы направо
+    else if (payload.key == 0xD2) {  // Провалы направо
       progTruncatedPyramid.start(90);
+      return;
+    }
+    else if (payload.key == 0xA3) {  // Рука на вращение среднего слоя 6-ти гранных трубок
+      hand.handToPos(_shoulderRotatePipeMiddlePlastPos, _elbowRotatePipeMiddlePlastPos);
+    }
+    else if (payload.key == 0xB3) {  // Горка с трубами с захватом маяка налево
+      progHillWithPipesAutoTin.start(-90);
+      return;
+    }
+    else if (payload.key == 0xC3) {  // Горка с трубами с захватом маяка прямо
+      progHillWithPipesAutoTin.start(0);
+      return;
+    }
+    else if (payload.key == 0xD3) {  // Горка с трубами с захватом маяка направо
+      progHillWithPipesAutoTin.start(90);
       return;
     }
     else if (payload.key == 0xA4) {  // Копыто налево
@@ -312,6 +327,7 @@ bool isAnyProgRunning() {
          || progTakeTin.isRunning()
          || progRotatePipe.isRunning()
          || progHillWithPipes.isRunning()
+         || progHillWithPipesAutoTin.isRunning()
          || progTruncatedPyramid.isRunning()
          || progHoof.isRunning()
          || progCorridor.isRunning();
@@ -328,6 +344,7 @@ void stopAll() {
   progTakeTin.stop();
   progRotatePipe.stop();
   progHillWithPipes.stop();
+  progHillWithPipesAutoTin.stop();
   progTruncatedPyramid.stop();
   progHoof.stop();
   progCorridor.stop();
@@ -345,6 +362,7 @@ void tickAll() {
   progTakeTin.tick();
   progRotatePipe.tick();
   progHillWithPipes.tick();
+  progHillWithPipesAutoTin.tick();
   progTruncatedPyramid.tick();
   progHoof.tick();
   progCorridor.tick();

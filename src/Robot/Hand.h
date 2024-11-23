@@ -11,7 +11,6 @@ public:
   void handToUp();
   void tinUp();
   void handToRideTheLine();
-  void handToRotatePipe();
   void handToTakeTin();
   void takeTin();
   void clenchPipe();
@@ -19,8 +18,8 @@ public:
   void rotateToCenter();
   void rotate(int pos);
   void claw(int pos);
-  void handToPos(int _shoulderPos = -1, int _elbowPos = -1, int _rotatePos = -1, int _clawPos = -1,
-                 byte _shoulderSpeed = 6, byte _elbowSpeed = 6, byte _rotateSpeed = 5, byte _clawSpeed = 4);
+  void handToPos(int shoulderPos = -1, int elbowPos = -1, int rotatePos = -1, int clawPos = -1,
+                 byte shoulderSpeed = 6, byte elbowSpeed = 6, byte rotateSpeed = 5, byte clawSpeed = 4);
   void stop();
   void tick();
   bool isRunning();
@@ -61,9 +60,6 @@ private:
   const byte _elbowRideTheLinePos = 0;
   const byte _rotateRideTheLinePos = 3;
   const byte _clawRideTheLinePos = 58;
-
-  const byte _shoulderRotatePipePos = 100;
-  const byte _elbowRotatePipePos = 76;
 
   const byte _shoulderAngleTakeTinFromHighPos = 60;
   const byte _elbowAngleTakeTinFromHighPos = 90;
@@ -196,11 +192,6 @@ void Hand::handToRideTheLine() {
   // TO_RIDE_LINE
 }
 
-void Hand::handToRotatePipe() {
-  handToPos(_shoulderRotatePipePos, _elbowRotatePipePos, _rotateCenterPos, _clawOpenPos);
-  // TO_ROTATE_PIPE
-}
-
 void Hand::handToTakeTin() {
   handToPos(-1, -1, _rotateCenterPos, _clawOpenPos);
   // handToPos(_shoulderToTakeTinPos, _elbowToTakeTinPos, _rotateCenterPos, _clawOpenPos); опускание руки пока убрали,
@@ -233,17 +224,17 @@ void Hand::claw(int pos) {
   _mode = CLAW;
 }
 
-void Hand::handToPos(int _shoulderPos = -1, int _elbowPos = -1, int _rotatePos = -1, int _clawPos = -1,
-                     byte _shoulderSpeed = 6, byte _elbowSpeed = 6, byte _rotateSpeed = 5, byte _clawSpeed = 4) {
-  _targetShoulderPos = _shoulderPos;
-  _targetElbowPos = _elbowPos;
-  _targetRotatePos = _rotatePos;
-  _targetClawPos = _clawPos;
+void Hand::handToPos(int shoulderPos = -1, int elbowPos = -1, int rotatePos = -1, int clawPos = -1,
+                     byte shoulderSpeed = 6, byte elbowSpeed = 6, byte rotateSpeed = 5, byte clawSpeed = 4) {
+  _targetShoulderPos = shoulderPos;
+  _targetElbowPos = elbowPos;
+  _targetRotatePos = rotatePos;
+  _targetClawPos = clawPos;
 
-  _shoulderSpeedInPoints = _shoulderSpeed;
-  _elbowSpeedInPoints = _elbowSpeed;
-  _rotateSpeedInPoints = _rotateSpeed;
-  _clawSpeedInPoints = _clawSpeed;
+  _shoulderSpeedInPoints = shoulderSpeed;
+  _elbowSpeedInPoints = elbowSpeed;
+  _rotateSpeedInPoints = rotateSpeed;
+  _clawSpeedInPoints = clawSpeed;
 
   _mode = HAND_TO_POS;
 }
