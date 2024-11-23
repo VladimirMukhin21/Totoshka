@@ -61,11 +61,6 @@ ProgTruncatedPyramid progTruncatedPyramid;
 ProgHoof progHoof;
 ProgCorridor progCorridor;
 
-const byte _shoulderRotatePipeMiddlePlastPos = 100;
-const byte _elbowRotatePipeMiddlePlastPos = 76;
-const byte _shoulderRotatePipeNeftPos = 120;
-const byte _elbowRotatePipeNeftPos = 96;
-
 unsigned long lastRadioTime = millis();
 
 unsigned long changeLedTime = millis();
@@ -273,7 +268,7 @@ void loop() {
     else if (payload.key == 0xD1) {  // СВОБОДНО
     }
     else if (payload.key == 0xA2) {  // Рука на вращение вентилей нефти
-      hand.handToPos(_shoulderRotatePipeNeftPos, _elbowRotatePipeNeftPos);
+      hand.handToOil();
     }
     else if (payload.key == 0xB2) {  // Провалы налево
       progTruncatedPyramid.start(-90);
@@ -288,7 +283,7 @@ void loop() {
       return;
     }
     else if (payload.key == 0xA3) {  // Рука на вращение среднего слоя 6-ти гранных трубок
-      hand.handToPos(_shoulderRotatePipeMiddlePlastPos, _elbowRotatePipeMiddlePlastPos);
+      hand.handToRotatePipe();
     }
     else if (payload.key == 0xB3) {  // Горка с трубами с захватом маяка налево
       progHillWithPipesAutoTin.start(-90);

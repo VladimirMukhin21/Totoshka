@@ -11,6 +11,8 @@ public:
   void handToUp();
   void tinUp();
   void handToRideTheLine();
+  void handToRotatePipe();
+  void handToOil();
   void handToTakeTin();
   void takeTin();
   void clenchPipe();
@@ -60,6 +62,11 @@ private:
   const byte _elbowRideTheLinePos = 0;
   const byte _rotateRideTheLinePos = 3;
   const byte _clawRideTheLinePos = 58;
+
+  const byte _shoulderToRotatePipe = 100;
+  const byte _elbowToRotatePipe = 76;
+  const byte _shoulderToOil = 120;  // надо подобрать
+  const byte _elbowToOil = 96;      // надо подобрать
 
   const byte _shoulderAngleTakeTinFromHighPos = 60;
   const byte _elbowAngleTakeTinFromHighPos = 90;
@@ -190,6 +197,14 @@ void Hand::tinUp() {
 void Hand::handToRideTheLine() {
   handToPos(_shoulderRideTheLinePos, _elbowRideTheLinePos, _rotateRideTheLinePos, _clawRideTheLinePos, 5, 7, 5, 3);
   // TO_RIDE_LINE
+}
+
+void Hand::handToRotatePipe() {
+  handToPos(_shoulderToRotatePipe, _elbowToRotatePipe, _rotateCenterPos, _clawOpenRotatePipePos);
+}
+
+void Hand::handToOil() {
+  handToPos(_shoulderToOil, _elbowToOil, _rotateCenterPos, _clawOpenPos);
 }
 
 void Hand::handToTakeTin() {
