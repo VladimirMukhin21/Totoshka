@@ -4,22 +4,35 @@ from datetime import datetime
 
 class AutoLine(object):
     lastDetectTime = datetime.now()
-    enabled = False
+    previewEnabled = False
+    driveEnabled = False
 
-    def switch(self):
-        self.enabled = not self.enabled
-        if self.enabled:
+    def switchPreview(self):
+        self.previewEnabled = not self.previewEnabled
+        if self.previewEnabled:
+            print("Просмотр линии включен")
+        else:
+            self.destroyWindows()
+            print("Просмотр линии выключен")
+
+    def switchDrive(self):
+        self.driveEnabled = not self.driveEnabled
+        if self.driveEnabled:
             print("Езда по линии включена")
         else:
+            self.previewEnabled = False
+            self.destroyWindows()
+            print("Езда по линии выключена")
+
+    def destroyWindows(self):
             try:
-                cv2.destroyWindow('tresh')
+                cv2.destroyWindow('lineMask')
                 # cv2.destroyWindow('gray')
                 # cv2.destroyWindow('blur')
                 # cv2.destroyWindow('warp')
                 # cv2.destroyWindow('tresh1')
             except:
                 pass
-            print("Езда по линии выключена")
 
     def warpImg(self, img, points, w, h):
         pts1 = np.float32(points)
@@ -39,7 +52,7 @@ class AutoLine(object):
         return basePoint
 
     def feed(self, img, remCtrl):
-        if not self.enabled:
+        if (not self.previewEnabled) and (not self.driveEnabled):
             return
         
         now = datetime.now()
@@ -76,8 +89,16 @@ class AutoLine(object):
             basePoint = self.getHist(img)
             img = cv2.rectangle(img, (0,0), (w,10), (0,0,0), cv2.FILLED)
             img = cv2.line(img, (basePoint, 2), (basePoint, 8), (255,255,255), 2)
-            cv2.imshow('tresh', img)
+            if self.previewEnabled:
+                cv2.imshow('lineMask', img)
             print(basePoint)
+            # basePoint - w//2 = 0 # целевое значение
             turn = int(np.interp(basePoint, [0,w], [0,255]))
+            # turn = int(np.interp(basePoint, [0,w], [-127,127]))
+            # turn = turn * 1.3
+            # turn = max(turn, -127)
+            # turn = min(turn, 127)
+            # turn = int(np.interp(turn, [-127,127], [0,255]))
             # print(turn)
-            remCtrl.sendDriveCommand(157, turn)
+            if self.driveEnabled:
+                remCtrl.sendDriveCommand(157, turn)

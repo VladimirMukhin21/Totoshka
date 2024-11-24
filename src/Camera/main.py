@@ -182,14 +182,16 @@ def record(image):
 
 HELP = []
 HELP.append("shift-1/2/3: выбор камеры")
-HELP.append("shift-8: таймер")
 HELP.append("shift-0: запись в файл")
 HELP.append("q: захваченные QR-коды")
 HELP.append("w/e/r: захват QR cv2/pyzbar/выкл")
 HELP.append("1/2/3: гайдлайны верх/нижн/выкл")
 HELP.append("l: датчики")
-HELP.append("x: автолиния")
-HELP.append("c: дорожные знаки")
+HELP.append("a: просмотр линии")
+HELP.append("s: автолиния")
+HELP.append("d: дорожные знаки")
+HELP.append("*: таймер")
+HELP.append("p: пауза таймера")
 HELP.append("h: справка")
 HELP.append("esc: завершить работу")
 
@@ -232,7 +234,7 @@ def clock(image):
     global timeLeft
     pre = int(datetime.now().strftime("%M%S"))
     
-    if timeLeft > 0 and pause == False:
+    if timeLeft > 0 and timerPause == False:
         if pre != now:
             timeLeft -= 1
             now = pre
@@ -260,7 +262,7 @@ scaleChangedTime = datetime.now()
 recording = False
 showHelp = False
 showClock = False
-pause = False
+timerPause = False
 cv2Decoder = cv2.QRCodeDetector()
 qrMode = QR_OFF
 qrDecodeTime = datetime.now()
@@ -290,12 +292,11 @@ if __name__ == "__main__":
 
         if readed:
             qrDecode(frame)
+            autoLine.feed(frame, remCtrl)
             if roadTraffic.enabled:
                 frame, _ = roadTraffic.feed(frame)
             elif signDetector.enabled:
                 frame, _ = signDetector.feed(frame)
-            elif autoLine.enabled:
-                autoLine.feed(frame, remCtrl)
             
             # cv2.putText(frame, "Тотошка", (x(5),y(20)), font, 1, color=(0,255,0), thickness=1, lineType=cv2.LINE_AA)
             draw_guides(frame)
@@ -336,7 +337,7 @@ if __name__ == "__main__":
             showClock = not showClock
             timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
         elif key == ord("p"):
-            pause = not pause
+            timerPause = not timerPause
         elif key == 41: # shift-0
             switch_record()
             showClock = not showClock
@@ -351,12 +352,14 @@ if __name__ == "__main__":
             connect_camera(3)
         elif key == 27: # Esc => exit
             break
-        elif key == ord("x"):
-            autoLine.switch()
-        elif key == ord("c"):
+        elif key == ord("a"):
+            autoLine.switchPreview()
+        elif key == ord("s"):
+            autoLine.switchDrive()
+        elif key == ord("d"):
             signDetector.switch()
-        elif key == ord("v"):
-            roadTraffic.switch()
+        # elif key == ord("f"):
+        #     roadTraffic.switch()
         elif key != -1:
             print("Нажата клавиша с кодом " + str(key) + ", действие не задано")
 
