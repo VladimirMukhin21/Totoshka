@@ -10,6 +10,7 @@ import time
 from threading import Thread
 import winsound
 import const
+from enabledModes import EnabledModes
 from control import RemoteControl
 from autoLine import AutoLine
 from signDetector import SignDetector
@@ -17,10 +18,11 @@ from roadTraffic import RoadTraffic
 
 CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
 QR_OFF = ""
-QR_CV2 = "C"
-QR_PYZBAR = "P"
+QR_CV2 = "qrcv"
+QR_PYZBAR = "qrpy"
 EMPTY_STR = ""
 
+enabledModes = EnabledModes()
 remCtrl = RemoteControl()
 autoLine = AutoLine()
 signDetector = SignDetector()
@@ -39,7 +41,6 @@ def qrDecode(image):
         pyzbarDecode(image)
     else:
         return
-    cv2.putText(image, qrMode, (x(375), y(12)), const.FONT, 0.5, color=const.RED)
 
 def pyzbarDecode(image):
     global qrDecodeTime
@@ -104,28 +105,23 @@ def cv2Decode(image):
     y = int(min(cv2_box[0][1], cv2_box[1][1], cv2_box[2][1], cv2_box[3][1]))
     cv2.putText(image, qr, (x, y-10), const.FONT, 1, const.RED)
 
-def x(x):
-    return int(width*x/400)
-def y(y):
-    return int(height*y/300)
-
 def draw_guides(image):
     thickness=1
     if guideMode == 1:
-        cv2.line(image, (x(190), y(280)), (x(190), y(20)), const.BLUE, thickness) # центр
-        cv2.line(image, (x(131), y(170)), (x(154), y(120)), const.GREEN, thickness) # лев
-        cv2.line(image, (x(249), y(170)), (x(227), y(120)), const.GREEN, thickness) # прав
-        cv2.line(image, (x(100), y(170)), (x(280), y(170)), const.GREEN, thickness) # горизонт
+        cv2.line(image, (const.x(190), const.y(280)), (const.x(190), const.y(20)), const.BLUE, thickness) # центр
+        cv2.line(image, (const.x(131), const.y(170)), (const.x(154), const.y(120)), const.GREEN, thickness) # лев
+        cv2.line(image, (const.x(249), const.y(170)), (const.x(227), const.y(120)), const.GREEN, thickness) # прав
+        cv2.line(image, (const.x(100), const.y(170)), (const.x(280), const.y(170)), const.GREEN, thickness) # горизонт
     elif guideMode == 2:
-        cv2.line(image, (x(247), y(300)), (x(227), y(240)), const.GREEN, thickness) # центр
-        cv2.line(image, (x(112), y(300)), (x(150), y(230)), const.GREEN, thickness) # лев
-        cv2.line(image, (x(386), y(300)), (x(300), y(230)), const.GREEN, thickness) # прав
-        cv2.line(image, (x(142), y(297)), (x(351), y(264)), const.BLUE, thickness) # горизонт
+        cv2.line(image, (const.x(247), const.y(300)), (const.x(227), const.y(240)), const.GREEN, thickness) # центр
+        cv2.line(image, (const.x(112), const.y(300)), (const.x(150), const.y(230)), const.GREEN, thickness) # лев
+        cv2.line(image, (const.x(386), const.y(300)), (const.x(300), const.y(230)), const.GREEN, thickness) # прав
+        cv2.line(image, (const.x(142), const.y(297)), (const.x(351), const.y(264)), const.BLUE, thickness) # горизонт
     elif guideMode == 5:
         for i in range(0, 400, 100):
-            cv2.line(image, (x(i), y(0)), (x(i), y(300)), const.GREEN, thickness)
+            cv2.line(image, (const.x(i), const.y(0)), (const.x(i), const.y(300)), const.GREEN, thickness)
         for i in range(0, 300, 100):
-            cv2.line(image, (x(0), y(i)), (x(400), y(i)), const.GREEN, thickness)
+            cv2.line(image, (const.x(0), const.y(i)), (const.x(400), const.y(i)), const.GREEN, thickness)
 
 def draw_captured_qrs(image):
     if not showCapturedQrs:
@@ -135,11 +131,11 @@ def draw_captured_qrs(image):
     size = 0.7
     index = 0
     step = 15
-    cv2.putText(image, "QR-коды:", (x(5), y((index+1)*step)), const.FONT, size, const.GREEN)
+    cv2.putText(image, "QR-коды:", (const.x(5), const.y((index+1)*step)), const.FONT, size, const.GREEN)
     for qr in capturedQrs:
         index += 1
         text = str.format("{0}. {1}", index, qr)
-        cv2.putText(image, text, (x(5), y((index+1)*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, text, (const.x(5), const.y((index+1)*step)), const.FONT, size, const.GREEN)
 
 def draw_telemetry(image):
     readed, dist, clrl, clrr = remCtrl.readTelemetry()
@@ -147,13 +143,13 @@ def draw_telemetry(image):
         size = 0.6
         firstStr = 100
         step = 15
-        cv2.putText(image, "Датчики:", (x(333), y(firstStr)), const.FONT, size, const.GREEN)
-        cv2.putText(image, "dist", (x(330), y(firstStr+step)), const.FONT, size, const.GREEN)
-        cv2.putText(image, str(dist), (x(365), y(firstStr+step)), const.FONT, size, const.GREEN)
-        cv2.putText(image, "clrl", (x(330), y(firstStr+2*step)), const.FONT, size, const.GREEN)
-        cv2.putText(image, str(clrl), (x(365), y(firstStr+2*step)), const.FONT, size, const.GREEN)
-        cv2.putText(image, "clrr", (x(330), y(firstStr+3*step)), const.FONT, size, const.GREEN)
-        cv2.putText(image, str(clrr), (x(365), y(firstStr+3*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, "Датчики:", (const.x(333), const.y(firstStr)), const.FONT, size, const.GREEN)
+        cv2.putText(image, "dist", (const.x(330), const.y(firstStr+step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, str(dist), (const.x(365), const.y(firstStr+step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, "clrl", (const.x(330), const.y(firstStr+2*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, str(clrl), (const.x(365), const.y(firstStr+2*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, "clrr", (const.x(330), const.y(firstStr+3*step)), const.FONT, size, const.GREEN)
+        cv2.putText(image, str(clrr), (const.x(365), const.y(firstStr+3*step)), const.FONT, size, const.GREEN)
 
 def connect_camera(num):
     print("Подключение камеры " + str(num) + "...")
@@ -165,20 +161,27 @@ def connect_camera(num):
 def switch_record():
     global file
     global recording
+    global timeLeft
+    global showClock
+    global timerPause
     recording = not recording
     if recording:
+        timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
+        showClock = True
+        timerPause = False
         name = datetime.now().strftime("%Y%m%d_%H%M%S") + ".avi"
         codec = cv2.VideoWriter_fourcc(*'DIVX')
         # codec = cv2.VideoWriter_fourcc(*'XVID')
         # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
-        file = cv2.VideoWriter(name, codec, 25, (width, height))
+        file = cv2.VideoWriter(name, codec, 25, (const.width, const.height))
     else:
+        timerPause = True
         file.release()
 
 def record(image):
     if recording:
         file.write(image)
-        cv2.circle(image, (x(390), y(10)), radius=3, color=const.RED, thickness=-1)
+        cv2.circle(image, (const.x(390), const.y(10)), radius=3, color=const.RED, thickness=-1)
 
 HELP = []
 HELP.append("shift-1/2/3: выбор камеры")
@@ -200,12 +203,12 @@ def draw_help(image):
         return
     cv2.rectangle(
         image,
-        (x(0), y(10)),
-        (x(310), y(290)),
+        (const.x(0), const.y(10)),
+        (const.x(310), const.y(290)),
         color = const.GREEN,
         thickness = -1)
     for i in range(len(HELP)):
-        cv2.putText(image, HELP[i], (x(5), y(10+(i+1)*20)), const.FONT, 0.7, const.BLACK)
+        cv2.putText(image, HELP[i], (const.x(5), const.y(10+(i+1)*20)), const.FONT, 0.7, const.BLACK)
 
 def draw_scale(image):
     now = datetime.now()
@@ -213,7 +216,7 @@ def draw_scale(image):
     if (delta.total_seconds() > 1):
         return
     msg = str(scale) + "%"
-    cv2.putText(image, msg, (x(180), y(140)), const.FONT, 1, const.GREEN)
+    cv2.putText(image, msg, (const.x(180), const.y(140)), const.FONT, 1, const.GREEN)
 
 def change_scale(delta):
     global scale
@@ -222,7 +225,7 @@ def change_scale(delta):
     scale += delta
     scale = max(scale, 30)  # ограничение минимального масштаба
     scale = min(scale, 200) # ограничение максимального масштаба
-    size = (int(width*scale/100), int(height*scale/100))
+    size = (int(const.width*scale/100), int(const.height*scale/100))
     scaleChangedTime = datetime.now()
     print("scale:", scale, "%,  image size:", size[0], "x", size[1])
 
@@ -253,7 +256,7 @@ def clock(image):
         sec = str(0) + str(sec)
 
     timerMinSec = str(min) + ":" + str(sec)
-    cv2.putText(image, timerMinSec, (x(367), y(35)), const.FONT, 0.5, color)
+    cv2.putText(image, timerMinSec, (const.x(367), const.y(27)), const.FONT, 0.5, color)
 
 capturedQrs = set()
 guideMode = 1  # 0
@@ -280,10 +283,10 @@ if __name__ == "__main__":
 
     remCtrl.connect()
 
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    const.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    const.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     scale = 130
-    size = (width, height)
+    size = (const.width, const.height)
     change_scale(0)
     # print(width, "x", height)
 
@@ -305,6 +308,7 @@ if __name__ == "__main__":
             draw_help(frame)
             draw_scale(frame)
             clock(frame)
+            enabledModes.show(frame)
             record(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
             cv2.imshow("TOTOSHKA", frame)
@@ -323,12 +327,17 @@ if __name__ == "__main__":
         elif key == ord("q"):
             showCapturedQrs = not showCapturedQrs
         elif key == ord("w"):
+            enabledModes.switch(qrMode, False)
             qrMode = QR_CV2
+            enabledModes.switch(qrMode, True)
             qr = EMPTY_STR
         elif key == ord("e"):
+            enabledModes.switch(qrMode, False)
             qrMode = QR_PYZBAR
+            enabledModes.switch(qrMode, True)
             qr = EMPTY_STR
         elif key == ord("r"):
+            enabledModes.switch(qrMode, False)
             qrMode = QR_OFF
             qr = EMPTY_STR
         elif key == ord("l"):
@@ -340,8 +349,6 @@ if __name__ == "__main__":
             timerPause = not timerPause
         elif key == 41: # shift-0
             switch_record()
-            showClock = not showClock
-            timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
         elif key == ord("h"):
             showHelp = not showHelp
         elif key == ord("!"): # shift-1
@@ -355,8 +362,10 @@ if __name__ == "__main__":
         elif key == ord("a"):
             autoLine.switchPreview()
         elif key == ord("s"):
+            enabledModes.switch('line')
             autoLine.switchDrive()
         elif key == ord("d"):
+            enabledModes.switch('sign')
             signDetector.switch()
         # elif key == ord("f"):
         #     roadTraffic.switch()
