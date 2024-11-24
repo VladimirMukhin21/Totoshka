@@ -11,6 +11,7 @@ from threading import Thread
 import winsound
 import const
 from enabledModes import EnabledModes
+from timer import Timer
 from control import RemoteControl
 from autoLine import AutoLine
 from signDetector import SignDetector
@@ -23,6 +24,7 @@ QR_PYZBAR = "qrpy"
 EMPTY_STR = ""
 
 enabledModes = EnabledModes()
+timer = Timer()
 remCtrl = RemoteControl()
 autoLine = AutoLine()
 signDetector = SignDetector()
@@ -161,21 +163,17 @@ def connect_camera(num):
 def switch_record():
     global file
     global recording
-    global timeLeft
-    global showClock
-    global timerPause
+    global timer
     recording = not recording
     if recording:
-        timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
-        showClock = True
-        timerPause = False
+        timer.start()
         name = datetime.now().strftime("%Y%m%d_%H%M%S") + ".avi"
         codec = cv2.VideoWriter_fourcc(*'DIVX')
         # codec = cv2.VideoWriter_fourcc(*'XVID')
         # codec = cv2.VideoWriter_fourcc(*'MJPG') # файл больше раза в 2
         file = cv2.VideoWriter(name, codec, 25, (const.width, const.height))
     else:
-        timerPause = True
+        timer.switchPause(True)
         file.release()
 
 def record(image):
@@ -229,43 +227,12 @@ def change_scale(delta):
     scaleChangedTime = datetime.now()
     print("scale:", scale, "%,  image size:", size[0], "x", size[1])
 
-def clock(image):
-    if not showClock:
-        return
-    
-    global now
-    global timeLeft
-    pre = int(datetime.now().strftime("%M%S"))
-    
-    if timeLeft > 0 and timerPause == False:
-        if pre != now:
-            timeLeft -= 1
-            now = pre
-    min = timeLeft // 60
-    sec = timeLeft % 60
-
-    if min < 1:
-        color = const.RED
-    elif min < 5:
-        color = const.YELLOW
-    else:
-        color = const.GREEN
-    if min <= 9:
-        min = str(0) + str(min)
-    if sec <= 9:
-        sec = str(0) + str(sec)
-
-    timerMinSec = str(min) + ":" + str(sec)
-    cv2.putText(image, timerMinSec, (const.x(367), const.y(27)), const.FONT, 0.5, color)
-
 capturedQrs = set()
 guideMode = 1  # 0
 showCapturedQrs = True
 scaleChangedTime = datetime.now()
 recording = False
 showHelp = False
-showClock = False
-timerPause = False
 cv2Decoder = cv2.QRCodeDetector()
 qrMode = QR_OFF
 qrDecodeTime = datetime.now()
@@ -307,7 +274,7 @@ if __name__ == "__main__":
             draw_telemetry(frame)
             draw_help(frame)
             draw_scale(frame)
-            clock(frame)
+            timer.draw(frame)
             enabledModes.show(frame)
             record(frame)
             frame = cv2.resize(frame, size, interpolation=cv2.INTER_LINEAR)
@@ -343,10 +310,12 @@ if __name__ == "__main__":
         elif key == ord("l"):
             remCtrl.telemetrySwitch()
         elif key == 42: # shift-8
-            showClock = not showClock
-            timeLeft = 601  # 600sec = 10min, пишем время в секундах +1
+            if timer.enabled:
+                timer.hide()
+            else:
+                timer.start()
         elif key == ord("p"):
-            timerPause = not timerPause
+            timer.switchPause()
         elif key == 41: # shift-0
             switch_record()
         elif key == ord("h"):
