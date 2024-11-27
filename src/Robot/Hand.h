@@ -55,7 +55,7 @@ private:
 
   const byte _clawOpenPos = 110;            // разжатие руки при захвате маяка
   const byte _clawOpenRotatePipePos = 105;  // разжатие руки при вращении трубок
-  const byte _clawTakeTinPos = 77;          // сжатие руки при захвате маяка
+  const byte _clawTakeTinPos = 82;          // сжатие руки при захвате маяка
   const byte _clenchPipePos = 77;           // сжатие руки при вращении трубок
 
   const byte _shoulderRideTheLinePos = 115;
