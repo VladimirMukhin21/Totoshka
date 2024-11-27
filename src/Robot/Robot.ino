@@ -263,12 +263,13 @@ void loop() {
       progCorridor.start(ProgCorridor::TURN_RIGHT);
       return;
     }
-    else if (payload.key == 0xC1) {  // СВОБОДНО
+    else if (payload.key == 0xC1) {  // Рука на вращение нижних вентилей нефти
+      hand.handToLowOil();
     }
-    else if (payload.key == 0xD1) {  // СВОБОДНО
+    else if (payload.key == 0xD1) {  // Рука на вращение верхних вентилей нефти
+      hand.handToHighOil();
     }
-    else if (payload.key == 0xA2) {  // Рука на вращение вентилей нефти
-      hand.handToOil();
+    else if (payload.key == 0xA2) {  // СВОБОДНО
     }
     else if (payload.key == 0xB2) {  // Провалы налево
       progTruncatedPyramid.start(-90);
