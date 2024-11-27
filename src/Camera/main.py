@@ -17,7 +17,7 @@ from autoLine import AutoLine
 from signDetector import SignDetector
 from roadTraffic import RoadTraffic
 
-CAMERA_NUM = 0 #1 + cv2.CAP_FFMPEG # номер камеры
+CAMERA_NUM = 1 #1 + cv2.CAP_FFMPEG # номер камеры
 QR_OFF = ""
 QR_CV2 = "qrcv"
 QR_PYZBAR = "qrpy"
