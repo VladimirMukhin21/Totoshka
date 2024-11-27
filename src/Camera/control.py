@@ -7,7 +7,7 @@ import serial
 from datetime import datetime
 
 class RemoteControl(object):
-    PORT = "COM4" # COM4   # 5 - левый, 3 - правый ближний, 6 - правый дальний
+    PORT = "COM3" # COM4   # 5 - левый, 3 - правый ближний, 6 - правый дальний
     BAUDRATE = 115200
     ser = serial.Serial()
     telemetryEnabled = False
