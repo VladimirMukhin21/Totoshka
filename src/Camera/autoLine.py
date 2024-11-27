@@ -84,7 +84,8 @@ class AutoLine(object):
 
             # сужаем область поиска линии - обрезаем изображение
             #img = img[200:440, 0:w]  # [y1:y2, x1:x2]
-            img = img[200:365, 10:w-10]  # [y1:y2, x1:x2]
+            # img = img[200:365, 10:w-10]  # [y1:y2, x1:x2]
+            img = img[200:365, 25:w-25]  # [y1:y2, x1:x2]
 
             basePoint = self.getHist(img)
             img = cv2.rectangle(img, (0,0), (w,10), (0,0,0), cv2.FILLED)
