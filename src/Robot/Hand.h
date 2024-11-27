@@ -12,7 +12,8 @@ public:
   void tinUp();
   void handToRideTheLine();
   void handToRotatePipe();
-  void handToOil();
+  void handToLowOil();
+  void handToHighOil();
   void handToTakeTin();
   void takeTin();
   void clenchPipe();
@@ -42,7 +43,7 @@ private:
 
   const byte _minStick = 0;
   const byte _maxStick = 255;
-  const byte _maxSpeed = 5;
+  const byte _maxSpeed = 7;
 
   //const byte _shoulderThr = 50;
   const byte _shoulderHandToBackPos = 30;
@@ -55,8 +56,8 @@ private:
 
   const byte _clawOpenPos = 110;            // разжатие руки при захвате маяка
   const byte _clawOpenRotatePipePos = 105;  // разжатие руки при вращении трубок
-  const byte _clawTakeTinPos = 82;          // сжатие руки при захвате маяка
-  const byte _clenchPipePos = 77;           // сжатие руки при вращении трубок
+  const byte _clawTakeTinPos = 80;          // сжатие руки при захвате маяка
+  const byte _clenchPipePos = 80;           // сжатие руки при вращении трубок
 
   const byte _shoulderRideTheLinePos = 115;
   const byte _elbowRideTheLinePos = 0;
@@ -64,9 +65,11 @@ private:
   const byte _clawRideTheLinePos = 58;
 
   const byte _shoulderToRotatePipe = 100;
-  const byte _elbowToRotatePipe = 76;
-  const byte _shoulderToOil = 120;  // надо подобрать
-  const byte _elbowToOil = 96;      // надо подобрать
+  const byte _elbowToRotatePipe = 72;
+  const byte _shoulderToLowOil = 150; // 148;
+  const byte _elbowToLowOil = 118; // 120;
+  const byte _shoulderToHighOil = 94; // 101
+  const byte _elbowToHighOil = 69; // 77
 
   const byte _shoulderAngleTakeTinFromHighPos = 60;
   const byte _elbowAngleTakeTinFromHighPos = 90;
@@ -203,8 +206,12 @@ void Hand::handToRotatePipe() {
   handToPos(_shoulderToRotatePipe, _elbowToRotatePipe, _rotateCenterPos, _clawOpenRotatePipePos);
 }
 
-void Hand::handToOil() {
-  handToPos(_shoulderToOil, _elbowToOil, _rotateCenterPos, _clawOpenPos);
+void Hand::handToLowOil() {
+  handToPos(_shoulderToLowOil, _elbowToLowOil, _rotateCenterPos, _clawOpenPos);
+}
+
+void Hand::handToHighOil() {
+  handToPos(_shoulderToHighOil, _elbowToHighOil, _rotateCenterPos, _clawOpenPos);
 }
 
 void Hand::handToTakeTin() {
@@ -273,7 +280,7 @@ void Hand::tick() {
   int clawPointsPre = _clawAngle.toPoints();
 
   if (_mode == ROTATE) {
-    _rotateAngle.addPoints(constrain(_targetRotatePos - _rotateAngle.toDeg(), -5, 5));
+    _rotateAngle.addPoints(constrain(_targetRotatePos - _rotateAngle.toDeg(), -7, 7));
     _rotate.write(_rotateAngle.toDeg());
   }
   else if (_mode == CLAW) {
