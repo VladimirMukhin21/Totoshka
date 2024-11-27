@@ -93,6 +93,7 @@ void ProgCorridor::tick() {
       // _distMeter->disable();
       _truck->stop(Motor::SMOOTH_OFF);
       _truck->turn(_turnMultiplier * 93);
+      _turnMultiplier *= -1;
       _phase = TURN_90;
     }
   }
@@ -107,6 +108,7 @@ void ProgCorridor::tick() {
         // _distMeter->disable();
         // _truck->turn(2 * _turnMultiplier * TURN_ANGLE);
         _truck->turn(_turnMultiplier * 201);
+      _turnMultiplier *= -1;
         _phase = TURN_180;
       }
       else {
