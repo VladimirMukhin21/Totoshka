@@ -38,7 +38,7 @@ private:
   DistMeter *_distMeter;
   Phase _phase = NONE;
 
-  unsigned long _tickTime = millis();
+  unsigned long _tickTime = millis();  // можно убрать (нигде не используется)
 };
 
 void ProgTakeTin::init(Truck &truck, Hand &hand, DistMeter &distMeter) {
@@ -73,6 +73,7 @@ void ProgTakeTin::tick() {
 
   if (_phase == START) {
     // программа стартует => опускаем руку в нач. положение
+    _distMeter->enable();
     _hand->handToTakeTin();
     _phase = INIT_HAND;
     //Serial.println("start");
@@ -82,7 +83,7 @@ void ProgTakeTin::tick() {
     //Serial.println("init hand");
     if (!_hand->isRunning()) {
       // рука опустилась => подъезжаем к маяку
-      _distMeter->enable();
+      // _distMeter->enable();
       int dist = _distMeter->getDist();
       if (dist > _maxDistToStartProg) {
         _distMeter->disable();
