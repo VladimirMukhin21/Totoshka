@@ -75,7 +75,7 @@ void ProgHillWithPipes::tick() {
   else if (_phase == INIT_TAIL_UP) {
     if (!_tail->isRunning()) {
       // хвост поднялся => подъезжаем пока не встанем на дыбы
-      _truck->goWhilePitchInRange(_driveSpeed, -8000, 10000, false, 5000);
+      _truck->goWhilePitchInRange(_driveSpeed, -8000, 12000, false, 5000);
       _phase = DRIVING_BOW_UP;
     }
   }
