@@ -178,7 +178,7 @@ void loop() {
       return;
     }
     else if (payload.key == 0xB1) {  // Езда прямо медленно
-      truck.goStraight(60);
+      truck.goStraight(70);
       return;
     }
     else if (payload.key == 0xC1) {  // Езда прямо задом
