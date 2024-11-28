@@ -56,7 +56,7 @@ private:
 
   const byte _clawOpenPos = 110;            // разжатие руки при захвате маяка
   const byte _clawOpenRotatePipePos = 105;  // разжатие руки при вращении трубок
-  const byte _clawTakeTinPos = 80;          // сжатие руки при захвате маяка
+  const byte _clawTakeTinPos = 79;          // сжатие руки при захвате маяка
   const byte _clenchPipePos = 80;           // сжатие руки при вращении трубок
 
   const byte _shoulderRideTheLinePos = 115;
@@ -69,7 +69,7 @@ private:
   const byte _shoulderToLowOil = 150; // 148;
   const byte _elbowToLowOil = 118; // 120;
   const byte _shoulderToHighOil = 94; // 101
-  const byte _elbowToHighOil = 69; // 77
+  const byte _elbowToHighOil = 63; // 77
 
   const byte _shoulderAngleTakeTinFromHighPos = 60;
   const byte _elbowAngleTakeTinFromHighPos = 90;
@@ -188,7 +188,7 @@ void Hand::tinUp() {
   if (_shoulderAngle.toDeg() > 100) {
     byte _shoulderAngleTakeTin = _shoulderAngle.toDeg() - 35;
     byte _elbowAngleTakeTin = _shoulderAngleTakeTin - 24;
-    handToPos(_shoulderAngleTakeTin, _elbowAngleTakeTin, _rotateCenterPos);
+    handToPos(_shoulderAngleTakeTin, _elbowAngleTakeTin, _rotateCenterPos, -1, 5, 5);
     // TIN_UP_FROM_LOW_POS
   }
   else {

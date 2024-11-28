@@ -42,7 +42,7 @@ private:
   const byte _tailDownDeg = 15;
   const int _driveSpeed = 230;  //180;
   const int _slowDriveSpeed = 50;
-  const int _distToTake = 65;  // 75
+  const int _distToTake = 62;  // 75
 
   const byte _shoulderInitPos = 60;
   const byte _elbowInitPos = 30;
