@@ -306,7 +306,10 @@ void loop() {
       progHoof.start(60);
       return;
     }
-    else if (payload.key == 0xC4) {  // СВОБОДНО
+    else if (payload.key == 0xC4) {  // рестарт датчика расстояния
+      distMeter.disable();
+      delay(50);
+      distMeter.enable();
     }
     else if (payload.key == 0xD4) {  // Калибровка гироскопа
       // не занимать! тут калибровка гироскопа на син + бел + D4
