@@ -25,7 +25,7 @@ class Recognized(object):
 
 class SignDetector(object):
     MIN_CONTOUR_AREA = 5000
-    MIN_ACCURACY = 60
+    MIN_ACCURACY = 55
 
     BLUE_COLOR = 'blue'
     RED_COLOR = 'red'
@@ -61,13 +61,17 @@ class SignDetector(object):
                 img = cv2.inRange(img, (103-20,50,50), (103+20,255,255))
             else:
                 # img = cv2.inRange(img, (105,50,50), (116,240,240)) # робот
-                img = cv2.inRange(img, (63,182,116), (143,255,196)) # ноут Г
+                # img = cv2.inRange(img, (63,182,116), (143,255,196)) # ноут Г
+                img = cv2.inRange(img, (58,187,201), (138,255,255)) # робот В
         elif color == self.RED_COLOR:
             # hsv=(3,218,188) # bgr=(28,42,188)
             if isSample:
                 img = cv2.inRange(img, (0,50,50), (3+20,255,255))
             else:
-                img = cv2.inRange(img, (125,75,75), (179,205,170))
+                # img = cv2.inRange(img, (125,75,75), (179,205,170))
+                img1 = cv2.inRange(img, (0,184,189), (40,255,255)) # робот В
+                img2 = cv2.inRange(img, (139,170,184), (179,255,255)) # робот В
+                img = cv2.bitwise_or(img1, img2)
         elif color == self.PURPLE_COLOR:
             img = cv2.inRange(img, (140,50,50), (255,255,255))
         else:

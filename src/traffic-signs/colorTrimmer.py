@@ -25,7 +25,7 @@ def onMouse(event, x, y, flags, param):
         cv2.setTrackbarPos('minV', 'result', 0)
         cv2.setTrackbarPos('maxV', 'result', 255)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 cv2.namedWindow('result')
 
