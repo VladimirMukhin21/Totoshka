@@ -144,15 +144,18 @@ void loop() {
       hand.handToBack();
     }
     else if (!payload.upBlueButton) {
-      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1);  // altMode
+      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 1, 0);  // altMode
     }
   }
   else if (payload.frontSwitch == 1) {
     if (payload.upGreenButton) {  // Рука на спину
       hand.handToBack();
     }
+    else if (payload.leftStick.pressed) {  // Управление плечом
+      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0, 1);
+    }
     else if (!payload.upBlueButton) {
-      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0);  // НЕ altMode
+      hand.operate(payload.leftStick.vert, payload.leftStick.horiz, 0, 0);  // НЕ altMode и НЕ управление плечом
     }
   }
   else if (payload.frontSwitch == 2) {

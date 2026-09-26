@@ -6,7 +6,7 @@
 class Hand {
 public:
   void init(byte shoulderPin, byte elbowPin, byte rotatePin, byte clawPin);
-  void operate(byte stickVert, byte stickHoriz, bool altMode);
+  void operate(byte stickVert, byte stickHoriz, bool altMode, bool buttonMode);
   void handToBack();
   void handToUp();
   void tinUp();
@@ -121,7 +121,7 @@ void Hand::init(byte shoulderPin, byte elbowPin, byte rotatePin, byte clawPin) {
   _claw.write(_clawAngle.toDeg());
 }
 
-void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
+void Hand::operate(byte stickVert, byte stickHoriz, bool altMode, bool buttonMode) {
   /*if(_shoulderAngle.toDeg() > shoulderThr){
     constrain(_elbowAngle.toDeg() ,0 ,_elbowUpHandPos);
     }*/
@@ -138,6 +138,14 @@ void Hand::operate(byte stickVert, byte stickHoriz, bool altMode) {
     if (speedHoriz != 0) {
       _rotateAngle.addPoints(speedHoriz);
       _rotate.write(_rotateAngle.toDeg());
+      _mode = NONE;
+    }
+  }
+  else if (buttonMode) {
+    int speedVert = map(filterStickDeadZoneVert(stickVert), _minStick, _maxStick + 1, -_maxSpeed, _maxSpeed + 1);
+    if (speedVert != 0) {
+      _shoulderAngle.addPoints(-speedVert);
+      _shoulder.write(_shoulderAngle.toDeg());
       _mode = NONE;
     }
   }
