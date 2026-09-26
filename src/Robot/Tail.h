@@ -23,7 +23,7 @@ private:
 
   Servo _coccyx;
 
-  Angle _coccyxAngle = Angle(UP_ANGLE, DOWN_ANGLE, UP_ANGLE, 40);  // вниз-вверх; макс вверх для больших колес - 140, для маленьких - 145
+  Angle _coccyxAngle = Angle(UP_ANGLE, DOWN_ANGLE, UP_ANGLE, 40); // 40 - быстрая скорость, 50 - медленная // вниз-вверх; макс вверх для больших колес - 140, для маленьких - 145
 
   //#define DEBUG
 #ifdef DEBUG

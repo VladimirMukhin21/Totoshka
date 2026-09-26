@@ -43,7 +43,7 @@ private:
 
   const byte _minStick = 0;
   const byte _maxStick = 255;
-  const byte _maxSpeed = 7;
+  const byte _maxSpeed = 7; // 7 - быстрая скорость, 6 - медленная
 
   //const byte _shoulderThr = 50;
   const byte _shoulderHandToBackPos = 30;

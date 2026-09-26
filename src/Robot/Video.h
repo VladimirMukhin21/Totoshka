@@ -20,7 +20,7 @@ private:
 void Video::init(byte switcherPin, byte frontServoPin, byte topServoPin) {
   _switcherPin = switcherPin;
   _front.init(frontServoPin, 0, 0, 180, 25);
-  _top.init(topServoPin, 90, 10, 180, 25);
+  _top.init(topServoPin, 90, 10, 175, 25);
   pinMode(_switcherPin, OUTPUT);
 }
 
