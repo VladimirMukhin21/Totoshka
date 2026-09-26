@@ -8,9 +8,10 @@ class Timer(object):
     targetTime = None
     timeLeft = None
 
-    def start(self, sec = 600):
+    def start(self, sec = 603):     # +3 сек для обратного отсчета
         self.clear()
-        self.targetTime = datetime.now() + timedelta(seconds=sec+1)
+        self.totalSec = sec + 1
+        self.targetTime = datetime.now() + timedelta(seconds=self.totalSec)
         self.enabled = True
     
     def hide(self):
@@ -33,7 +34,7 @@ class Timer(object):
         min = currentTimeLeft // 60
         sec = currentTimeLeft % 60
 
-        if min < 1:
+        if (min < 1) or (self.totalSec - currentTimeLeft <= 3):
             color = const.RED
         elif min < 5:
             color = const.YELLOW
@@ -69,5 +70,5 @@ class Timer(object):
             self.timeLeft = self.getTimeLeft()
             self.paused = True
         else:
-            self.start(self.timeLeft)
+            self.targetTime = datetime.now() + timedelta(seconds=self.timeLeft)
             self.paused = False
