@@ -17,6 +17,7 @@
 #include "ProgTruncatedPyramid.h"
 #include "ProgHoof.h"
 #include "ProgCorridor.h"
+#include "ProgBoard.h"
 
 #define L_EN_PIN 38
 #define L_INA_PIN 40  // 41
@@ -60,6 +61,7 @@ ProgHillWithPipesAutoTin progHillWithPipesAutoTin;
 ProgTruncatedPyramid progTruncatedPyramid;
 ProgHoof progHoof;
 ProgCorridor progCorridor;
+ProgBoard progBoard;
 
 unsigned long lastRadioTime = millis();
 
@@ -96,6 +98,7 @@ void setup() {
   progTruncatedPyramid.init(truck);
   progHoof.init(truck);
   progCorridor.init(truck, distMeter);
+  progBoard.init(truck);
 
   pinMode(LED_PIN, OUTPUT);
 }
@@ -269,7 +272,9 @@ void loop() {
     else if (payload.key == 0xD1) {  // Рука на вращение верхних вентилей нефти
       hand.handToHighOil();
     }
-    else if (payload.key == 0xA2) {  // СВОБОДНО
+    else if (payload.key == 0xA2) {  // Доска
+      progBoard.start();
+      return;
     }
     else if (payload.key == 0xB2) {  // Провалы налево
       progTruncatedPyramid.start(-90);
@@ -329,7 +334,8 @@ bool isAnyProgRunning() {
          || progHillWithPipesAutoTin.isRunning()
          || progTruncatedPyramid.isRunning()
          || progHoof.isRunning()
-         || progCorridor.isRunning();
+         || progCorridor.isRunning()
+         || progBoard.isRunning();
 }
 
 void stopAll() {
@@ -347,6 +353,7 @@ void stopAll() {
   progTruncatedPyramid.stop();
   progHoof.stop();
   progCorridor.stop();
+  progBoard.stop();
 }
 
 void tickAll() {
@@ -365,4 +372,5 @@ void tickAll() {
   progTruncatedPyramid.tick();
   progHoof.tick();
   progCorridor.tick();
+  progBoard.tick();
 }
